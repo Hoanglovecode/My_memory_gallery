@@ -17,6 +17,10 @@ const PhotoSchema = new mongoose.Schema({
   imageUrl: {
     type: String,
     required: true
+  },
+  order: {
+    type: Number,
+    default: 0
   }
 }, {
   timestamps: true

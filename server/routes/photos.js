@@ -21,9 +21,35 @@ const formatPhotoUrl = (photo, req) => {
 // @access  Public
 router.get('/', async (req, res) => {
   try {
-    const photos = await Photo.find().sort({ createdAt: -1 });
+    const photos = await Photo.find().sort({ order: 1, createdAt: -1 });
     const formattedPhotos = photos.map(photo => formatPhotoUrl(photo, req));
     res.json(formattedPhotos);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ msg: err.message || 'Server error' });
+  }
+});
+
+// @route   POST api/photos/reorder
+// @desc    Reorder photos in database
+// @access  Private
+router.post('/reorder', auth, async (req, res) => {
+  const { ids } = req.body;
+
+  try {
+    if (!ids || !Array.isArray(ids)) {
+      return res.status(400).json({ msg: 'Please provide an array of photo IDs' });
+    }
+
+    const bulkOps = ids.map((id, index) => ({
+      updateOne: {
+        filter: { _id: id },
+        update: { $set: { order: index } }
+      }
+    }));
+
+    await Photo.bulkWrite(bulkOps);
+    res.json({ msg: 'Photos reordered successfully' });
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ msg: err.message || 'Server error' });

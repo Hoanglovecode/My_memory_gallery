@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Lock, Plus, Trash2, Save, CheckCircle, Upload, Edit2, Film, Music, Sparkles } from 'lucide-react';
+import { Lock, Plus, Trash2, Save, CheckCircle, Upload, Edit2, Film, Music, Sparkles, GripVertical } from 'lucide-react';
 import type { Photo, Letter, Video } from '../types';
 import { API_BASE_URL } from '../config';
 
@@ -132,6 +132,47 @@ export default function AdminDashboard({
   // Editing Photo States
   const [editingPhoto, setEditingPhoto] = useState<Photo | null>(null);
   const [editUploadMode, setEditUploadMode] = useState<'file' | 'url'>('file');
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = async (e: React.DragEvent, targetIndex: number) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === targetIndex) return;
+
+    const updatedPhotos = [...photos];
+    const [draggedItem] = updatedPhotos.splice(draggedIndex, 1);
+    updatedPhotos.splice(targetIndex, 0, draggedItem);
+
+    // Optimistically update frontend state
+    setPhotos(updatedPhotos);
+
+    try {
+      const ids = updatedPhotos.map(p => p.id);
+      const response = await fetch(`${API_BASE_URL}/photos/reorder`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ ids })
+      });
+
+      if (!response.ok) {
+        throw new Error('Không thể lưu thứ tự ảnh.');
+      }
+      showToast('Đã cập nhật thứ tự ảnh thành công! ↔️');
+    } catch (err: any) {
+      showToast(err.message || 'Lỗi lưu thứ tự', 'error');
+    }
+
+    setDraggedIndex(null);
+  };
+
 
   const handleStartEdit = (photo: Photo) => {
     setEditingPhoto(photo);
@@ -760,18 +801,31 @@ export default function AdminDashboard({
 
           {/* Danh sách ảnh */}
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {photos.map(photo => (
-              <div key={photo.id} className="bg-white rounded-2xl shadow-md overflow-hidden group hover:shadow-xl transition-shadow relative border border-gray-100">
-                <div className="h-48 overflow-hidden">
-                  <img src={photo.imageUrl} alt="preview" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+            {photos.map((photo, index) => (
+              <div 
+                key={photo.id} 
+                className={`bg-white rounded-2xl shadow-md overflow-hidden group hover:shadow-xl transition-all duration-300 relative border border-gray-100 cursor-move ${draggedIndex === index ? 'opacity-40 border-dashed border-theme-accent1 scale-95' : ''}`}
+                draggable
+                onDragStart={(e) => handleDragStart(e, index)}
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, index)}
+              >
+                {/* Drag Handle Indicator */}
+                <div className="absolute top-3 left-3 bg-black/50 backdrop-blur-xs text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none" title="Giữ kéo để đổi thứ tự">
+                  <GripVertical size={16} />
                 </div>
-                <div className="p-4">
+                
+                <div className="h-48 overflow-hidden select-none">
+                  <img src={photo.imageUrl} alt="preview" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 pointer-events-none" />
+                </div>
+                <div className="p-4 select-none">
                   <h4 className="font-bold text-lg text-gray-800 line-clamp-1">{photo.title}</h4>
                   <p className="text-sm text-gray-500 mt-1">{photo.eventDate}</p>
                 </div>
                 {/* Nút thao tác hiện ra khi hover */}
                 <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-1 group-hover:translate-y-0">
                   <button 
+                    type="button"
                     onClick={() => handleStartEdit(photo)}
                     className="bg-blue-500/90 backdrop-blur-xs text-white p-2 rounded-full hover:bg-blue-600 shadow-lg cursor-pointer transition-transform hover:scale-110 flex items-center justify-center"
                     title="Chỉnh sửa ảnh"
@@ -779,6 +833,7 @@ export default function AdminDashboard({
                     <Edit2 size={16}/>
                   </button>
                   <button 
+                    type="button"
                     onClick={() => handleDeletePhoto(photo.id)}
                     className="bg-red-500/90 backdrop-blur-xs text-white p-2 rounded-full hover:bg-red-600 shadow-lg cursor-pointer transition-transform hover:scale-110 flex items-center justify-center"
                     title="Xóa ảnh"
