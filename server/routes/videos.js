@@ -9,8 +9,9 @@ const formatVideoUrl = (video, req) => {
   const v = video.toObject ? video.toObject() : { ...video };
   v.id = v._id;
   if (v.videoUrl && v.videoUrl.startsWith('/uploads/')) {
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-    v.videoUrl = `${baseUrl}${v.videoUrl}`;
+    const host = req.get('host');
+    const protocol = host.includes('localhost') ? 'http' : 'https';
+    v.videoUrl = `${protocol}://${host}${v.videoUrl}`;
   }
   return v;
 };

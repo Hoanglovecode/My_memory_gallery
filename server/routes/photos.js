@@ -9,8 +9,9 @@ const formatPhotoUrl = (photo, req) => {
   const p = photo.toObject ? photo.toObject() : { ...photo };
   p.id = p._id;
   if (p.imageUrl && p.imageUrl.startsWith('/uploads/')) {
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-    p.imageUrl = `${baseUrl}${p.imageUrl}`;
+    const host = req.get('host');
+    const protocol = host.includes('localhost') ? 'http' : 'https';
+    p.imageUrl = `${protocol}://${host}${p.imageUrl}`;
   }
   return p;
 };
