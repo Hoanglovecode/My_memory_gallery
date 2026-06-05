@@ -42,7 +42,7 @@ router.post('/', auth, async (req, res) => {
     }
 
     // Save base64 video to file if applicable
-    const savedVideoUrl = saveBase64File(videoUrl, 'video');
+    const savedVideoUrl = await saveBase64File(videoUrl, 'video');
 
     const newVideo = new Video({
       title: title || 'Video kỷ niệm',
@@ -72,7 +72,7 @@ router.put('/:id', auth, async (req, res) => {
     }
 
     // Save base64 video to file if new one is provided
-    const savedVideoUrl = videoUrl ? saveBase64File(videoUrl, 'video') : undefined;
+    const savedVideoUrl = videoUrl ? await saveBase64File(videoUrl, 'video') : undefined;
 
     // Update fields
     video.title = title || 'Video kỷ niệm';

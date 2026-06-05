@@ -42,7 +42,7 @@ router.post('/', auth, async (req, res) => {
     }
 
     // Save base64 image to file if applicable
-    const savedImageUrl = saveBase64File(imageUrl, 'photo');
+    const savedImageUrl = await saveBase64File(imageUrl, 'photo');
 
     const newPhoto = new Photo({
       title: title || 'Ảnh kỷ niệm',
@@ -72,7 +72,7 @@ router.put('/:id', auth, async (req, res) => {
     }
 
     // Save base64 image to file if new one is provided
-    const savedImageUrl = imageUrl ? saveBase64File(imageUrl, 'photo') : undefined;
+    const savedImageUrl = imageUrl ? await saveBase64File(imageUrl, 'photo') : undefined;
 
     // Update fields
     photo.title = title || 'Ảnh kỷ niệm';
