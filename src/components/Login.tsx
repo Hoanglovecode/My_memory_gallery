@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { View } from '../types';
 import { API_BASE_URL } from '../config';
+import { Eye, EyeOff } from 'lucide-react';
 
 interface LoginProps {
   setIsAdmin: (isAdmin: boolean) => void;
@@ -12,6 +13,7 @@ export default function Login({ setIsAdmin, navigate }: LoginProps) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,13 +64,22 @@ export default function Login({ setIsAdmin, navigate }: LoginProps) {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Mật khẩu</label>
-          <input
-            type="password"
-            className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:border-theme-dark focus:ring-2 focus:ring-theme-accent1 transition-all"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            required
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              className="w-full p-4 pr-12 border border-gray-200 rounded-xl focus:outline-none focus:border-theme-dark focus:ring-2 focus:ring-theme-accent1 transition-all"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              required
+            />
+            <button
+              type="button"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none cursor-pointer flex items-center justify-center"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+          </div>
         </div>
         <button
           type="submit"
