@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Lock, Plus, Trash2, Save, CheckCircle, Upload, Edit2, Film } from 'lucide-react';
+import { Lock, Plus, Trash2, Save, CheckCircle, Upload, Edit2, Film, Music, Sparkles } from 'lucide-react';
 import type { Photo, Letter, Video } from '../types';
+import { API_BASE_URL } from '../config';
 
 interface AdminDashboardProps {
   photos: Photo[];
@@ -9,6 +10,20 @@ interface AdminDashboardProps {
   setLetter: React.Dispatch<React.SetStateAction<Letter>>;
   videos: Video[];
   setVideos: React.Dispatch<React.SetStateAction<Video[]>>;
+  musicUrl: string;
+  setMusicUrl: React.Dispatch<React.SetStateAction<string>>;
+  musicTitle: string;
+  setMusicTitle: React.Dispatch<React.SetStateAction<string>>;
+  chatbotEnabled: boolean;
+  setChatbotEnabled: React.Dispatch<React.SetStateAction<boolean>>;
+  chatbotName: string;
+  setChatbotName: React.Dispatch<React.SetStateAction<string>>;
+  chatbotWelcomeMessage: string;
+  setChatbotWelcomeMessage: React.Dispatch<React.SetStateAction<string>>;
+  chatbotSystemPrompt: string;
+  setChatbotSystemPrompt: React.Dispatch<React.SetStateAction<string>>;
+  chatbotApiKey: string;
+  setChatbotApiKey: React.Dispatch<React.SetStateAction<string>>;
 }
 
 interface Toast {
@@ -17,11 +32,82 @@ interface Toast {
   type: 'success' | 'error';
 }
 
-export default function AdminDashboard({ photos, setPhotos, letter, setLetter, videos, setVideos }: AdminDashboardProps) {
-  const [activeTab, setActiveTab] = useState<'photos' | 'letter' | 'videos'>('photos');
+export default function AdminDashboard({ 
+  photos, 
+  setPhotos, 
+  letter, 
+  setLetter, 
+  videos, 
+  setVideos,
+  musicUrl,
+  setMusicUrl,
+  musicTitle,
+  setMusicTitle,
+  chatbotEnabled,
+  setChatbotEnabled,
+  chatbotName,
+  setChatbotName,
+  chatbotWelcomeMessage,
+  setChatbotWelcomeMessage,
+  chatbotSystemPrompt,
+  setChatbotSystemPrompt,
+  chatbotApiKey,
+  setChatbotApiKey
+}: AdminDashboardProps) {
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('admin_token');
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token || ''}`
+    };
+  };
+
+  const [activeTab, setActiveTab] = useState<'photos' | 'letter' | 'videos' | 'music' | 'chatbot'>('photos');
   const [showAddForm, setShowAddForm] = useState(false);
   const [newPhoto, setNewPhoto] = useState({ title: '', description: '', eventDate: '', imageUrl: '' });
   const [uploadMode, setUploadMode] = useState<'file' | 'url'>('file');
+
+  // Music editing states
+  const [editMusicTitle, setEditMusicTitle] = useState(musicTitle);
+  const [editMusicUrl, setEditMusicUrl] = useState(musicUrl);
+  const [musicUploadMode, setMusicUploadMode] = useState<'file' | 'url'>(musicUrl.startsWith('data:audio') ? 'file' : 'url');
+
+  // Chatbot editing states
+  const [editChatbotEnabled, setEditChatbotEnabled] = useState(chatbotEnabled);
+  const [editChatbotName, setEditChatbotName] = useState(chatbotName);
+  const [editChatbotWelcomeMessage, setEditChatbotWelcomeMessage] = useState(chatbotWelcomeMessage);
+  const [editChatbotSystemPrompt, setEditChatbotSystemPrompt] = useState(chatbotSystemPrompt);
+  const [editChatbotApiKey, setEditChatbotApiKey] = useState(chatbotApiKey);
+
+  const [testStatus, setTestStatus] = useState<'idle' | 'testing' | 'success' | 'failed'>('idle');
+  const [testError, setTestError] = useState('');
+
+  const handleTestApiKey = async () => {
+    setTestStatus('testing');
+    setTestError('');
+    try {
+      const response = await fetch(`${API_BASE_URL}/chatbot/test-key`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          apiKey: editChatbotApiKey
+        })
+      });
+      const data = await response.json();
+      if (data.success) {
+        setTestStatus('success');
+        showToast('Kết nối tới Gemini thành công! ✅', 'success');
+      } else {
+        setTestStatus('failed');
+        setTestError(data.error || 'Lỗi không xác định');
+        showToast('Kết nối thất bại! ❌', 'error');
+      }
+    } catch (err: any) {
+      setTestStatus('failed');
+      setTestError(err.message || 'Lỗi kết nối server');
+      showToast('Lỗi kết nối server! ❌', 'error');
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -75,16 +161,44 @@ export default function AdminDashboard({ photos, setPhotos, letter, setLetter, v
     reader.readAsDataURL(file);
   };
 
-  const handleUpdatePhoto = (e: React.FormEvent) => {
+  const handleUpdatePhoto = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editingPhoto || !editingPhoto.imageUrl || !editingPhoto.title) {
-      showToast('Vui lòng điền đầy đủ các thông tin bắt buộc!', 'error');
+    if (!editingPhoto || !editingPhoto.imageUrl) {
+      showToast('Vui lòng chọn hoặc nhập nguồn ảnh!', 'error');
       return;
     }
 
-    setPhotos(photos.map(p => p.id === editingPhoto.id ? editingPhoto : p));
-    setEditingPhoto(null);
-    showToast('Đã cập nhật thông tin ảnh thành công! 📝');
+    try {
+      const response = await fetch(`${API_BASE_URL}/photos/${editingPhoto.id}`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          title: editingPhoto.title,
+          description: editingPhoto.description,
+          eventDate: editingPhoto.eventDate,
+          imageUrl: editingPhoto.imageUrl
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.msg || 'Không thể cập nhật ảnh.');
+      }
+
+      setPhotos(photos.map(p => p.id === editingPhoto.id ? {
+        id: data._id,
+        title: data.title,
+        description: data.description,
+        eventDate: data.eventDate,
+        imageUrl: data.imageUrl
+      } : p));
+      
+      setEditingPhoto(null);
+      showToast('Đã cập nhật thông tin ảnh thành công! 📝');
+    } catch (err: any) {
+      showToast(err.message || 'Lỗi kết nối server', 'error');
+    }
   };
 
   // --- VIDEO MANAGEMENT ---
@@ -98,9 +212,9 @@ export default function AdminDashboard({ photos, setPhotos, letter, setLetter, v
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Limit to 15MB for video storage (using IndexedDB)
-    if (file.size > 15 * 1024 * 1024) {
-      showToast('Kích thước video quá lớn! Vui lòng chọn file video dưới 15.0 MB.', 'error');
+    // Limit to 50MB for video storage (using IndexedDB)
+    if (file.size > 50 * 1024 * 1024) {
+      showToast('Kích thước video quá lớn! Vui lòng chọn file video dưới 50.0 MB.', 'error');
       return;
     }
 
@@ -118,8 +232,8 @@ export default function AdminDashboard({ photos, setPhotos, letter, setLetter, v
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 15 * 1024 * 1024) {
-      showToast('Kích thước video quá lớn! Vui lòng chọn file video dưới 15.0 MB.', 'error');
+    if (file.size > 50 * 1024 * 1024) {
+      showToast('Kích thước video quá lớn! Vui lòng chọn file video dưới 50.0 MB.', 'error');
       return;
     }
 
@@ -133,25 +247,46 @@ export default function AdminDashboard({ photos, setPhotos, letter, setLetter, v
     reader.readAsDataURL(file);
   };
 
-  const handleAddVideo = (e: React.FormEvent) => {
+  const handleAddVideo = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newVideo.videoUrl || !newVideo.title) {
-      showToast('Vui lòng điền đầy đủ các thông tin bắt buộc!', 'error');
+    if (!newVideo.videoUrl) {
+      showToast('Vui lòng chọn hoặc nhập nguồn video!', 'error');
       return;
     }
 
-    const videoToAdd: Video = {
-      id: Date.now(),
-      title: newVideo.title,
-      description: newVideo.description,
-      eventDate: newVideo.eventDate || 'Hôm nay',
-      videoUrl: newVideo.videoUrl
-    };
+    try {
+      const response = await fetch(`${API_BASE_URL}/videos`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          title: newVideo.title,
+          description: newVideo.description,
+          eventDate: newVideo.eventDate || 'Hôm nay',
+          videoUrl: newVideo.videoUrl
+        })
+      });
 
-    setVideos([videoToAdd, ...videos]);
-    setNewVideo({ title: '', description: '', eventDate: '', videoUrl: '' });
-    setShowAddVideoForm(false);
-    showToast('Đã thêm video mới vào album! 🎥');
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.msg || 'Không thể thêm video mới.');
+      }
+
+      const videoToAdd: Video = {
+        id: data._id,
+        title: data.title,
+        description: data.description,
+        eventDate: data.eventDate,
+        videoUrl: data.videoUrl
+      };
+
+      setVideos([videoToAdd, ...videos]);
+      setNewVideo({ title: '', description: '', eventDate: '', videoUrl: '' });
+      setShowAddVideoForm(false);
+      showToast('Đã thêm video mới vào album! 🎥');
+    } catch (err: any) {
+      showToast(err.message || 'Lỗi kết nối server', 'error');
+    }
   };
 
   const handleStartVideoEdit = (video: Video) => {
@@ -163,22 +298,63 @@ export default function AdminDashboard({ photos, setPhotos, letter, setLetter, v
     }
   };
 
-  const handleUpdateVideo = (e: React.FormEvent) => {
+  const handleUpdateVideo = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editingVideo || !editingVideo.videoUrl || !editingVideo.title) {
-      showToast('Vui lòng điền đầy đủ thông tin bắt buộc!', 'error');
+    if (!editingVideo || !editingVideo.videoUrl) {
+      showToast('Vui lòng chọn hoặc nhập nguồn video!', 'error');
       return;
     }
 
-    setVideos(videos.map(v => v.id === editingVideo.id ? editingVideo : v));
-    setEditingVideo(null);
-    showToast('Đã cập nhật video thành công! 📝');
+    try {
+      const response = await fetch(`${API_BASE_URL}/videos/${editingVideo.id}`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          title: editingVideo.title,
+          description: editingVideo.description,
+          eventDate: editingVideo.eventDate,
+          videoUrl: editingVideo.videoUrl
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.msg || 'Không thể cập nhật video.');
+      }
+
+      setVideos(videos.map(v => v.id === editingVideo.id ? {
+        id: data._id,
+        title: data.title,
+        description: data.description,
+        eventDate: data.eventDate,
+        videoUrl: data.videoUrl
+      } : v));
+      
+      setEditingVideo(null);
+      showToast('Đã cập nhật video thành công! 📝');
+    } catch (err: any) {
+      showToast(err.message || 'Lỗi kết nối server', 'error');
+    }
   };
 
-  const handleDeleteVideo = (id: number) => {
+  const handleDeleteVideo = async (id: any) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa video này?')) {
-      setVideos(videos.filter(v => v.id !== id));
-      showToast('Đã xóa video thành công!', 'success');
+      try {
+        const response = await fetch(`${API_BASE_URL}/videos/${id}`, {
+          method: 'DELETE',
+          headers: getAuthHeaders()
+        });
+
+        if (!response.ok) {
+          throw new Error('Không thể xóa video. Vui lòng thử lại.');
+        }
+
+        setVideos(videos.filter(v => v.id !== id));
+        showToast('Đã xóa video thành công!', 'success');
+      } catch (err: any) {
+        showToast(err.message || 'Lỗi kết nối server', 'error');
+      }
     }
   };
   
@@ -193,38 +369,185 @@ export default function AdminDashboard({ photos, setPhotos, letter, setLetter, v
     }, 3000);
   };
 
-  // Xử lý Xóa ảnh
-  const handleDeletePhoto = (id: number) => {
+  // --- BACKGROUND MUSIC HANDLERS ---
+  const handleMusicFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Check size limit: 12 MB
+    if (file.size > 12 * 1024 * 1024) {
+      showToast('Kích thước file nhạc quá lớn! Vui lòng chọn file < 12 MB để lưu trữ tốt nhất.', 'error');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (event.target?.result) {
+        setEditMusicUrl(event.target!.result as string);
+        showToast('Đã nhận diện file nhạc!', 'success');
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSaveMusic = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editMusicTitle || !editMusicUrl) {
+      showToast('Vui lòng điền đầy đủ các thông tin bắt buộc!', 'error');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/settings`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          musicUrl: editMusicUrl,
+          musicTitle: editMusicTitle
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.msg || 'Không thể cập nhật cấu hình nhạc.');
+      }
+
+      setMusicUrl(data.musicUrl);
+      setMusicTitle(data.musicTitle);
+      showToast('Cập nhật nhạc nền thành công! 🎵');
+    } catch (err: any) {
+      showToast(err.message || 'Lỗi kết nối server', 'error');
+    }
+  };
+
+  const handleSaveChatbot = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editChatbotName || !editChatbotWelcomeMessage || !editChatbotSystemPrompt) {
+      showToast('Vui lòng điền đầy đủ các thông tin bắt buộc!', 'error');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/settings`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          chatbotEnabled: editChatbotEnabled,
+          chatbotName: editChatbotName,
+          chatbotWelcomeMessage: editChatbotWelcomeMessage,
+          chatbotSystemPrompt: editChatbotSystemPrompt,
+          chatbotApiKey: editChatbotApiKey
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.msg || 'Không thể cập nhật cấu hình chatbot.');
+      }
+
+      setChatbotEnabled(data.chatbotEnabled);
+      setChatbotName(data.chatbotName);
+      setChatbotWelcomeMessage(data.chatbotWelcomeMessage);
+      setChatbotSystemPrompt(data.chatbotSystemPrompt);
+      setChatbotApiKey(data.chatbotApiKey);
+      showToast('Cập nhật cấu hình chatbot thành công! 🤖');
+    } catch (err: any) {
+      showToast(err.message || 'Lỗi kết nối server', 'error');
+    }
+  };
+
+  const handleDeletePhoto = async (id: any) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa ảnh này?')) {
-      setPhotos(photos.filter(p => p.id !== id));
-      showToast('Đã xóa ảnh khỏi album thành công!', 'success');
+      try {
+        const response = await fetch(`${API_BASE_URL}/photos/${id}`, {
+          method: 'DELETE',
+          headers: getAuthHeaders()
+        });
+
+        if (!response.ok) {
+          throw new Error('Không thể xóa ảnh. Vui lòng thử lại.');
+        }
+
+        setPhotos(photos.filter(p => p.id !== id));
+        showToast('Đã xóa ảnh khỏi album thành công!', 'success');
+      } catch (err: any) {
+        showToast(err.message || 'Lỗi kết nối server', 'error');
+      }
     }
   };
 
   // Xử lý Thêm ảnh
-  const handleAddPhoto = (e: React.FormEvent) => {
+  const handleAddPhoto = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newPhoto.imageUrl || !newPhoto.title) {
-      showToast('Vui lòng điền đầy đủ các thông tin bắt buộc!', 'error');
+    if (!newPhoto.imageUrl) {
+      showToast('Vui lòng chọn hoặc nhập nguồn ảnh!', 'error');
       return;
     }
     
-    const photoToAdd: Photo = {
-      id: Date.now(), // tạo ID duy nhất cho frontend
-      title: newPhoto.title,
-      description: newPhoto.description,
-      eventDate: newPhoto.eventDate || 'Hôm nay',
-      imageUrl: newPhoto.imageUrl
-    };
-    
-    setPhotos([photoToAdd, ...photos]); // Thêm lên đầu danh sách
-    setNewPhoto({ title: '', description: '', eventDate: '', imageUrl: '' }); // Reset form
-    setShowAddForm(false);
-    showToast('Đã thêm ảnh mới vào album thành công! 🎉');
+    try {
+      const response = await fetch(`${API_BASE_URL}/photos`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          title: newPhoto.title,
+          description: newPhoto.description,
+          eventDate: newPhoto.eventDate || 'Hôm nay',
+          imageUrl: newPhoto.imageUrl
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.msg || 'Không thể thêm ảnh mới.');
+      }
+
+      const photoToAdd: Photo = {
+        id: data._id,
+        title: data.title,
+        description: data.description,
+        eventDate: data.eventDate,
+        imageUrl: data.imageUrl
+      };
+      
+      setPhotos([photoToAdd, ...photos]); // Thêm lên đầu danh sách
+      setNewPhoto({ title: '', description: '', eventDate: '', imageUrl: '' }); // Reset form
+      setShowAddForm(false);
+      showToast('Đã thêm ảnh mới vào album thành công! 🎉');
+    } catch (err: any) {
+      showToast(err.message || 'Lỗi kết nối server', 'error');
+    }
   };
 
-  const handleSaveLetter = () => {
-    showToast('Đã cập nhật và lưu thư tình thành công! ❤️');
+  const handleSaveLetter = async () => {
+    if (!letter.title || !letter.content) {
+      showToast('Vui lòng điền đầy đủ tiêu đề và nội dung thư!', 'error');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/letters`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          title: letter.title,
+          content: letter.content
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.msg || 'Không thể lưu thư tình.');
+      }
+
+      setLetter(data);
+      showToast('Đã cập nhật và lưu thư tình thành công! ❤️');
+    } catch (err: any) {
+      showToast(err.message || 'Lỗi kết nối server', 'error');
+    }
   };
 
   return (
@@ -276,6 +599,22 @@ export default function AdminDashboard({ photos, setPhotos, letter, setLetter, v
           }`}
         >
           Chỉnh sửa Thư Tình
+        </button>
+        <button 
+          onClick={() => setActiveTab('music')} 
+          className={`pb-3 px-6 font-bold text-lg transition-colors cursor-pointer ${
+            activeTab === 'music' ? 'text-theme-dark border-b-4 border-theme-dark' : 'text-gray-400 hover:text-theme-dark'
+          }`}
+        >
+          Cấu hình Nhạc Nền
+        </button>
+        <button 
+          onClick={() => setActiveTab('chatbot')} 
+          className={`pb-3 px-6 font-bold text-lg transition-colors cursor-pointer ${
+            activeTab === 'chatbot' ? 'text-theme-dark border-b-4 border-theme-dark' : 'text-gray-400 hover:text-theme-dark'
+          }`}
+        >
+          Cấu hình Chatbot
         </button>
       </div>
 
@@ -378,11 +717,10 @@ export default function AdminDashboard({ photos, setPhotos, letter, setLetter, v
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Tiêu đề *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tiêu đề</label>
                   <input 
                     type="text" 
                     placeholder="Ví dụ: Kỷ niệm Đà Lạt" 
-                    required
                     value={newPhoto.title} 
                     onChange={e => setNewPhoto({...newPhoto, title: e.target.value})}
                     className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-theme-accent1 outline-none focus:border-theme-dark transition-all"
@@ -523,7 +861,7 @@ export default function AdminDashboard({ photos, setPhotos, letter, setLetter, v
                         <label className="border-2 border-dashed border-gray-300 rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer hover:border-theme-accent2 hover:bg-theme-main/10 transition-all group">
                           <Upload className="text-gray-400 group-hover:text-theme-dark transition-colors mb-2" size={32} />
                           <span className="font-bold text-gray-600 group-hover:text-theme-dark transition-colors">Chọn video từ máy tính</span>
-                          <span className="text-xs text-gray-400 mt-1">Hỗ trợ MP4, WEBM (Tối đa 15.0MB)</span>
+                          <span className="text-xs text-gray-400 mt-1">Hỗ trợ MP4, WEBM (Tối đa 50.0MB)</span>
                           <input 
                             type="file" 
                             accept="video/*" 
@@ -552,11 +890,10 @@ export default function AdminDashboard({ photos, setPhotos, letter, setLetter, v
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Tiêu đề video *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tiêu đề video</label>
                   <input 
                     type="text" 
                     placeholder="Ví dụ: Nụ cười của em" 
-                    required
                     value={newVideo.title} 
                     onChange={e => setNewVideo({...newVideo, title: e.target.value})}
                     className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-theme-accent1 outline-none focus:border-theme-dark transition-all"
@@ -664,6 +1001,252 @@ export default function AdminDashboard({ photos, setPhotos, letter, setLetter, v
         </div>
       )}
 
+      {/* Tùy chọn Nhạc Nền */}
+      {activeTab === 'music' && (
+        <div className="bg-white p-8 rounded-2xl shadow-md border border-gray-100 animate-fade-in">
+          <h3 className="text-2xl font-bold text-theme-dark mb-6 flex items-center gap-2">
+            <Music size={24} className="text-theme-accent2" /> Cấu hình Nhạc nền ứng dụng
+          </h3>
+          
+          <form onSubmit={handleSaveMusic} className="grid grid-cols-1 gap-6">
+            <div>
+              <label className="block font-bold text-gray-700 mb-2">Tên bài hát *</label>
+              <input 
+                type="text" 
+                required
+                placeholder="Ví dụ: Lối Nhỏ - Đen Vâu"
+                value={editMusicTitle} 
+                onChange={(e) => setEditMusicTitle(e.target.value)}
+                className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-theme-accent1 outline-none focus:border-theme-dark transition-all font-medium animate-fade-in"
+              />
+            </div>
+
+            <div>
+              <label className="block font-bold text-gray-700 mb-2">Nguồn nhạc *</label>
+              <div className="flex gap-2 p-1 bg-gray-100 rounded-xl w-fit mb-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMusicUploadMode('file');
+                    setEditMusicUrl('');
+                  }}
+                  className={`px-4 py-2 rounded-lg text-sm font-bold transition-all cursor-pointer ${
+                    musicUploadMode === 'file' 
+                      ? 'bg-white text-theme-dark shadow-xs' 
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  Tải file từ máy (.mp3, .wav)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMusicUploadMode('url');
+                    setEditMusicUrl('');
+                  }}
+                  className={`px-4 py-2 rounded-lg text-sm font-bold transition-all cursor-pointer ${
+                    musicUploadMode === 'url' 
+                      ? 'bg-white text-theme-dark shadow-xs' 
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  Nhập link URL trực tiếp
+                </button>
+              </div>
+
+              {musicUploadMode === 'file' ? (
+                <div>
+                  {editMusicUrl && editMusicUrl.startsWith('data:audio') ? (
+                    <div className="relative rounded-2xl overflow-hidden border border-gray-200 p-6 bg-gray-50 flex flex-col items-center justify-center gap-3">
+                      <audio src={editMusicUrl} controls className="w-full max-w-md" />
+                      <button
+                        type="button"
+                        onClick={() => setEditMusicUrl('')}
+                        className="bg-red-500 text-white px-4 py-2 rounded-xl hover:bg-red-600 shadow-md transition-all cursor-pointer text-xs font-bold"
+                      >
+                        Xóa file chọn lại
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="border-2 border-dashed border-gray-300 rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer hover:border-theme-accent2 hover:bg-theme-main/10 transition-all group">
+                      <Upload className="text-gray-400 group-hover:text-theme-dark transition-colors mb-2" size={32} />
+                      <span className="font-bold text-gray-600 group-hover:text-theme-dark transition-colors">Chọn file nhạc từ máy tính</span>
+                      <span className="text-xs text-gray-400 mt-1">Hỗ trợ các file định dạng âm thanh (Khuyên dùng MP3 dưới 12MB)</span>
+                      <input 
+                        type="file" 
+                        accept="audio/*" 
+                        className="hidden" 
+                        onChange={handleMusicFileChange}
+                      />
+                    </label>
+                  )}
+                </div>
+              ) : (
+                <div>
+                  <input 
+                    type="url" 
+                    placeholder="https://example.com/song.mp3" 
+                    required={musicUploadMode === 'url'}
+                    value={editMusicUrl} 
+                    onChange={e => setEditMusicUrl(e.target.value)}
+                    className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-theme-accent1 outline-none focus:border-theme-dark transition-all font-medium"
+                  />
+                  {editMusicUrl && (
+                    <div className="mt-4 p-4 rounded-2xl overflow-hidden border border-gray-200 bg-gray-50 flex items-center justify-center">
+                      <audio src={editMusicUrl} controls className="w-full max-w-md" onError={() => {
+                        console.log("Audio URL load error");
+                      }} />
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="flex justify-end mt-4">
+              <button 
+                type="submit"
+                className="bg-theme-dark text-white px-8 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-[#8A5B66] shadow-lg transition-all cursor-pointer"
+              >
+                <Save size={20}/> Cập nhật Nhạc Nền
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Tùy chọn Cấu hình Chatbot */}
+      {activeTab === 'chatbot' && (
+        <div className="bg-white p-8 rounded-2xl shadow-md border border-gray-100 animate-fade-in font-medium">
+          <h3 className="text-2xl font-bold text-theme-dark mb-6 flex items-center gap-2">
+            <Sparkles size={24} className="text-theme-accent2 animate-pulse" /> Cấu hình Chatbot Trò Chuyện
+          </h3>
+
+          <form onSubmit={handleSaveChatbot} className="grid grid-cols-1 gap-6">
+            {/* Trạng thái hoạt động */}
+            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
+              <div>
+                <label className="block font-bold text-gray-800">Trạng thái hoạt động</label>
+                <p className="text-sm text-gray-500">Bật/Tắt bong bóng trò chuyện chatbot trên trang chủ.</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  checked={editChatbotEnabled} 
+                  onChange={e => setEditChatbotEnabled(e.target.checked)}
+                  className="sr-only peer" 
+                />
+                <div className="w-14 h-7 bg-gray-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-theme-accent2"></div>
+              </label>
+            </div>
+
+            {/* Tên Chatbot */}
+            <div>
+              <label className="block font-bold text-gray-700 mb-2">Tên hiển thị của Chatbot *</label>
+              <input 
+                type="text" 
+                required
+                placeholder="Ví dụ: AI Love Bot"
+                value={editChatbotName} 
+                onChange={e => setEditChatbotName(e.target.value)}
+                className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-theme-accent1 outline-none focus:border-theme-dark transition-all"
+              />
+            </div>
+
+            {/* Tin nhắn chào mừng */}
+            <div>
+              <label className="block font-bold text-gray-700 mb-2">Tin nhắn chào mừng đầu tiên *</label>
+              <textarea 
+                rows={3}
+                required
+                placeholder="Lời chào mở đầu khi mở khung chat..."
+                value={editChatbotWelcomeMessage} 
+                onChange={e => setEditChatbotWelcomeMessage(e.target.value)}
+                className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-theme-accent1 outline-none focus:border-theme-dark transition-all leading-relaxed"
+              />
+            </div>
+
+            {/* Chỉ dẫn AI / Persona */}
+            <div>
+              <label className="block font-bold text-gray-700 mb-2 font-semibold">Chỉ dẫn AI (System Prompt) *</label>
+              <p className="text-xs text-gray-500 mb-2">Định hình tính cách, phong cách trả lời cho AI. Ví dụ: xưng hô ngọt ngào, hài hước, trả lời ngắn gọn...</p>
+              <textarea 
+                rows={6}
+                required
+                placeholder="Chỉ dẫn AI của bạn..."
+                value={editChatbotSystemPrompt} 
+                onChange={e => setEditChatbotSystemPrompt(e.target.value)}
+                className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-theme-accent1 outline-none focus:border-theme-dark transition-all leading-relaxed"
+              />
+            </div>
+
+            {/* Google Gemini API Key */}
+            <div>
+              <label className="block font-bold text-gray-700 mb-2 font-semibold">Google Gemini API Key</label>
+              <p className="text-xs text-gray-500 mb-2">
+                Nhập API Key của bạn từ Google AI Studio (được cung cấp miễn phí). Khóa này sẽ được lưu bảo mật ở server.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-2.5">
+                <input 
+                  type="password" 
+                  placeholder={editChatbotApiKey === '********' ? '******** (Đã được bảo mật ở server)' : 'Nhập Google Gemini API Key của bạn...'}
+                  value={editChatbotApiKey === '********' ? '********' : editChatbotApiKey} 
+                  onChange={e => {
+                    setEditChatbotApiKey(e.target.value);
+                    setTestStatus('idle');
+                  }}
+                  className="flex-1 p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-theme-accent1 outline-none focus:border-theme-dark transition-all font-mono"
+                />
+                <button
+                  type="button"
+                  onClick={handleTestApiKey}
+                  disabled={testStatus === 'testing'}
+                  className="px-6 py-4 bg-theme-accent1 hover:bg-theme-accent1/80 text-theme-dark font-bold rounded-xl shadow-xs transition-all disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap"
+                >
+                  {testStatus === 'testing' ? 'Đang test...' : 'Test kết nối'}
+                </button>
+              </div>
+              
+              <div className="mt-2.5 flex flex-wrap gap-2.5 items-center">
+                {editChatbotApiKey === '********' && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditChatbotApiKey('');
+                      setTestStatus('idle');
+                    }}
+                    className="text-xs text-red-500 hover:text-red-700 font-bold transition-all cursor-pointer"
+                  >
+                    Xóa và cấu hình khóa mới
+                  </button>
+                )}
+                
+                {testStatus === 'success' && (
+                  <span className="text-xs bg-emerald-100 text-emerald-800 font-bold px-3 py-1.5 rounded-full inline-flex items-center gap-1 animate-fade-in border border-emerald-200">
+                    Kết nối thành công ✅
+                  </span>
+                )}
+                
+                {testStatus === 'failed' && (
+                  <span className="text-xs bg-rose-100 text-rose-800 font-bold px-3 py-1.5 rounded-full inline-flex items-center gap-1 animate-fade-in border border-rose-200" title={testError}>
+                    Key không hợp lệ ❌ ({testError.substring(0, 40)}{testError.length > 40 ? '...' : ''})
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Nút lưu */}
+            <div className="flex justify-end mt-4">
+              <button 
+                type="submit"
+                className="bg-theme-dark text-white px-8 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-[#8A5B66] shadow-lg transition-all cursor-pointer"
+              >
+                <Save size={20}/> Cập nhật Cấu hình Chatbot
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
       {/* Edit Photo Modal */}
       {editingPhoto && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center z-[999] p-4 animate-fade-in">
@@ -753,11 +1336,10 @@ export default function AdminDashboard({ photos, setPhotos, letter, setLetter, v
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Tiêu đề *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tiêu đề</label>
                 <input 
                   type="text" 
                   placeholder="Ví dụ: Kỷ niệm Đà Lạt" 
-                  required
                   value={editingPhoto.title} 
                   onChange={e => setEditingPhoto(prev => prev ? ({ ...prev, title: e.target.value }) : null)}
                   className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-theme-accent1 outline-none focus:border-theme-dark transition-all"
@@ -861,7 +1443,7 @@ export default function AdminDashboard({ photos, setPhotos, letter, setLetter, v
                       <label className="border-2 border-dashed border-gray-300 rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer hover:border-theme-accent2 hover:bg-theme-main/10 transition-all group">
                         <Upload className="text-gray-400 group-hover:text-theme-dark transition-colors mb-2" size={32} />
                         <span className="font-bold text-gray-600 group-hover:text-theme-dark transition-colors">Chọn video từ máy tính</span>
-                        <span className="text-xs text-gray-400 mt-1">Hỗ trợ MP4, WEBM (Tối đa 15.0MB)</span>
+                        <span className="text-xs text-gray-400 mt-1">Hỗ trợ MP4, WEBM (Tối đa 50.0MB)</span>
                         <input 
                           type="file" 
                           accept="video/*" 
@@ -890,11 +1472,10 @@ export default function AdminDashboard({ photos, setPhotos, letter, setLetter, v
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Tiêu đề video *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tiêu đề video</label>
                 <input 
                   type="text" 
                   placeholder="Ví dụ: Nụ cười của em" 
-                  required
                   value={editingVideo.title} 
                   onChange={e => setEditingVideo(prev => prev ? ({ ...prev, title: e.target.value }) : null)}
                   className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-theme-accent1 outline-none focus:border-theme-dark transition-all"

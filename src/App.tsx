@@ -7,25 +7,15 @@ import LetterView from './components/LetterView';
 import Login from './components/Login';
 import AdminDashboard from './components/AdminDashboard';
 import VideoGallery from './components/VideoGallery';
-import { setItem, getItem, STORE_PHOTOS, STORE_VIDEOS } from './services/db';
+import { API_BASE_URL } from './config';
+import BackgroundParticles from './components/BackgroundParticles';
+import ChatbotWidget from './components/ChatbotWidget';
 
 // --- MOCK DATA ---
-const initialPhotos: Photo[] = [
-  { id: 1, title: 'Lần đầu gặp gỡ', description: 'Ngày ánh mắt ta chạm nhau...', eventDate: '14-02-2024', imageUrl: 'https://images.unsplash.com/photo-1518199268815-95a206b4a532?q=80&w=2068&auto=format&fit=crop' },
-  { id: 2, title: 'Chuyến đi Đà Lạt', description: 'Cùng nhau đón bình minh trên đồi chè', eventDate: '20-05-2024', imageUrl: 'https://images.unsplash.com/photo-1520699049698-acd2fce18736?q=80&w=2070&auto=format&fit=crop' },
-  { id: 3, title: 'Kỷ niệm 1 năm', description: 'Bữa tối lãng mạn bên ánh nến', eventDate: '14-02-2025', imageUrl: 'https://images.unsplash.com/photo-1474552226712-ac0f0961a954?q=80&w=2071&auto=format&fit=crop' },
-  { id: 4, title: 'Bình yên', description: 'Chỉ cần có nhau là đủ', eventDate: '08-03-2025', imageUrl: 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?q=80&w=2000&auto=format&fit=crop' }
-];
-
 const initialLetter: Letter = {
   title: 'Dear My Love,',
   content: 'Cảm ơn em đã xuất hiện trong cuộc đời anh. Mỗi khoảnh khắc bên em đều là một món quà vô giá. Dù tương lai có ra sao, anh vẫn muốn nắm tay em đi qua mọi giông bão. Yêu em vô cùng! ❤️'
 };
-
-const initialVideos: Video[] = [
-  { id: 1, title: 'Kỷ niệm hoàng hôn Đà Lạt', description: 'Chiều hoàng hôn rực rỡ, ta nắm tay nhau ngắm mây trôi.', eventDate: '21-05-2024', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-sunset-over-a-lake-with-clouds-43184-large.mp4' },
-  { id: 2, title: 'Ngày cùng dạo phố', description: 'Những bước chân nhỏ, tiếng cười giòn tan dưới nắng mai.', eventDate: '12-10-2024', videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-young-couple-walking-in-a-forest-42862-large.mp4' }
-];
 
 export default function App() {
   const [currentView, setCurrentView] = useState<View>('home');
@@ -34,27 +24,79 @@ export default function App() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // App State
-  const [photos, setPhotos] = useState<Photo[]>(initialPhotos);
-  const [videos, setVideos] = useState<Video[]>(initialVideos);
+  const [photos, setPhotos] = useState<Photo[]>([]);
+  const [videos, setVideos] = useState<Video[]>([]);
   const [letter, setLetter] = useState<Letter>(initialLetter);
+  const [musicUrl, setMusicUrl] = useState('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
+  const [musicTitle, setMusicTitle] = useState('SoundHelix-Song-1');
+  const [chatbotEnabled, setChatbotEnabled] = useState(true);
+  const [chatbotName, setChatbotName] = useState('AI Love Bot');
+  const [chatbotWelcomeMessage, setChatbotWelcomeMessage] = useState('Chào em! Anh là trợ lý tình yêu của hai bạn. Hôm nay em muốn trò chuyện gì nào? 💕');
+  const [chatbotSystemPrompt, setChatbotSystemPrompt] = useState('');
+  const [chatbotApiKey, setChatbotApiKey] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load from IndexedDB & LocalStorage on mount
+  // Load from Backend API on mount
   useEffect(() => {
     async function loadData() {
       try {
-        const savedPhotos = await getItem(STORE_PHOTOS, 'photos_key');
-        if (savedPhotos) setPhotos(savedPhotos);
+        // 1. Fetch photos
+        const photosRes = await fetch(`${API_BASE_URL}/photos`);
+        if (photosRes.ok) {
+          const photosData = await photosRes.json();
+          // Backend returns _id instead of id, so we map it
+          const mappedPhotos = photosData.map((p: any) => ({
+            id: p._id,
+            title: p.title,
+            description: p.description,
+            eventDate: p.eventDate,
+            imageUrl: p.imageUrl
+          }));
+          setPhotos(mappedPhotos);
+        }
 
-        const savedVideos = await getItem(STORE_VIDEOS, 'videos_key');
-        if (savedVideos) setVideos(savedVideos);
+        // 2. Fetch videos
+        const videosRes = await fetch(`${API_BASE_URL}/videos`);
+        if (videosRes.ok) {
+          const videosData = await videosRes.json();
+          const mappedVideos = videosData.map((v: any) => ({
+            id: v._id,
+            title: v.title,
+            description: v.description,
+            eventDate: v.eventDate,
+            videoUrl: v.videoUrl
+          }));
+          setVideos(mappedVideos);
+        }
 
-        const savedLetter = localStorage.getItem('memory_gallery_letter');
-        if (savedLetter) setLetter(JSON.parse(savedLetter));
+        // 3. Fetch letter
+        const letterRes = await fetch(`${API_BASE_URL}/letters`);
+        if (letterRes.ok) {
+          const letterData = await letterRes.json();
+          setLetter(letterData);
+        }
+
+        // 3.5. Fetch music and chatbot settings
+        const settingsRes = await fetch(`${API_BASE_URL}/settings`);
+        if (settingsRes.ok) {
+          const settingsData = await settingsRes.json();
+          if (settingsData.musicUrl) setMusicUrl(settingsData.musicUrl);
+          if (settingsData.musicTitle) setMusicTitle(settingsData.musicTitle);
+          if (settingsData.chatbotEnabled !== undefined) setChatbotEnabled(settingsData.chatbotEnabled);
+          if (settingsData.chatbotName) setChatbotName(settingsData.chatbotName);
+          if (settingsData.chatbotWelcomeMessage) setChatbotWelcomeMessage(settingsData.chatbotWelcomeMessage);
+          if (settingsData.chatbotSystemPrompt) setChatbotSystemPrompt(settingsData.chatbotSystemPrompt);
+          if (settingsData.chatbotApiKey) setChatbotApiKey(settingsData.chatbotApiKey);
+        }
+
+        // 4. Check auth status
+        const token = localStorage.getItem('admin_token');
+        if (token) {
+          setIsAdmin(true);
+        }
       } catch (err) {
-        console.error("Failed to load data from IndexedDB:", err);
+        console.error("Failed to load data from Backend:", err);
       } finally {
-        // Delay slightly for smooth transition
         setTimeout(() => {
           setIsLoading(false);
         }, 800);
@@ -62,22 +104,6 @@ export default function App() {
     }
     loadData();
   }, []);
-
-  // Sync to IndexedDB / localStorage
-  useEffect(() => {
-    if (isLoading) return;
-    setItem(STORE_PHOTOS, 'photos_key', photos).catch(err => console.error(err));
-  }, [photos, isLoading]);
-
-  useEffect(() => {
-    if (isLoading) return;
-    setItem(STORE_VIDEOS, 'videos_key', videos).catch(err => console.error(err));
-  }, [videos, isLoading]);
-
-  useEffect(() => {
-    if (isLoading) return;
-    localStorage.setItem('memory_gallery_letter', JSON.stringify(letter));
-  }, [letter, isLoading]);
 
   // Music toggle
   const toggleMusic = () => {
@@ -90,6 +116,49 @@ export default function App() {
     }
     setIsPlayingMusic(!isPlayingMusic);
   };
+
+  // Autoplay background music with user interaction fallback (due to browser autoplay policies)
+  useEffect(() => {
+    if (isLoading) return; // Wait until loading screen ends
+
+    const playAudio = () => {
+      if (audioRef.current) {
+        audioRef.current.play()
+          .then(() => {
+            setIsPlayingMusic(true);
+            removeInteractionListeners();
+          })
+          .catch(err => {
+            console.log("Autoplay blocked by browser policy. Waiting for user interaction to play music.", err);
+          });
+      }
+    };
+
+    const handleFirstInteraction = () => {
+      playAudio();
+    };
+
+    const removeInteractionListeners = () => {
+      document.removeEventListener('click', handleFirstInteraction);
+      document.removeEventListener('touchstart', handleFirstInteraction);
+      document.removeEventListener('keydown', handleFirstInteraction);
+    };
+
+    // Attempt to load and play
+    if (audioRef.current) {
+      audioRef.current.load();
+      playAudio();
+    }
+
+    // Set fallback listeners for autoplay block
+    document.addEventListener('click', handleFirstInteraction);
+    document.addEventListener('touchstart', handleFirstInteraction);
+    document.addEventListener('keydown', handleFirstInteraction);
+
+    return () => {
+      removeInteractionListeners();
+    };
+  }, [isLoading, musicUrl]);
 
   const navigate = (view: View) => {
     setCurrentView(view);
@@ -106,37 +175,38 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-theme-main text-theme-dark font-sans selection:bg-theme-accent2 selection:text-white">
+    <div className="min-h-screen animated-gradient text-theme-dark font-sans selection:bg-theme-accent2 selection:text-white relative">
+      {/* Background Particles */}
+      <BackgroundParticles />
+
       {/* Background Music */}
-      <audio ref={audioRef} loop>
-        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg" />
-      </audio>
+      <audio ref={audioRef} loop src={musicUrl} />
 
       {/* Floating Navigation */}
-      <nav className="fixed top-0 left-0 w-full z-50 p-4 flex justify-between items-center bg-theme-main/80 backdrop-blur-md shadow-sm border-b border-theme-accent1/30">
+      <nav className="fixed top-4 left-1/2 -translate-x-1/2 w-[92%] max-w-5xl z-50 px-6 py-4 flex justify-between items-center bg-white/30 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(242,190,209,0.2)] rounded-full transition-all duration-300">
         <div 
-          className="text-2xl font-bold italic cursor-pointer flex items-center gap-2 select-none"
+          className="text-2xl font-bold italic cursor-pointer flex items-center gap-2 select-none hover:opacity-85 transition-opacity"
           onClick={() => navigate('home')}
         >
           <Heart className="text-theme-accent2 fill-current animate-pulse" />
           Memories
         </div>
-        <div className="flex gap-4 md:gap-6 text-sm md:text-base font-medium">
+        <div className="flex gap-2 md:gap-4 text-sm md:text-base font-medium items-center">
           <button 
             onClick={() => navigate('slideshow')} 
-            className="hover:text-theme-accent2 transition-colors flex items-center gap-1 hidden md:flex cursor-pointer"
+            className="hover:text-[#8A5B66] hover:bg-white/40 px-3.5 py-2 rounded-full transition-all duration-300 flex items-center gap-1.5 hidden md:flex cursor-pointer"
           >
             <ImageIcon size={18}/> Bật Slideshow
           </button>
           <button 
             onClick={() => navigate('videos')} 
-            className="hover:text-theme-accent2 transition-colors flex items-center gap-1 hidden md:flex cursor-pointer"
+            className="hover:text-[#8A5B66] hover:bg-white/40 px-3.5 py-2 rounded-full transition-all duration-300 flex items-center gap-1.5 hidden md:flex cursor-pointer"
           >
             <Film size={18}/> Video kỷ niệm
           </button>
           <button 
             onClick={() => navigate('letter')} 
-            className="hover:text-theme-accent2 transition-colors flex items-center gap-1 hidden md:flex cursor-pointer"
+            className="hover:text-[#8A5B66] hover:bg-white/40 px-3.5 py-2 rounded-full transition-all duration-300 flex items-center gap-1.5 hidden md:flex cursor-pointer"
           >
             <Mail size={18}/> Thư tình
           </button>
@@ -144,48 +214,52 @@ export default function App() {
           {/* Mobile Nav Icons */}
           <button 
             onClick={() => navigate('slideshow')} 
-            className="md:hidden hover:text-theme-accent2 cursor-pointer"
+            className="md:hidden hover:text-theme-accent2 p-2 rounded-full hover:bg-white/40 transition-colors cursor-pointer"
             title="Slideshow"
           >
             <ImageIcon size={20}/>
           </button>
           <button 
             onClick={() => navigate('videos')} 
-            className="md:hidden hover:text-theme-accent2 cursor-pointer"
+            className="md:hidden hover:text-theme-accent2 p-2 rounded-full hover:bg-white/40 transition-colors cursor-pointer"
             title="Video kỷ niệm"
           >
             <Film size={20}/>
           </button>
           <button 
             onClick={() => navigate('letter')} 
-            className="md:hidden hover:text-theme-accent2 cursor-pointer"
+            className="md:hidden hover:text-theme-accent2 p-2 rounded-full hover:bg-white/40 transition-colors cursor-pointer"
             title="Thư tình"
           >
             <Mail size={20}/>
           </button>
 
+          <div className="w-[1px] h-6 bg-theme-dark/20 mx-1 hidden md:block"></div>
+
           {isAdmin ? (
             <button 
-              onClick={() => { setIsAdmin(false); navigate('home'); }} 
-              className="text-rose-400 hover:text-rose-600 flex items-center gap-1 cursor-pointer"
+              onClick={() => { setIsAdmin(false); localStorage.removeItem('admin_token'); navigate('home'); }} 
+              className="text-rose-400 hover:text-rose-600 p-2 md:px-3.5 md:py-2 rounded-full hover:bg-white/40 transition-all flex items-center gap-1.5 cursor-pointer"
               title="Đăng xuất"
             >
               <LogOut size={18}/>
+              <span className="hidden md:inline">Đăng xuất</span>
             </button>
           ) : (
             <button 
               onClick={() => navigate('login')} 
-              className="hover:text-theme-accent2 flex items-center gap-1 cursor-pointer"
+              className="hover:text-theme-accent2 p-2 md:px-3.5 md:py-2 rounded-full hover:bg-white/40 transition-all flex items-center gap-1.5 cursor-pointer"
               title="Quản trị"
             >
               <Lock size={18}/>
+              <span className="hidden md:inline">Quản trị</span>
             </button>
           )}
         </div>
       </nav>
 
       {/* Main Content Area */}
-      <main className="pt-24 pb-24 min-h-screen">
+      <main className="pt-28 pb-24 min-h-screen relative z-10">
         {currentView === 'home' && <Home navigate={navigate} photos={photos} />}
         {currentView === 'slideshow' && <Slideshow photos={photos} navigate={navigate} />}
         {currentView === 'videos' && <VideoGallery videos={videos} />}
@@ -199,18 +273,45 @@ export default function App() {
             setLetter={setLetter}
             videos={videos}
             setVideos={setVideos}
+            musicUrl={musicUrl}
+            setMusicUrl={setMusicUrl}
+            musicTitle={musicTitle}
+            setMusicTitle={setMusicTitle}
+            chatbotEnabled={chatbotEnabled}
+            setChatbotEnabled={setChatbotEnabled}
+            chatbotName={chatbotName}
+            setChatbotName={setChatbotName}
+            chatbotWelcomeMessage={chatbotWelcomeMessage}
+            setChatbotWelcomeMessage={setChatbotWelcomeMessage}
+            chatbotSystemPrompt={chatbotSystemPrompt}
+            setChatbotSystemPrompt={setChatbotSystemPrompt}
+            chatbotApiKey={chatbotApiKey}
+            setChatbotApiKey={setChatbotApiKey}
           />
         )}
       </main>
 
+      {/* AI Chatbot Widget */}
+      {chatbotEnabled && (
+        <ChatbotWidget 
+          chatbotName={chatbotName} 
+          chatbotWelcomeMessage={chatbotWelcomeMessage} 
+        />
+      )}
+
       {/* Floating Music Controller */}
-      <button 
-        onClick={toggleMusic}
-        className="fixed bottom-6 right-6 p-4 rounded-full bg-theme-accent2 text-white shadow-lg hover:scale-110 transition-transform z-50 flex items-center gap-2 cursor-pointer"
-        title={isPlayingMusic ? "Tạm dừng nhạc" : "Phát nhạc"}
-      >
-        {isPlayingMusic ? <Pause size={24} /> : <Music size={24} />}
-      </button>
+      <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 group">
+        <span className="bg-white/90 backdrop-blur-xs text-theme-dark text-xs font-semibold px-3 py-2 rounded-2xl border border-theme-accent1 shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none select-none max-w-[200px] truncate translate-x-2 group-hover:translate-x-0">
+          🎵 {musicTitle || 'Nhạc nền'}
+        </span>
+        <button 
+          onClick={toggleMusic}
+          className="p-4 rounded-full bg-theme-accent2 text-white shadow-lg hover:scale-110 transition-transform cursor-pointer flex items-center justify-center"
+          title={isPlayingMusic ? `Tạm dừng: ${musicTitle}` : `Phát nhạc: ${musicTitle}`}
+        >
+          {isPlayingMusic ? <Pause size={24} /> : <Music size={24} />}
+        </button>
+      </div>
     </div>
   );
 }

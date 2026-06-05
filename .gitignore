@@ -27,3 +27,6 @@ dist-ssr
 .env.*
 server/.env
 client/.env
+
+# Uploaded media files
+server/uploads/
