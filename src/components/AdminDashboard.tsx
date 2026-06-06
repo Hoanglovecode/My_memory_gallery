@@ -24,6 +24,14 @@ interface AdminDashboardProps {
   setChatbotSystemPrompt: React.Dispatch<React.SetStateAction<string>>;
   chatbotApiKey: string;
   setChatbotApiKey: React.Dispatch<React.SetStateAction<string>>;
+  creatorFacebook: string;
+  setCreatorFacebook: React.Dispatch<React.SetStateAction<string>>;
+  creatorLinkedin: string;
+  setCreatorLinkedin: React.Dispatch<React.SetStateAction<string>>;
+  creatorYoutube: string;
+  setCreatorYoutube: React.Dispatch<React.SetStateAction<string>>;
+  creatorGithub: string;
+  setCreatorGithub: React.Dispatch<React.SetStateAction<string>>;
 }
 
 interface Toast {
@@ -52,7 +60,15 @@ export default function AdminDashboard({
   chatbotSystemPrompt,
   setChatbotSystemPrompt,
   chatbotApiKey,
-  setChatbotApiKey
+  setChatbotApiKey,
+  creatorFacebook,
+  setCreatorFacebook,
+  creatorLinkedin,
+  setCreatorLinkedin,
+  creatorYoutube,
+  setCreatorYoutube,
+  creatorGithub,
+  setCreatorGithub
 }: AdminDashboardProps) {
   const getAuthHeaders = () => {
     const token = localStorage.getItem('admin_token');
@@ -62,7 +78,7 @@ export default function AdminDashboard({
     };
   };
 
-  const [activeTab, setActiveTab] = useState<'photos' | 'letter' | 'videos' | 'music' | 'chatbot'>('photos');
+  const [activeTab, setActiveTab] = useState<'photos' | 'letter' | 'videos' | 'music' | 'chatbot' | 'social'>('photos');
   const [showAddForm, setShowAddForm] = useState(false);
   const [newPhoto, setNewPhoto] = useState({ title: '', description: '', eventDate: '', imageUrl: '' });
   const [uploadMode, setUploadMode] = useState<'file' | 'url'>('file');
@@ -78,6 +94,19 @@ export default function AdminDashboard({
   const [editChatbotWelcomeMessage, setEditChatbotWelcomeMessage] = useState(chatbotWelcomeMessage);
   const [editChatbotSystemPrompt, setEditChatbotSystemPrompt] = useState(chatbotSystemPrompt);
   const [editChatbotApiKey, setEditChatbotApiKey] = useState(chatbotApiKey);
+
+  // Social editing states
+  const [editFacebook, setEditFacebook] = useState(creatorFacebook);
+  const [editLinkedin, setEditLinkedin] = useState(creatorLinkedin);
+  const [editYoutube, setEditYoutube] = useState(creatorYoutube);
+  const [editGithub, setEditGithub] = useState(creatorGithub);
+
+  useEffect(() => {
+    setEditFacebook(creatorFacebook);
+    setEditLinkedin(creatorLinkedin);
+    setEditYoutube(creatorYoutube);
+    setEditGithub(creatorGithub);
+  }, [creatorFacebook, creatorLinkedin, creatorYoutube, creatorGithub]);
 
   const [testStatus, setTestStatus] = useState<'idle' | 'testing' | 'success' | 'failed'>('idle');
   const [testError, setTestError] = useState('');
@@ -537,6 +566,36 @@ export default function AdminDashboard({
     }
   };
 
+  const handleSaveSocial = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(`${API_BASE_URL}/settings`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          creatorFacebook: editFacebook,
+          creatorLinkedin: editLinkedin,
+          creatorYoutube: editYoutube,
+          creatorGithub: editGithub
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.msg || 'Không thể cập nhật liên kết mạng xã hội.');
+      }
+
+      setCreatorFacebook(data.creatorFacebook);
+      setCreatorLinkedin(data.creatorLinkedin);
+      setCreatorYoutube(data.creatorYoutube);
+      setCreatorGithub(data.creatorGithub);
+      showToast('Cập nhật liên kết mạng xã hội thành công! 🌐');
+    } catch (err: any) {
+      showToast(err.message || 'Lỗi kết nối server', 'error');
+    }
+  };
+
   const handleDeletePhoto = async (id: any) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa ảnh này?')) {
       try {
@@ -710,6 +769,14 @@ export default function AdminDashboard({
           }`}
         >
           Cấu hình Chatbot
+        </button>
+        <button 
+          onClick={() => setActiveTab('social')} 
+          className={`pb-3 px-6 font-bold text-lg transition-colors cursor-pointer ${
+            activeTab === 'social' ? 'text-theme-dark border-b-4 border-theme-dark' : 'text-gray-400 hover:text-theme-dark'
+          }`}
+        >
+          Mạng Xã Hội Creator
         </button>
       </div>
 
@@ -1350,6 +1417,71 @@ export default function AdminDashboard({
                 className="bg-theme-dark text-white px-8 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-[#8A5B66] shadow-lg transition-all cursor-pointer"
               >
                 <Save size={20}/> Cập nhật Cấu hình Chatbot
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Tùy chọn Cấu hình Mạng Xã Hội Creator */}
+      {activeTab === 'social' && (
+        <div className="bg-white p-8 rounded-2xl shadow-md border border-gray-100 animate-fade-in font-medium">
+          <h3 className="text-2xl font-bold text-theme-dark mb-6 flex items-center gap-2">
+            <Sparkles size={24} className="text-theme-accent2" /> Cấu hình Liên kết Mạng Xã Hội Creator
+          </h3>
+          <p className="text-sm text-gray-500 mb-6 font-normal">Cấu hình các đường dẫn Facebook, LinkedIn, YouTube, GitHub của người thiết kế trang web (Lê Văn Hoàng).</p>
+
+          <form onSubmit={handleSaveSocial} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block font-bold text-gray-700 mb-2">Đường dẫn Facebook</label>
+              <input 
+                type="url" 
+                placeholder="https://facebook.com/username"
+                value={editFacebook} 
+                onChange={e => setEditFacebook(e.target.value)}
+                className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-theme-accent1 outline-none focus:border-theme-dark transition-all"
+              />
+            </div>
+
+            <div>
+              <label className="block font-bold text-gray-700 mb-2">Đường dẫn LinkedIn</label>
+              <input 
+                type="url" 
+                placeholder="https://linkedin.com/in/username"
+                value={editLinkedin} 
+                onChange={e => setEditLinkedin(e.target.value)}
+                className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-theme-accent1 outline-none focus:border-theme-dark transition-all"
+              />
+            </div>
+
+            <div>
+              <label className="block font-bold text-gray-700 mb-2">Đường dẫn YouTube</label>
+              <input 
+                type="url" 
+                placeholder="https://youtube.com/@username"
+                value={editYoutube} 
+                onChange={e => setEditYoutube(e.target.value)}
+                className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-theme-accent1 outline-none focus:border-theme-dark transition-all"
+              />
+            </div>
+
+            <div>
+              <label className="block font-bold text-gray-700 mb-2">Đường dẫn GitHub</label>
+              <input 
+                type="url" 
+                placeholder="https://github.com/username"
+                value={editGithub} 
+                onChange={e => setEditGithub(e.target.value)}
+                className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-theme-accent1 outline-none focus:border-theme-dark transition-all"
+              />
+            </div>
+
+            <div className="md:col-span-2 flex justify-end mt-4">
+              <button 
+                type="submit"
+                className="bg-theme-dark text-white px-8 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-[#8A5B66] shadow-lg transition-all cursor-pointer"
+              >
+                <Save size={20}/> Cập nhật Liên kết
               </button>
             </div>
           </form>

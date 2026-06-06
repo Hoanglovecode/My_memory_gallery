@@ -28,6 +28,22 @@ const SettingsSchema = new mongoose.Schema({
   chatbotApiKey: {
     type: String,
     default: ''
+  },
+  creatorFacebook: {
+    type: String,
+    default: 'https://facebook.com'
+  },
+  creatorLinkedin: {
+    type: String,
+    default: 'https://linkedin.com'
+  },
+  creatorYoutube: {
+    type: String,
+    default: 'https://youtube.com'
+  },
+  creatorGithub: {
+    type: String,
+    default: 'https://github.com'
   }
 }, {
   timestamps: true

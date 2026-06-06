@@ -40,13 +40,28 @@ router.put('/', auth, async (req, res) => {
     chatbotName, 
     chatbotWelcomeMessage, 
     chatbotSystemPrompt, 
-    chatbotApiKey 
+    chatbotApiKey,
+    creatorFacebook,
+    creatorLinkedin,
+    creatorYoutube,
+    creatorGithub
   } = req.body;
 
   try {
     let settings = await Settings.findOne();
     if (!settings) {
-      const initSettings = { musicUrl, musicTitle, chatbotEnabled, chatbotName, chatbotWelcomeMessage, chatbotSystemPrompt };
+      const initSettings = { 
+        musicUrl, 
+        musicTitle, 
+        chatbotEnabled, 
+        chatbotName, 
+        chatbotWelcomeMessage, 
+        chatbotSystemPrompt,
+        creatorFacebook,
+        creatorLinkedin,
+        creatorYoutube,
+        creatorGithub
+      };
       if (chatbotApiKey && chatbotApiKey !== '********') {
         initSettings.chatbotApiKey = chatbotApiKey;
       }
@@ -58,6 +73,10 @@ router.put('/', auth, async (req, res) => {
       if (chatbotName !== undefined) settings.chatbotName = chatbotName;
       if (chatbotWelcomeMessage !== undefined) settings.chatbotWelcomeMessage = chatbotWelcomeMessage;
       if (chatbotSystemPrompt !== undefined) settings.chatbotSystemPrompt = chatbotSystemPrompt;
+      if (creatorFacebook !== undefined) settings.creatorFacebook = creatorFacebook;
+      if (creatorLinkedin !== undefined) settings.creatorLinkedin = creatorLinkedin;
+      if (creatorYoutube !== undefined) settings.creatorYoutube = creatorYoutube;
+      if (creatorGithub !== undefined) settings.creatorGithub = creatorGithub;
       
       // Only update API key if it's changed and not the masked placeholder
       if (chatbotApiKey !== undefined && chatbotApiKey !== '********') {

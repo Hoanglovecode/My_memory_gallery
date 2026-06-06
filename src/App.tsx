@@ -25,6 +25,10 @@ export default function App() {
   const [musicUrl, setMusicUrl] = useState('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
   const [musicTitle, setMusicTitle] = useState('SoundHelix-Song-1');
   const [chatbotEnabled, setChatbotEnabled] = useState(true);
+  const [creatorFacebook, setCreatorFacebook] = useState('https://facebook.com');
+  const [creatorLinkedin, setCreatorLinkedin] = useState('https://linkedin.com');
+  const [creatorYoutube, setCreatorYoutube] = useState('https://youtube.com');
+  const [creatorGithub, setCreatorGithub] = useState('https://github.com');
   const [chatbotName, setChatbotName] = useState('AI Love Bot');
   const [chatbotWelcomeMessage, setChatbotWelcomeMessage] = useState('Chào em! Anh là trợ lý tình yêu của hai bạn. Hôm nay em muốn trò chuyện gì nào? 💕');
   const [chatbotSystemPrompt, setChatbotSystemPrompt] = useState('');
@@ -86,6 +90,10 @@ export default function App() {
           if (settingsData.chatbotWelcomeMessage) setChatbotWelcomeMessage(settingsData.chatbotWelcomeMessage);
           if (settingsData.chatbotSystemPrompt) setChatbotSystemPrompt(settingsData.chatbotSystemPrompt);
           if (settingsData.chatbotApiKey) setChatbotApiKey(settingsData.chatbotApiKey);
+          if (settingsData.creatorFacebook) setCreatorFacebook(settingsData.creatorFacebook);
+          if (settingsData.creatorLinkedin) setCreatorLinkedin(settingsData.creatorLinkedin);
+          if (settingsData.creatorYoutube) setCreatorYoutube(settingsData.creatorYoutube);
+          if (settingsData.creatorGithub) setCreatorGithub(settingsData.creatorGithub);
         }
 
         // 4. Check auth status
@@ -286,9 +294,83 @@ export default function App() {
             setChatbotSystemPrompt={setChatbotSystemPrompt}
             chatbotApiKey={chatbotApiKey}
             setChatbotApiKey={setChatbotApiKey}
+            creatorFacebook={creatorFacebook}
+            setCreatorFacebook={setCreatorFacebook}
+            creatorLinkedin={creatorLinkedin}
+            setCreatorLinkedin={setCreatorLinkedin}
+            creatorYoutube={creatorYoutube}
+            setCreatorYoutube={setCreatorYoutube}
+            creatorGithub={creatorGithub}
+            setCreatorGithub={setCreatorGithub}
           />
         )}
       </main>
+
+      {/* Footer with Creator Social Media Links */}
+      {currentView !== 'slideshow' && (
+        <footer className="w-full bg-white/20 backdrop-blur-md border-t border-white/20 py-10 mt-auto transition-all duration-300">
+          <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="text-center md:text-left">
+              <p className="text-base font-serif italic text-[#A7727D] font-bold">
+                Dự án kỷ niệm được thiết kế bởi Lê Văn Hoàng ❤️
+              </p>
+              <p className="text-xs text-[#A7727D]/70 mt-1.5 font-medium">
+                © {new Date().getFullYear()} Memories Gallery. All rights reserved.
+              </p>
+            </div>
+            
+            <div className="flex flex-col items-center md:items-end gap-2">
+              <span className="text-xs font-serif italic text-[#A7727D]/80 font-bold">Kết nối với Lê Văn Hoàng</span>
+              <div className="flex gap-4 items-center">
+                {creatorFacebook && (
+                  <a 
+                    href={creatorFacebook} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 rounded-full bg-white/80 hover:bg-white flex items-center justify-center border border-white/40 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
+                    title="Facebook"
+                  >
+                    <img src="/assets/social/facebook.png" alt="Facebook" className="w-5 h-5 object-contain" />
+                  </a>
+                )}
+                {creatorLinkedin && (
+                  <a 
+                    href={creatorLinkedin} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 rounded-full bg-white/80 hover:bg-white flex items-center justify-center border border-white/40 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
+                    title="LinkedIn"
+                  >
+                    <img src="/assets/social/linkedin.png" alt="LinkedIn" className="w-5 h-5 object-contain" />
+                  </a>
+                )}
+                {creatorYoutube && (
+                  <a 
+                    href={creatorYoutube} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 rounded-full bg-white/80 hover:bg-white flex items-center justify-center border border-white/40 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
+                    title="YouTube"
+                  >
+                    <img src="/assets/social/youtube.png" alt="YouTube" className="w-5 h-5 object-contain" />
+                  </a>
+                )}
+                {creatorGithub && (
+                  <a 
+                    href={creatorGithub} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 rounded-full bg-white/80 hover:bg-white flex items-center justify-center border border-white/40 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
+                    title="GitHub"
+                  >
+                    <img src="/assets/social/github.png" alt="GitHub" className="w-5 h-5 object-contain" />
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        </footer>
+      )}
 
       {/* AI Chatbot Widget */}
       {chatbotEnabled && (
