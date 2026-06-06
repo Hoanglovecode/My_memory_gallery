@@ -258,7 +258,7 @@ export default function App() {
       </nav>
 
       {/* Main Content Area */}
-      <main className="pt-28 pb-24 min-h-screen relative z-10">
+      <main className="pt-28 pb-24 min-h-screen relative">
         {currentView === 'home' && <Home navigate={navigate} photos={photos} />}
         {currentView === 'slideshow' && <Slideshow photos={photos} navigate={navigate} />}
         {currentView === 'videos' && <VideoGallery videos={videos} />}

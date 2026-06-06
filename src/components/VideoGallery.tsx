@@ -96,12 +96,12 @@ export default function VideoGallery({ videos }: VideoGalleryProps) {
           </button>
 
           {/* Modal Container */}
-          <div className="w-full max-w-4xl flex flex-col bg-[#111] rounded-3xl overflow-hidden shadow-2xl animate-scale-up border border-white/10">
+          <div className="w-full max-w-lg md:max-w-4xl flex flex-col bg-[#111] rounded-3xl overflow-hidden shadow-2xl animate-scale-up border border-white/10 max-h-[90vh]">
             {/* Video Player */}
-            <div className="relative aspect-video bg-black">
+            <div className="relative bg-black flex items-center justify-center flex-1 min-h-0" style={{ maxHeight: '70vh' }}>
               <video 
                 src={activeVideo.videoUrl} 
-                className="w-full h-full object-contain"
+                className="max-w-full max-h-[70vh] w-auto h-auto object-contain block mx-auto"
                 controls
                 autoPlay
                 playsInline
