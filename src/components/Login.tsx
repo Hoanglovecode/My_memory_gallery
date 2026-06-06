@@ -9,8 +9,8 @@ interface LoginProps {
 }
 
 export default function Login({ setIsAdmin, navigate }: LoginProps) {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('levanhoang');
+  const [password, setPassword] = useState('10052007');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -35,8 +35,9 @@ export default function Login({ setIsAdmin, navigate }: LoginProps) {
         throw new Error(data.msg || 'Sai tài khoản hoặc mật khẩu!');
       }
 
-      // Save token to localStorage
+      // Save token and username to localStorage
       localStorage.setItem('admin_token', data.token);
+      localStorage.setItem('admin_username', data.user.username);
       setIsAdmin(true);
       navigate('admin');
     } catch (err: any) {

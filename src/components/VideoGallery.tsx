@@ -46,10 +46,15 @@ export default function VideoGallery({ videos }: VideoGalleryProps) {
                   </div>
                 </div>
 
-                {/* Date Tag */}
-                <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-xs text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1.5">
-                  <Calendar size={12} />
-                  {video.eventDate}
+                {/* Date and Owner Tags */}
+                <div className="absolute bottom-3 left-3 flex gap-2">
+                  <div className="bg-black/60 backdrop-blur-xs text-white px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1.5">
+                    <Calendar size={12} />
+                    {video.eventDate}
+                  </div>
+                  <div className="bg-[#E6C280]/90 backdrop-blur-xs text-theme-dark px-3 py-1 rounded-full text-xs font-bold">
+                    Bởi: {video.username === 'hoangngoclan' ? 'Lan' : 'Hoàng'}
+                  </div>
                 </div>
               </div>
 
@@ -107,9 +112,14 @@ export default function VideoGallery({ videos }: VideoGalleryProps) {
             <div className="p-6 bg-zinc-900 text-white">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 mb-3">
                 <h2 className="text-2xl font-bold font-serif text-theme-accent1">{activeVideo.title}</h2>
-                <div className="text-sm text-zinc-400 flex items-center gap-1.5 bg-zinc-800 px-3 py-1 rounded-full w-fit">
-                  <Calendar size={14} />
-                  {activeVideo.eventDate}
+                <div className="flex gap-2">
+                  <div className="text-sm text-zinc-400 flex items-center gap-1.5 bg-zinc-800 px-3 py-1 rounded-full w-fit">
+                    <Calendar size={14} />
+                    {activeVideo.eventDate}
+                  </div>
+                  <div className="text-sm text-theme-dark font-bold bg-[#E6C280] px-3 py-1 rounded-full w-fit flex items-center">
+                    Đăng bởi: {activeVideo.username === 'hoangngoclan' ? 'Lan' : 'Hoàng'}
+                  </div>
                 </div>
               </div>
               <p className="text-zinc-300 italic text-sm md:text-base whitespace-pre-wrap">

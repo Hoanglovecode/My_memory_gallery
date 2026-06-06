@@ -11,11 +11,6 @@ import { API_BASE_URL } from './config';
 import BackgroundParticles from './components/BackgroundParticles';
 import ChatbotWidget from './components/ChatbotWidget';
 
-// --- MOCK DATA ---
-const initialLetter: Letter = {
-  title: 'Dear My Love,',
-  content: 'Cảm ơn em đã xuất hiện trong cuộc đời anh. Mỗi khoảnh khắc bên em đều là một món quà vô giá. Dù tương lai có ra sao, anh vẫn muốn nắm tay em đi qua mọi giông bão. Yêu em vô cùng! ❤️'
-};
 
 export default function App() {
   const [currentView, setCurrentView] = useState<View>('home');
@@ -26,7 +21,7 @@ export default function App() {
   // App State
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [videos, setVideos] = useState<Video[]>([]);
-  const [letter, setLetter] = useState<Letter>(initialLetter);
+  const [letters, setLetters] = useState<Letter[]>([]);
   const [musicUrl, setMusicUrl] = useState('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
   const [musicTitle, setMusicTitle] = useState('SoundHelix-Song-1');
   const [chatbotEnabled, setChatbotEnabled] = useState(true);
@@ -50,7 +45,9 @@ export default function App() {
             title: p.title,
             description: p.description,
             eventDate: p.eventDate,
-            imageUrl: p.imageUrl
+            imageUrl: p.imageUrl,
+            username: p.username,
+            user: p.user
           }));
           setPhotos(mappedPhotos);
         }
@@ -64,16 +61,18 @@ export default function App() {
             title: v.title,
             description: v.description,
             eventDate: v.eventDate,
-            videoUrl: v.videoUrl
+            videoUrl: v.videoUrl,
+            username: v.username,
+            user: v.user
           }));
           setVideos(mappedVideos);
         }
 
-        // 3. Fetch letter
-        const letterRes = await fetch(`${API_BASE_URL}/letters`);
-        if (letterRes.ok) {
-          const letterData = await letterRes.json();
-          setLetter(letterData);
+        // 3. Fetch letters
+        const lettersRes = await fetch(`${API_BASE_URL}/letters`);
+        if (lettersRes.ok) {
+          const lettersData = await lettersRes.json();
+          setLetters(lettersData);
         }
 
         // 3.5. Fetch music and chatbot settings
@@ -238,7 +237,7 @@ export default function App() {
 
           {isAdmin ? (
             <button 
-              onClick={() => { setIsAdmin(false); localStorage.removeItem('admin_token'); navigate('home'); }} 
+              onClick={() => { setIsAdmin(false); localStorage.removeItem('admin_token'); localStorage.removeItem('admin_username'); navigate('home'); }} 
               className="text-rose-400 hover:text-rose-600 p-2 md:px-3.5 md:py-2 rounded-full hover:bg-white/40 transition-all flex items-center gap-1.5 cursor-pointer"
               title="Đăng xuất"
             >
@@ -263,14 +262,14 @@ export default function App() {
         {currentView === 'home' && <Home navigate={navigate} photos={photos} />}
         {currentView === 'slideshow' && <Slideshow photos={photos} navigate={navigate} />}
         {currentView === 'videos' && <VideoGallery videos={videos} />}
-        {currentView === 'letter' && <LetterView letter={letter} />}
+        {currentView === 'letter' && <LetterView letters={letters} />}
         {currentView === 'login' && <Login setIsAdmin={setIsAdmin} navigate={navigate} />}
         {currentView === 'admin' && isAdmin && (
           <AdminDashboard 
             photos={photos} 
             setPhotos={setPhotos}
-            letter={letter} 
-            setLetter={setLetter}
+            letters={letters} 
+            setLetters={setLetters}
             videos={videos}
             setVideos={setVideos}
             musicUrl={musicUrl}

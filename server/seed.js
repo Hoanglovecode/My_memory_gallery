@@ -46,6 +46,26 @@ async function seedAdmin() {
       console.log('User hoangngoclan already exists.');
     }
 
+    // 3. Seed 'levanhoang' / '10052007'
+    const levanhoangExists = await User.findOne({ username: 'levanhoang' });
+    if (!levanhoangExists) {
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash('10052007', salt);
+      const user = new User({
+        username: 'levanhoang',
+        password: hashedPassword
+      });
+      await user.save();
+      console.log('Successfully seeded levanhoang / 10052007');
+    } else {
+      // If it exists, update it to the desired password 10052007
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash('10052007', salt);
+      levanhoangExists.password = hashedPassword;
+      await levanhoangExists.save();
+      console.log('Successfully updated password for levanhoang to 10052007');
+    }
+
     console.log('Seeding completed successfully!');
     process.exit(0);
   } catch (err) {

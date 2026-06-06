@@ -91,7 +91,7 @@ export default function Slideshow({ photos, navigate }: SlideshowProps) {
         {currentPhoto.description && (
           <p className="text-xl md:text-2xl italic mb-3 text-gray-200 drop-shadow-md font-medium">"{currentPhoto.description}"</p>
         )}
-        <p className="text-sm font-light text-theme-accent2 drop-shadow-md">Nơi tình yêu lưu giữ: {currentPhoto.eventDate}</p>
+        <p className="text-sm font-light text-theme-accent2 drop-shadow-md">Nơi tình yêu lưu giữ: {currentPhoto.eventDate} | Đăng bởi: {currentPhoto.username === 'hoangngoclan' ? 'Lan' : 'Hoàng'}</p>
       </div>
 
       {/* Thanh tiến trình báo hiệu thời gian chuyển ảnh */}

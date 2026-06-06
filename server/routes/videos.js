@@ -8,6 +8,11 @@ const { saveBase64File } = require('../utils/fileUpload');
 const formatVideoUrl = (video, req) => {
   const v = video.toObject ? video.toObject() : { ...video };
   v.id = v._id;
+  if (v.user && v.user.username) {
+    v.username = v.user.username;
+  } else {
+    v.username = 'levanhoang'; // fallback
+  }
   if (v.videoUrl && v.videoUrl.startsWith('/uploads/')) {
     const host = req.get('host');
     const protocol = host.includes('localhost') ? 'http' : 'https';
@@ -21,7 +26,7 @@ const formatVideoUrl = (video, req) => {
 // @access  Public
 router.get('/', async (req, res) => {
   try {
-    const videos = await Video.find().sort({ createdAt: -1 });
+    const videos = await Video.find().populate('user', 'username').sort({ createdAt: -1 });
     const formattedVideos = videos.map(video => formatVideoUrl(video, req));
     res.json(formattedVideos);
   } catch (err) {
@@ -48,10 +53,13 @@ router.post('/', auth, async (req, res) => {
       title: title || 'Video kỷ niệm',
       description: description || '',
       eventDate: eventDate || 'Hôm nay',
-      videoUrl: savedVideoUrl
+      videoUrl: savedVideoUrl,
+      user: req.user.id
     });
 
-    const video = await newVideo.save();
+    let video = await newVideo.save();
+    // Populate user to get username
+    video = await Video.findById(video._id).populate('user', 'username');
     res.json(formatVideoUrl(video, req));
   } catch (err) {
     console.error(err.message);
@@ -71,6 +79,11 @@ router.put('/:id', auth, async (req, res) => {
       return res.status(404).json({ msg: 'Video not found' });
     }
 
+    // Verify ownership
+    if (video.user && video.user.toString() !== req.user.id && req.user.username !== 'admin') {
+      return res.status(403).json({ msg: 'Bạn không có quyền sửa video này' });
+    }
+
     // Save base64 video to file if new one is provided
     const savedVideoUrl = videoUrl ? await saveBase64File(videoUrl, 'video') : undefined;
 
@@ -81,6 +94,8 @@ router.put('/:id', auth, async (req, res) => {
     if (savedVideoUrl) video.videoUrl = savedVideoUrl;
 
     await video.save();
+    // Populate user to get username
+    video = await Video.findById(video._id).populate('user', 'username');
     res.json(formatVideoUrl(video, req));
   } catch (err) {
     console.error(err.message);
@@ -96,6 +111,11 @@ router.delete('/:id', auth, async (req, res) => {
     const video = await Video.findById(req.params.id);
     if (!video) {
       return res.status(404).json({ msg: 'Video not found' });
+    }
+
+    // Verify ownership
+    if (video.user && video.user.toString() !== req.user.id && req.user.username !== 'admin') {
+      return res.status(403).json({ msg: 'Bạn không có quyền xóa video này' });
     }
 
     await Video.findByIdAndDelete(req.params.id);

@@ -71,6 +71,7 @@ export default function Home({ navigate, photos }: HomeProps) {
                     />
                     <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/85 via-black/45 to-transparent p-3 text-white">
                       <p className="font-bold text-sm drop-shadow-md tracking-wide truncate">{photo.title}</p>
+                      <p className="text-[10px] text-white/80 italic mt-0.5">Đăng bởi: {photo.username === 'hoangngoclan' ? 'Lan' : 'Hoàng'}</p>
                     </div>
                   </div>
                 ))}
@@ -104,6 +105,7 @@ export default function Home({ navigate, photos }: HomeProps) {
                     />
                     <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/85 via-black/45 to-transparent p-3 text-white">
                       <p className="font-bold text-sm drop-shadow-md tracking-wide truncate">{photo.title}</p>
+                      <p className="text-[10px] text-white/80 italic mt-0.5">Đăng bởi: {photo.username === 'hoangngoclan' ? 'Lan' : 'Hoàng'}</p>
                     </div>
                   </div>
                 ))}
@@ -159,9 +161,14 @@ export default function Home({ navigate, photos }: HomeProps) {
 
             {/* Details */}
             <div className="pt-4 pb-2 text-left">
-              <span className="text-[10px] bg-theme-accent2 text-white px-2.5 py-0.5 rounded-full font-serif italic mb-1.5 inline-block">
-                {selectedPhoto.eventDate || 'Hôm nay'}
-              </span>
+              <div className="flex flex-wrap gap-2 mb-1.5 items-center">
+                <span className="text-[10px] bg-theme-accent2 text-white px-2.5 py-0.5 rounded-full font-serif italic inline-block">
+                  {selectedPhoto.eventDate || 'Hôm nay'}
+                </span>
+                <span className="text-[10px] bg-[#E6C280] text-theme-dark font-semibold px-2.5 py-0.5 rounded-full inline-block">
+                  Đăng bởi: {selectedPhoto.username === 'hoangngoclan' ? 'Lan' : 'Hoàng'}
+                </span>
+              </div>
               <h3 className="text-xl font-serif font-bold text-theme-dark line-clamp-1">
                 {selectedPhoto.title}
               </h3>

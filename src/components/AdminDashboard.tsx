@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Lock, Plus, Trash2, Save, CheckCircle, Upload, Edit2, Film, Music, Sparkles, GripVertical } from 'lucide-react';
 import type { Photo, Letter, Video } from '../types';
 import { API_BASE_URL } from '../config';
@@ -6,8 +6,8 @@ import { API_BASE_URL } from '../config';
 interface AdminDashboardProps {
   photos: Photo[];
   setPhotos: React.Dispatch<React.SetStateAction<Photo[]>>;
-  letter: Letter;
-  setLetter: React.Dispatch<React.SetStateAction<Letter>>;
+  letters: Letter[];
+  setLetters: React.Dispatch<React.SetStateAction<Letter[]>>;
   videos: Video[];
   setVideos: React.Dispatch<React.SetStateAction<Video[]>>;
   musicUrl: string;
@@ -35,8 +35,8 @@ interface Toast {
 export default function AdminDashboard({ 
   photos, 
   setPhotos, 
-  letter, 
-  setLetter, 
+  letters, 
+  setLetters, 
   videos, 
   setVideos,
   musicUrl,
@@ -81,6 +81,30 @@ export default function AdminDashboard({
 
   const [testStatus, setTestStatus] = useState<'idle' | 'testing' | 'success' | 'failed'>('idle');
   const [testError, setTestError] = useState('');
+
+  const [editLetterTitle, setEditLetterTitle] = useState('');
+  const [editLetterContent, setEditLetterContent] = useState('');
+
+  const currentUsername = localStorage.getItem('admin_username') || 'levanhoang';
+
+  useEffect(() => {
+    const myLetter = letters.find(l => l.username === currentUsername);
+    if (myLetter) {
+      setEditLetterTitle(myLetter.title);
+      setEditLetterContent(myLetter.content);
+    } else {
+      setEditLetterTitle('Dear My Love,');
+      setEditLetterContent('');
+    }
+  }, [letters, currentUsername]);
+
+  const displayPhotos = currentUsername === 'admin' 
+    ? photos 
+    : photos.filter(p => p.username === currentUsername);
+
+  const displayVideos = currentUsername === 'admin' 
+    ? videos 
+    : videos.filter(v => v.username === currentUsername);
 
   const handleTestApiKey = async () => {
     setTestStatus('testing');
@@ -147,9 +171,17 @@ export default function AdminDashboard({
     e.preventDefault();
     if (draggedIndex === null || draggedIndex === targetIndex) return;
 
+    const targetPhoto = displayPhotos[targetIndex];
+    const draggedPhoto = displayPhotos[draggedIndex];
+
+    const draggedAbsoluteIndex = photos.findIndex(p => p.id === draggedPhoto.id);
+    const targetAbsoluteIndex = photos.findIndex(p => p.id === targetPhoto.id);
+
+    if (draggedAbsoluteIndex === -1 || targetAbsoluteIndex === -1) return;
+
     const updatedPhotos = [...photos];
-    const [draggedItem] = updatedPhotos.splice(draggedIndex, 1);
-    updatedPhotos.splice(targetIndex, 0, draggedItem);
+    const [draggedItem] = updatedPhotos.splice(draggedAbsoluteIndex, 1);
+    updatedPhotos.splice(targetAbsoluteIndex, 0, draggedItem);
 
     // Optimistically update frontend state
     setPhotos(updatedPhotos);
@@ -232,7 +264,9 @@ export default function AdminDashboard({
         title: data.title,
         description: data.description,
         eventDate: data.eventDate,
-        imageUrl: data.imageUrl
+        imageUrl: data.imageUrl,
+        username: data.username || p.username,
+        user: data.user || p.user
       } : p));
       
       setEditingPhoto(null);
@@ -318,7 +352,9 @@ export default function AdminDashboard({
         title: data.title,
         description: data.description,
         eventDate: data.eventDate,
-        videoUrl: data.videoUrl
+        videoUrl: data.videoUrl,
+        username: data.username || currentUsername,
+        user: data.user
       };
 
       setVideos([videoToAdd, ...videos]);
@@ -369,7 +405,9 @@ export default function AdminDashboard({
         title: data.title,
         description: data.description,
         eventDate: data.eventDate,
-        videoUrl: data.videoUrl
+        videoUrl: data.videoUrl,
+        username: data.username || v.username,
+        user: data.user || v.user
       } : v));
       
       setEditingVideo(null);
@@ -550,7 +588,9 @@ export default function AdminDashboard({
         title: data.title,
         description: data.description,
         eventDate: data.eventDate,
-        imageUrl: data.imageUrl
+        imageUrl: data.imageUrl,
+        username: data.username || currentUsername,
+        user: data.user
       };
       
       setPhotos([photoToAdd, ...photos]); // Thêm lên đầu danh sách
@@ -563,7 +603,7 @@ export default function AdminDashboard({
   };
 
   const handleSaveLetter = async () => {
-    if (!letter.title || !letter.content) {
+    if (!editLetterTitle || !editLetterContent) {
       showToast('Vui lòng điền đầy đủ tiêu đề và nội dung thư!', 'error');
       return;
     }
@@ -573,8 +613,8 @@ export default function AdminDashboard({
         method: 'PUT',
         headers: getAuthHeaders(),
         body: JSON.stringify({
-          title: letter.title,
-          content: letter.content
+          title: editLetterTitle,
+          content: editLetterContent
         })
       });
 
@@ -584,7 +624,21 @@ export default function AdminDashboard({
         throw new Error(data.msg || 'Không thể lưu thư tình.');
       }
 
-      setLetter(data);
+      // Format from _id to id if backend returned _id
+      const mappedLetter: Letter = {
+        id: data._id,
+        title: data.title,
+        content: data.content,
+        username: data.username || currentUsername,
+        user: data.user
+      };
+
+      const exists = letters.some(l => l.username === currentUsername);
+      if (exists) {
+        setLetters(letters.map(l => l.username === currentUsername ? mappedLetter : l));
+      } else {
+        setLetters([...letters, mappedLetter]);
+      }
       showToast('Đã cập nhật và lưu thư tình thành công! ❤️');
     } catch (err: any) {
       showToast(err.message || 'Lỗi kết nối server', 'error');
@@ -623,7 +677,7 @@ export default function AdminDashboard({
             activeTab === 'photos' ? 'text-theme-dark border-b-4 border-theme-dark' : 'text-gray-400 hover:text-theme-dark'
           }`}
         >
-          Quản lý Ảnh ({photos.length})
+          Quản lý Ảnh ({displayPhotos.length})
         </button>
         <button 
           onClick={() => setActiveTab('videos')} 
@@ -631,7 +685,7 @@ export default function AdminDashboard({
             activeTab === 'videos' ? 'text-theme-dark border-b-4 border-theme-dark' : 'text-gray-400 hover:text-theme-dark'
           }`}
         >
-          Quản lý Video ({videos.length})
+          Quản lý Video ({displayVideos.length})
         </button>
         <button 
           onClick={() => setActiveTab('letter')} 
@@ -801,7 +855,7 @@ export default function AdminDashboard({
 
           {/* Danh sách ảnh */}
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {photos.map((photo, index) => (
+            {displayPhotos.map((photo, index) => (
               <div 
                 key={photo.id} 
                 className={`bg-white rounded-2xl shadow-md overflow-hidden group hover:shadow-xl transition-all duration-300 relative border border-gray-100 cursor-move ${draggedIndex === index ? 'opacity-40 border-dashed border-theme-accent1 scale-95' : ''}`}
@@ -843,7 +897,7 @@ export default function AdminDashboard({
                 </div>
               </div>
             ))}
-            {photos.length === 0 && <div className="col-span-full text-center py-10 text-gray-500">Danh sách trống. Vui lòng thêm ảnh!</div>}
+            {displayPhotos.length === 0 && <div className="col-span-full text-center py-10 text-gray-500">Danh sách trống. Vui lòng thêm ảnh!</div>}
           </div>
         </div>
       )}
@@ -988,7 +1042,7 @@ export default function AdminDashboard({
 
           {/* Danh sách video */}
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {videos.map(video => (
+            {displayVideos.map(video => (
               <div key={video.id} className="bg-white rounded-2xl shadow-md overflow-hidden group hover:shadow-xl transition-shadow relative border border-gray-100 flex flex-col">
                 <div className="h-48 overflow-hidden bg-black flex items-center justify-center relative">
                   <video src={video.videoUrl} className="w-full h-full object-cover opacity-80" preload="metadata" />
@@ -1019,7 +1073,7 @@ export default function AdminDashboard({
                 </div>
               </div>
             ))}
-            {videos.length === 0 && <div className="col-span-full text-center py-10 text-gray-500">Danh sách trống. Vui lòng thêm video!</div>}
+            {displayVideos.length === 0 && <div className="col-span-full text-center py-10 text-gray-500">Danh sách trống. Vui lòng thêm video!</div>}
           </div>
         </div>
       )}
@@ -1031,8 +1085,8 @@ export default function AdminDashboard({
             <label className="block font-bold text-gray-700 mb-2">Tiêu đề thư</label>
             <input 
               type="text" 
-              value={letter.title} 
-              onChange={(e) => setLetter({...letter, title: e.target.value})}
+              value={editLetterTitle} 
+              onChange={(e) => setEditLetterTitle(e.target.value)}
               className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-theme-accent1 outline-none focus:border-theme-dark transition-all"
             />
           </div>
@@ -1040,8 +1094,8 @@ export default function AdminDashboard({
             <label className="block font-bold text-gray-700 mb-2">Nội dung thư</label>
             <textarea 
               rows={12} 
-              value={letter.content}
-              onChange={(e) => setLetter({...letter, content: e.target.value})}
+              value={editLetterContent}
+              onChange={(e) => setEditLetterContent(e.target.value)}
               className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-theme-accent1 outline-none focus:border-theme-dark transition-all leading-relaxed"
             />
           </div>

@@ -8,6 +8,11 @@ const { saveBase64File } = require('../utils/fileUpload');
 const formatPhotoUrl = (photo, req) => {
   const p = photo.toObject ? photo.toObject() : { ...photo };
   p.id = p._id;
+  if (p.user && p.user.username) {
+    p.username = p.user.username;
+  } else {
+    p.username = 'levanhoang'; // fallback
+  }
   if (p.imageUrl && p.imageUrl.startsWith('/uploads/')) {
     const host = req.get('host');
     const protocol = host.includes('localhost') ? 'http' : 'https';
@@ -21,7 +26,7 @@ const formatPhotoUrl = (photo, req) => {
 // @access  Public
 router.get('/', async (req, res) => {
   try {
-    const photos = await Photo.find().sort({ order: 1, createdAt: -1 });
+    const photos = await Photo.find().populate('user', 'username').sort({ order: 1, createdAt: -1 });
     const formattedPhotos = photos.map(photo => formatPhotoUrl(photo, req));
     res.json(formattedPhotos);
   } catch (err) {
@@ -74,10 +79,13 @@ router.post('/', auth, async (req, res) => {
       title: title || 'Ảnh kỷ niệm',
       description: description || '',
       eventDate: eventDate || 'Hôm nay',
-      imageUrl: savedImageUrl
+      imageUrl: savedImageUrl,
+      user: req.user.id
     });
 
-    const photo = await newPhoto.save();
+    let photo = await newPhoto.save();
+    // Populate user to get username
+    photo = await Photo.findById(photo._id).populate('user', 'username');
     res.json(formatPhotoUrl(photo, req));
   } catch (err) {
     console.error(err.message);
@@ -97,6 +105,11 @@ router.put('/:id', auth, async (req, res) => {
       return res.status(404).json({ msg: 'Photo not found' });
     }
 
+    // Verify ownership
+    if (photo.user && photo.user.toString() !== req.user.id && req.user.username !== 'admin') {
+      return res.status(403).json({ msg: 'Bạn không có quyền sửa ảnh này' });
+    }
+
     // Save base64 image to file if new one is provided
     const savedImageUrl = imageUrl ? await saveBase64File(imageUrl, 'photo') : undefined;
 
@@ -107,6 +120,8 @@ router.put('/:id', auth, async (req, res) => {
     if (savedImageUrl) photo.imageUrl = savedImageUrl;
 
     await photo.save();
+    // Populate user to get username
+    photo = await Photo.findById(photo._id).populate('user', 'username');
     res.json(formatPhotoUrl(photo, req));
   } catch (err) {
     console.error(err.message);
@@ -122,6 +137,11 @@ router.delete('/:id', auth, async (req, res) => {
     const photo = await Photo.findById(req.params.id);
     if (!photo) {
       return res.status(404).json({ msg: 'Photo not found' });
+    }
+
+    // Verify ownership
+    if (photo.user && photo.user.toString() !== req.user.id && req.user.username !== 'admin') {
+      return res.status(403).json({ msg: 'Bạn không có quyền xóa ảnh này' });
     }
 
     await Photo.findByIdAndDelete(req.params.id);
