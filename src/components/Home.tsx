@@ -24,7 +24,7 @@ export default function Home({ navigate, photos }: HomeProps) {
 
   // Hàm tính toán bán kính Z cho từng Carousel
   const getRadius = (total: number) => {
-    return Math.max(130, Math.round((200 / 2) / Math.tan(Math.PI / (total || 1))) + 30);
+    return Math.max(120, Math.round((180 / 2) / Math.tan(Math.PI / (total || 1))) + 20);
   };
 
   const radius1 = getRadius(carousel1Photos.length);
@@ -43,7 +43,7 @@ export default function Home({ navigate, photos }: HomeProps) {
       </p>
 
       {photos.length > 0 ? (
-        <div className="flex flex-col lg:flex-row items-center justify-center gap-24 lg:gap-32 w-full max-w-6xl mb-24 px-4">
+        <div className="flex flex-col lg:flex-row items-center justify-center gap-32 lg:gap-52 w-full max-w-7xl mb-28 px-4">
           
           {/* Carousel 1 - Chiều kim đồng hồ */}
           <div className="flex flex-col items-center w-full lg:w-1/2">

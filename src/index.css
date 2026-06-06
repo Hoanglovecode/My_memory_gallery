@@ -66,15 +66,15 @@
 }
 .carousel-container-compact {
   perspective: 1200px;
-  width: 200px;
-  height: 280px;
+  width: 180px;
+  height: 250px;
   margin: 0 auto;
   position: relative;
 }
 .carousel-item-compact {
   position: absolute;
-  width: 200px;
-  height: 280px;
+  width: 180px;
+  height: 250px;
   left: 0;
   top: 0;
   border-radius: 20px;
