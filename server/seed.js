@@ -31,17 +31,17 @@ async function seedAdmin() {
       console.log('User admin already exists.');
     }
 
-    // 2. Seed 'bangaituonglai' / '19012007'
+    // 2. Seed 'bangaituonglai' / '00000000'
     const userExists = await User.findOne({ username: 'bangaituonglai' });
     if (!userExists) {
       const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash('19012007', salt);
+      const hashedPassword = await bcrypt.hash('00000000', salt);
       const user = new User({
         username: 'bangaituonglai',
         password: hashedPassword
       });
       await user.save();
-      console.log('Successfully seeded bangaituonglai / 19012007');
+      console.log('Successfully seeded bangaituonglai / 00000000');
     } else {
       console.log('User bangaituonglai already exists.');
     }
