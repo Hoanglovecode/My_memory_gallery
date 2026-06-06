@@ -9,15 +9,15 @@ interface LetterViewProps {
 export default function LetterView({ letters }: LetterViewProps) {
   const hoangLetter = letters.find(l => l.username === 'levanhoang') || {
     title: 'Dear My Love,',
-    content: 'Thư Hoàng chưa viết hoặc đang chuẩn bị viết gửi Lan... ❤️'
+    content: 'Thư Hoàng chưa viết hoặc đang chuẩn bị viết gửi Bạn gái tương lai... ❤️'
   };
 
-  const lanLetter = letters.find(l => l.username === 'hoangngoclan') || {
+  const lanLetter = letters.find(l => l.username === 'bangaituonglai') || {
     title: 'Dear My Love,',
-    content: 'Thư Lan chưa viết hoặc đang chuẩn bị viết gửi Hoàng... ❤️'
+    content: 'Thư Bạn gái tương lai chưa viết hoặc đang chuẩn bị viết gửi Hoàng... ❤️'
   };
 
-  const [activeTab, setActiveTab] = useState<'hoang' | 'lan'>('hoang');
+  const [activeTab, setActiveTab] = useState<'hoang' | 'bangaituonglai'>('hoang');
   const currentLetter = activeTab === 'hoang' ? hoangLetter : lanLetter;
 
   return (
@@ -35,14 +35,14 @@ export default function LetterView({ letters }: LetterViewProps) {
           💌 Thư của Hoàng
         </button>
         <button
-          onClick={() => setActiveTab('lan')}
+          onClick={() => setActiveTab('bangaituonglai')}
           className={`px-6 py-2.5 rounded-full font-serif font-bold text-sm md:text-base transition-all cursor-pointer ${
-            activeTab === 'lan'
+            activeTab === 'bangaituonglai'
               ? 'bg-theme-dark text-white shadow-md'
               : 'text-theme-dark/70 hover:text-theme-dark hover:bg-white/40'
           }`}
         >
-          💌 Thư của Lan
+          💌 Thư của Bạn gái tương lai
         </button>
       </div>
 

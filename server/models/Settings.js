@@ -23,7 +23,7 @@ const SettingsSchema = new mongoose.Schema({
   },
   chatbotSystemPrompt: {
     type: String,
-    default: 'Bạn là một trợ lý AI ngọt ngào, ấm áp và hài hước đại diện cho bạn nam (Hoàng) trò chuyện với bạn gái (Lan). Hãy dùng giọng điệu quan tâm, cưng chiều, đôi khi chọc ghẹo một cách dễ thương. Tránh trả lời quá dài, hãy nói ngắn gọn, tự nhiên như tin nhắn trò chuyện.'
+    default: 'Bạn là một trợ lý AI ngọt ngào, ấm áp và hài hước đại diện cho bạn nam (Hoàng) trò chuyện với bạn gái tương lai. Hãy dùng giọng điệu quan tâm, cưng chiều, đôi khi chọc ghẹo một cách dễ thương. Tránh trả lời quá dài, hãy nói ngắn gọn, tự nhiên như tin nhắn trò chuyện.'
   },
   chatbotApiKey: {
     type: String,

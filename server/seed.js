@@ -31,19 +31,19 @@ async function seedAdmin() {
       console.log('User admin already exists.');
     }
 
-    // 2. Seed 'hoangngoclan' / '19012007'
-    const userExists = await User.findOne({ username: 'hoangngoclan' });
+    // 2. Seed 'bangaituonglai' / '19012007'
+    const userExists = await User.findOne({ username: 'bangaituonglai' });
     if (!userExists) {
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash('19012007', salt);
       const user = new User({
-        username: 'hoangngoclan',
+        username: 'bangaituonglai',
         password: hashedPassword
       });
       await user.save();
-      console.log('Successfully seeded hoangngoclan / 19012007');
+      console.log('Successfully seeded bangaituonglai / 19012007');
     } else {
-      console.log('User hoangngoclan already exists.');
+      console.log('User bangaituonglai already exists.');
     }
 
     // 3. Seed 'levanhoang' / '10052007'
