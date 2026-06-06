@@ -25,10 +25,10 @@ export default function App() {
   const [musicUrl, setMusicUrl] = useState('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
   const [musicTitle, setMusicTitle] = useState('SoundHelix-Song-1');
   const [chatbotEnabled, setChatbotEnabled] = useState(true);
-  const [creatorFacebook, setCreatorFacebook] = useState('https://facebook.com');
-  const [creatorLinkedin, setCreatorLinkedin] = useState('https://linkedin.com');
-  const [creatorYoutube, setCreatorYoutube] = useState('https://youtube.com');
-  const [creatorGithub, setCreatorGithub] = useState('https://github.com');
+  const [creatorFacebook, setCreatorFacebook] = useState('https://www.facebook.com/van.hoang.774744/');
+  const [creatorLinkedin, setCreatorLinkedin] = useState('https://www.linkedin.com/in/hoangalgoict/');
+  const [creatorYoutube, setCreatorYoutube] = useState('https://www.youtube.com/@Algoict_Official');
+  const [creatorGithub, setCreatorGithub] = useState('https://github.com/Hoanglovecode');
   const [chatbotName, setChatbotName] = useState('AI Love Bot');
   const [chatbotWelcomeMessage, setChatbotWelcomeMessage] = useState('Chào em! Anh là trợ lý tình yêu của hai bạn. Hôm nay em muốn trò chuyện gì nào? 💕');
   const [chatbotSystemPrompt, setChatbotSystemPrompt] = useState('');

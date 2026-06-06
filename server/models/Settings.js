@@ -31,19 +31,19 @@ const SettingsSchema = new mongoose.Schema({
   },
   creatorFacebook: {
     type: String,
-    default: 'https://facebook.com'
+    default: 'https://www.facebook.com/van.hoang.774744/'
   },
   creatorLinkedin: {
     type: String,
-    default: 'https://linkedin.com'
+    default: 'https://www.linkedin.com/in/hoangalgoict/'
   },
   creatorYoutube: {
     type: String,
-    default: 'https://youtube.com'
+    default: 'https://www.youtube.com/@Algoict_Official'
   },
   creatorGithub: {
     type: String,
-    default: 'https://github.com'
+    default: 'https://github.com/Hoanglovecode'
   }
 }, {
   timestamps: true
