@@ -102,6 +102,20 @@ export default function AdminDashboard({
   const [editGithub, setEditGithub] = useState(creatorGithub);
 
   useEffect(() => {
+    setEditMusicTitle(musicTitle);
+    setEditMusicUrl(musicUrl);
+    setMusicUploadMode(musicUrl.startsWith('data:audio') ? 'file' : 'url');
+  }, [musicTitle, musicUrl]);
+
+  useEffect(() => {
+    setEditChatbotEnabled(chatbotEnabled);
+    setEditChatbotName(chatbotName);
+    setEditChatbotWelcomeMessage(chatbotWelcomeMessage);
+    setEditChatbotSystemPrompt(chatbotSystemPrompt);
+    setEditChatbotApiKey(chatbotApiKey);
+  }, [chatbotEnabled, chatbotName, chatbotWelcomeMessage, chatbotSystemPrompt, chatbotApiKey]);
+
+  useEffect(() => {
     setEditFacebook(creatorFacebook);
     setEditLinkedin(creatorLinkedin);
     setEditYoutube(creatorYoutube);
