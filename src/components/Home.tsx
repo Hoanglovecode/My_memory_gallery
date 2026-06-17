@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Image as ImageIcon, X } from 'lucide-react';
 import type { Photo, View } from '../types';
+import { optimizeImageUrl } from '../config';
 
 interface HomeProps {
   navigate: (view: View) => void;
@@ -65,9 +66,10 @@ export default function Home({ navigate, photos }: HomeProps) {
                     }}
                   >
                     <img
-                      src={photo.imageUrl}
+                      src={optimizeImageUrl(photo.imageUrl)}
                       alt={photo.title}
                       className="w-full h-full object-cover"
+                      loading="lazy"
                     />
                     <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/85 via-black/45 to-transparent p-3 text-white">
                       <p className="font-bold text-sm drop-shadow-md tracking-wide truncate">{photo.title}</p>
@@ -99,9 +101,10 @@ export default function Home({ navigate, photos }: HomeProps) {
                     }}
                   >
                     <img
-                      src={photo.imageUrl}
+                      src={optimizeImageUrl(photo.imageUrl)}
                       alt={photo.title}
                       className="w-full h-full object-cover"
+                      loading="lazy"
                     />
                     <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/85 via-black/45 to-transparent p-3 text-white">
                       <p className="font-bold text-sm drop-shadow-md tracking-wide truncate">{photo.title}</p>
@@ -153,9 +156,10 @@ export default function Home({ navigate, photos }: HomeProps) {
               }}
             >
               <img 
-                src={selectedPhoto.imageUrl} 
+                src={optimizeImageUrl(selectedPhoto.imageUrl)} 
                 alt={selectedPhoto.title} 
                 className="w-full h-full object-cover"
+                loading="lazy"
               />
             </div>
 

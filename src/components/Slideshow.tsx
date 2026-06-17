@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import type { Photo, View } from '../types';
+import { optimizeImageUrl } from '../config';
 
 interface SlideshowProps {
   photos: Photo[];
@@ -59,9 +60,10 @@ export default function Slideshow({ photos, navigate }: SlideshowProps) {
       {/* Hiệu ứng chuyển cảnh (Crossfade) */}
       <div key={currentPhoto.id} className="absolute inset-0 animate-fade-in overflow-hidden">
         <img 
-          src={currentPhoto.imageUrl} 
+          src={optimizeImageUrl(currentPhoto.imageUrl)} 
           alt={currentPhoto.title}
           className="w-full h-full object-contain md:object-cover animate-slow-zoom opacity-85"
+          loading="lazy"
         />
         {/* Lớp phủ gradient để đọc chữ rõ hơn */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/25 to-transparent" />

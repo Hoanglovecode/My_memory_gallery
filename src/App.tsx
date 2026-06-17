@@ -18,22 +18,64 @@ export default function App() {
   const [isPlayingMusic, setIsPlayingMusic] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // App State
-  const [photos, setPhotos] = useState<Photo[]>([]);
-  const [videos, setVideos] = useState<Video[]>([]);
-  const [letters, setLetters] = useState<Letter[]>([]);
-  const [musicUrl, setMusicUrl] = useState('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
-  const [musicTitle, setMusicTitle] = useState('SoundHelix-Song-1');
-  const [chatbotEnabled, setChatbotEnabled] = useState(true);
-  const [creatorFacebook, setCreatorFacebook] = useState('https://www.facebook.com/van.hoang.774744/');
-  const [creatorLinkedin, setCreatorLinkedin] = useState('https://www.linkedin.com/in/hoangalgoict/');
-  const [creatorYoutube, setCreatorYoutube] = useState('https://www.youtube.com/@Algoict_Official');
-  const [creatorGithub, setCreatorGithub] = useState('https://github.com/Hoanglovecode');
-  const [chatbotName, setChatbotName] = useState('AI Love Bot');
-  const [chatbotWelcomeMessage, setChatbotWelcomeMessage] = useState('Chào em! Anh là trợ lý tình yêu của hai bạn. Hôm nay em muốn trò chuyện gì nào? 💕');
-  const [chatbotSystemPrompt, setChatbotSystemPrompt] = useState('');
-  const [chatbotApiKey, setChatbotApiKey] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
+  // App State with localStorage cache fallback
+  const [photos, setPhotos] = useState<Photo[]>(() => {
+    try {
+      const cached = localStorage.getItem('cached_photos');
+      return cached ? JSON.parse(cached) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [videos, setVideos] = useState<Video[]>(() => {
+    try {
+      const cached = localStorage.getItem('cached_videos');
+      return cached ? JSON.parse(cached) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [letters, setLetters] = useState<Letter[]>(() => {
+    try {
+      const cached = localStorage.getItem('cached_letters');
+      return cached ? JSON.parse(cached) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const getCachedSetting = (key: string, defaultValue: any) => {
+    try {
+      const cached = localStorage.getItem('cached_settings');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed[key] !== undefined) return parsed[key];
+      }
+    } catch {}
+    return defaultValue;
+  };
+
+  const [musicUrl, setMusicUrl] = useState<string>(() => getCachedSetting('musicUrl', 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'));
+  const [musicTitle, setMusicTitle] = useState<string>(() => getCachedSetting('musicTitle', 'SoundHelix-Song-1'));
+  const [chatbotEnabled, setChatbotEnabled] = useState<boolean>(() => getCachedSetting('chatbotEnabled', true));
+  const [creatorFacebook, setCreatorFacebook] = useState<string>(() => getCachedSetting('creatorFacebook', 'https://www.facebook.com/van.hoang.774744/'));
+  const [creatorLinkedin, setCreatorLinkedin] = useState<string>(() => getCachedSetting('creatorLinkedin', 'https://www.linkedin.com/in/hoangalgoict/'));
+  const [creatorYoutube, setCreatorYoutube] = useState<string>(() => getCachedSetting('creatorYoutube', 'https://www.youtube.com/@Algoict_Official'));
+  const [creatorGithub, setCreatorGithub] = useState<string>(() => getCachedSetting('creatorGithub', 'https://github.com/Hoanglovecode'));
+  const [chatbotName, setChatbotName] = useState<string>(() => getCachedSetting('chatbotName', 'AI Love Bot'));
+  const [chatbotWelcomeMessage, setChatbotWelcomeMessage] = useState<string>(() => getCachedSetting('chatbotWelcomeMessage', 'Chào em! Anh là trợ lý tình yêu của hai bạn. Hôm nay em muốn trò chuyện gì nào? 💕'));
+  const [chatbotSystemPrompt, setChatbotSystemPrompt] = useState<string>(() => getCachedSetting('chatbotSystemPrompt', ''));
+  const [chatbotApiKey, setChatbotApiKey] = useState<string>(() => getCachedSetting('chatbotApiKey', ''));
+
+  // If there's any cached photos, skip the full screen loading screen on start
+  const [isLoading, setIsLoading] = useState(() => {
+    try {
+      const cachedPhotos = localStorage.getItem('cached_photos');
+      return !cachedPhotos; // true (show loading screen) only if no cache
+    } catch {
+      return true;
+    }
+  });
 
   // Load from Backend API on mount
   useEffect(() => {
@@ -54,6 +96,7 @@ export default function App() {
             user: p.user
           }));
           setPhotos(mappedPhotos);
+          localStorage.setItem('cached_photos', JSON.stringify(mappedPhotos));
         }
 
         // 2. Fetch videos
@@ -70,6 +113,7 @@ export default function App() {
             user: v.user
           }));
           setVideos(mappedVideos);
+          localStorage.setItem('cached_videos', JSON.stringify(mappedVideos));
         }
 
         // 3. Fetch letters
@@ -77,6 +121,7 @@ export default function App() {
         if (lettersRes.ok) {
           const lettersData = await lettersRes.json();
           setLetters(lettersData);
+          localStorage.setItem('cached_letters', JSON.stringify(lettersData));
         }
 
         // 3.5. Fetch music and chatbot settings
@@ -94,6 +139,8 @@ export default function App() {
           if (settingsData.creatorLinkedin) setCreatorLinkedin(settingsData.creatorLinkedin);
           if (settingsData.creatorYoutube) setCreatorYoutube(settingsData.creatorYoutube);
           if (settingsData.creatorGithub) setCreatorGithub(settingsData.creatorGithub);
+
+          localStorage.setItem('cached_settings', JSON.stringify(settingsData));
         }
 
         // 4. Check auth status
@@ -111,6 +158,7 @@ export default function App() {
     }
     loadData();
   }, []);
+
 
   // Music toggle
   const toggleMusic = () => {
