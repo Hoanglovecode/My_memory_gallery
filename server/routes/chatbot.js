@@ -3,6 +3,9 @@ const router = express.Router();
 const rateLimit = require('express-rate-limit');
 const Settings = require('../models/Settings');
 const ChatLog = require('../models/ChatLog');
+const Photo = require('../models/Photo');
+const Video = require('../models/Video');
+const Letter = require('../models/Letter');
 
 // Giới hạn mỗi IP chỉ được gửi tối đa 30 request mỗi 10 phút
 const chatLimiter = rateLimit({
@@ -58,7 +61,31 @@ router.post('/chat', chatLimiter, async (req, res) => {
     }
 
     const apiKey = settings.chatbotApiKey;
-    const systemPrompt = settings.chatbotSystemPrompt || 'Bạn là trợ lý AI đáng yêu đại diện cho bạn nam.';
+    let systemPrompt = settings.chatbotSystemPrompt || 'Bạn là trợ lý AI đáng yêu đại diện cho bạn nam.';
+
+    // Fetch memory context dynamically from the database to inject into the Gemini context
+    try {
+      const [photos, videos, letters] = await Promise.all([
+        Photo.find({}, 'title eventDate').limit(40),
+        Video.find({}, 'title eventDate').limit(20),
+        Letter.find({}, 'title content').limit(5)
+      ]);
+
+      let memoryContext = '\n\n[Dữ liệu Album kỷ niệm thực tế từ website của bạn để sử dụng khi trò chuyện:]';
+      if (photos.length > 0) {
+        memoryContext += '\n- Ảnh kỷ niệm hiện có: ' + photos.map(p => `"${p.title}" (${p.eventDate || 'chưa rõ ngày'})`).join(', ');
+      }
+      if (videos.length > 0) {
+        memoryContext += '\n- Video kỷ niệm hiện có: ' + videos.map(v => `"${v.title}" (${v.eventDate || 'chưa rõ ngày'})`).join(', ');
+      }
+      if (letters.length > 0) {
+        memoryContext += '\n- Thư tình đã viết: ' + letters.map(l => `Thư "${l.title}" (nội dung chính: "${l.content.substring(0, 150)}...")`).join('; ');
+      }
+      systemPrompt += memoryContext;
+    } catch (dbErr) {
+      console.warn("Failed to fetch memories context for chatbot RAG:", dbErr.message);
+    }
+
     const systemPromptTokens = estimateTokenCount(systemPrompt);
 
     // Fetch previous messages for this session
@@ -109,6 +136,11 @@ router.post('/chat', chatLimiter, async (req, res) => {
       contents: contents,
       systemInstruction: {
         parts: [{ text: systemPrompt }]
+      },
+      generationConfig: {
+        temperature: 1.0,
+        topP: 0.95,
+        maxOutputTokens: 800
       }
     };
 
@@ -132,7 +164,7 @@ router.post('/chat', chatLimiter, async (req, res) => {
           fetchOptions.signal = AbortSignal.timeout(8000); // 8-second timeout
         }
 
-        response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`, fetchOptions);
+        response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, fetchOptions);
         data = await response.json();
 
         if (response.ok) {
