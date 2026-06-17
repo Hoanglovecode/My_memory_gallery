@@ -58,8 +58,8 @@ export default function App() {
     return defaultValue;
   };
 
-  const [musicUrl, setMusicUrl] = useState<string>(() => getCachedSetting('musicUrl', 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'));
-  const [musicTitle, setMusicTitle] = useState<string>(() => getCachedSetting('musicTitle', 'SoundHelix-Song-1'));
+  const [musicUrl, setMusicUrl] = useState<string>(() => getCachedSetting('musicUrl', ''));
+  const [musicTitle, setMusicTitle] = useState<string>(() => getCachedSetting('musicTitle', 'Đang tải nhạc...'));
   const [chatbotEnabled, setChatbotEnabled] = useState<boolean>(() => getCachedSetting('chatbotEnabled', true));
   const [creatorFacebook, setCreatorFacebook] = useState<string>(() => getCachedSetting('creatorFacebook', 'https://www.facebook.com/van.hoang.774744/'));
   const [creatorLinkedin, setCreatorLinkedin] = useState<string>(() => getCachedSetting('creatorLinkedin', 'https://www.linkedin.com/in/hoangalgoict/'));
@@ -145,7 +145,17 @@ export default function App() {
           if (settingsData.creatorYoutube) setCreatorYoutube(settingsData.creatorYoutube);
           if (settingsData.creatorGithub) setCreatorGithub(settingsData.creatorGithub);
 
-          localStorage.setItem('cached_settings', JSON.stringify(settingsData));
+          // Create settings copy without large base64 audio data for local storage caching to prevent QuotaExceededError
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const settingsToCache = { ...settingsData } as Record<string, any>;
+          if (settingsToCache.musicUrl && settingsToCache.musicUrl.startsWith('data:')) {
+            delete settingsToCache.musicUrl;
+          }
+          try {
+            localStorage.setItem('cached_settings', JSON.stringify(settingsToCache));
+          } catch (e) {
+            console.warn("Failed to cache settings in localStorage:", e);
+          }
         }
 
         // 4. Check auth status
