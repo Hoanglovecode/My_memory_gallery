@@ -164,7 +164,7 @@ router.post('/chat', chatLimiter, async (req, res) => {
           fetchOptions.signal = AbortSignal.timeout(8000); // 8-second timeout
         }
 
-        response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`, fetchOptions);
+        response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, fetchOptions);
         data = await response.json();
 
         if (response.ok) {
@@ -186,6 +186,13 @@ router.post('/chat', chatLimiter, async (req, res) => {
 
     if (!response || !response.ok) {
       console.error("Gemini API call failed after retries. Last error:", lastError);
+      try {
+        const fs = require('fs');
+        const path = require('path');
+        fs.writeFileSync(path.join(__dirname, '../error.log'), `Response status: ${response ? response.status : 'unknown'}\nError: ${lastError ? (lastError.stack || lastError.message) : 'unknown'}\nData: ${JSON.stringify(data || {})}`);
+      } catch (err) {
+        console.error("Failed to write error log:", err);
+      }
       return res.status(500).json({
         reply: "Anh đang bận tí, em nhắn lại sau nhé 🥺"
       });
