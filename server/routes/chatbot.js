@@ -164,7 +164,7 @@ router.post('/chat', chatLimiter, async (req, res) => {
           fetchOptions.signal = AbortSignal.timeout(8000); // 8-second timeout
         }
 
-        response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, fetchOptions);
+        response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`, fetchOptions);
         data = await response.json();
 
         if (response.ok) {
