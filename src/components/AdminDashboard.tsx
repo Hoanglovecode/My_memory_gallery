@@ -180,9 +180,9 @@ export default function AdminDashboard({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Check size limit: 1.5 MB = 1.5 * 1024 * 1024 bytes
-    if (file.size > 1.5 * 1024 * 1024) {
-      showToast('Kích thước ảnh quá lớn! Vui lòng chọn ảnh < 1.5 MB để lưu trữ mượt mà.', 'error');
+    // Check size limit: 10 MB = 10 * 1024 * 1024 bytes
+    if (file.size > 10 * 1024 * 1024) {
+      showToast('Kích thước ảnh quá lớn! Vui lòng chọn ảnh < 10 MB để lưu trữ mượt mà.', 'error');
       return;
     }
 
@@ -262,8 +262,8 @@ export default function AdminDashboard({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 1.5 * 1024 * 1024) {
-      showToast('Kích thước ảnh quá lớn! Vui lòng chọn ảnh < 1.5 MB để lưu trữ mượt mà.', 'error');
+    if (file.size > 10 * 1024 * 1024) {
+      showToast('Kích thước ảnh quá lớn! Vui lòng chọn ảnh < 10 MB để lưu trữ mượt mà.', 'error');
       return;
     }
 
@@ -862,7 +862,7 @@ export default function AdminDashboard({
                         <label className="border-2 border-dashed border-gray-300 rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer hover:border-theme-accent2 hover:bg-theme-main/10 transition-all group">
                           <Upload className="text-gray-400 group-hover:text-theme-dark transition-colors mb-2" size={32} />
                           <span className="font-bold text-gray-600 group-hover:text-theme-dark transition-colors">Chọn ảnh từ máy tính</span>
-                          <span className="text-xs text-gray-400 mt-1">Hỗ trợ PNG, JPG, JPEG, WEBP, GIF (Tối đa 1.5MB)</span>
+                          <span className="text-xs text-gray-400 mt-1">Hỗ trợ PNG, JPG, JPEG, WEBP, GIF (Tối đa 10MB)</span>
                           <input 
                             type="file" 
                             accept="image/*" 
@@ -1560,7 +1560,7 @@ export default function AdminDashboard({
                       <label className="border-2 border-dashed border-gray-300 rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer hover:border-theme-accent2 hover:bg-theme-main/10 transition-all group">
                         <Upload className="text-gray-400 group-hover:text-theme-dark transition-colors mb-2" size={32} />
                         <span className="font-bold text-gray-600 group-hover:text-theme-dark transition-colors">Chọn ảnh từ máy tính</span>
-                        <span className="text-xs text-gray-400 mt-1">Hỗ trợ PNG, JPG, JPEG, WEBP, GIF (Tối đa 1.5MB)</span>
+                        <span className="text-xs text-gray-400 mt-1">Hỗ trợ PNG, JPG, JPEG, WEBP, GIF (Tối đa 10MB)</span>
                         <input 
                           type="file" 
                           accept="image/*" 
