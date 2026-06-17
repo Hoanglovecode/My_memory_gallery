@@ -12,16 +12,12 @@ export default function Home({ navigate, photos }: HomeProps) {
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
 
   // Phân chia ảnh cho 2 vòng xoay nếu có nhiều hơn 3 ảnh
-  let carousel1Photos: Photo[] = [];
-  let carousel2Photos: Photo[] = [];
-
-  if (photos.length >= 4) {
-    carousel1Photos = photos.filter((_, idx) => idx % 2 === 0);
-    carousel2Photos = photos.filter((_, idx) => idx % 2 !== 0);
-  } else {
-    carousel1Photos = photos;
-    carousel2Photos = photos;
-  }
+  const carousel1Photos = photos.length >= 4 
+    ? photos.filter((_, idx) => idx % 2 === 0) 
+    : photos;
+  const carousel2Photos = photos.length >= 4 
+    ? photos.filter((_, idx) => idx % 2 !== 0) 
+    : photos;
 
   // Hàm tính toán bán kính Z cho từng Carousel
   const getRadius = (total: number) => {

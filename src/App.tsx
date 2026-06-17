@@ -44,14 +44,17 @@ export default function App() {
     }
   });
 
-  const getCachedSetting = (key: string, defaultValue: any) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const getCachedSetting = (key: string, defaultValue: any): any => {
     try {
       const cached = localStorage.getItem('cached_settings');
       if (cached) {
-        const parsed = JSON.parse(cached);
+        const parsed = JSON.parse(cached) as Record<string, unknown>;
         if (parsed[key] !== undefined) return parsed[key];
       }
-    } catch {}
+    } catch {
+      // ignore
+    }
     return defaultValue;
   };
 
@@ -86,7 +89,8 @@ export default function App() {
         if (photosRes.ok) {
           const photosData = await photosRes.json();
           // Backend returns _id instead of id, so we map it
-          const mappedPhotos = photosData.map((p: any) => ({
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const mappedPhotos = (photosData as any[]).map((p: any) => ({
             id: p._id,
             title: p.title,
             description: p.description,
@@ -103,7 +107,8 @@ export default function App() {
         const videosRes = await fetch(`${API_BASE_URL}/videos`);
         if (videosRes.ok) {
           const videosData = await videosRes.json();
-          const mappedVideos = videosData.map((v: any) => ({
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const mappedVideos = (videosData as any[]).map((v: any) => ({
             id: v._id,
             title: v.title,
             description: v.description,
