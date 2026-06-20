@@ -1,16 +1,33 @@
 import { useState } from 'react';
-import { Play, Calendar, Film, X } from 'lucide-react';
-import type { Video } from '../types';
+import { Play, Calendar, Film, X, ArrowLeft } from 'lucide-react';
+import type { Video, View } from '../types';
 
 interface VideoGalleryProps {
   videos: Video[];
+  navigate: (view: View) => void;
+  onPlayVideo: () => void;
+  onCloseVideo: () => void;
 }
 
-export default function VideoGallery({ videos }: VideoGalleryProps) {
+export default function VideoGallery({ videos, navigate, onPlayVideo, onCloseVideo }: VideoGalleryProps) {
   const [activeVideo, setActiveVideo] = useState<Video | null>(null);
 
+  const handleClose = () => {
+    setActiveVideo(null);
+    onCloseVideo();
+  };
+
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 animate-fade-in">
+    <div className="max-w-6xl mx-auto px-4 py-8 animate-fade-in relative">
+      {/* Back Button */}
+      <button
+        onClick={() => navigate('fantasy')}
+        className="absolute top-4 left-4 flex items-center gap-2 text-theme-dark hover:text-theme-accent2 font-semibold text-sm transition-colors bg-white/60 hover:bg-white px-4 py-2 rounded-full border border-theme-dark/10 shadow-sm cursor-pointer z-10"
+        title="Quay lại"
+      >
+        <ArrowLeft size={16} />
+        <span>Quay lại</span>
+      </button>
       <div className="text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-serif font-bold text-theme-dark mb-4 flex items-center justify-center gap-3">
           <Film className="text-theme-accent2 animate-pulse" size={40} />
@@ -27,7 +44,10 @@ export default function VideoGallery({ videos }: VideoGalleryProps) {
             <div 
               key={video.id} 
               className="bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 group cursor-pointer flex flex-col"
-              onClick={() => setActiveVideo(video)}
+              onClick={() => {
+                setActiveVideo(video);
+                onPlayVideo();
+              }}
             >
               {/* Video Thumbnail (Auto preview from first frame) */}
               <div className="h-56 relative bg-black flex items-center justify-center overflow-hidden">
@@ -83,12 +103,12 @@ export default function VideoGallery({ videos }: VideoGalleryProps) {
         <div 
           className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-[9999] p-4 animate-fade-in"
           onClick={(e) => {
-            if (e.target === e.currentTarget) setActiveVideo(null);
+            if (e.target === e.currentTarget) handleClose();
           }}
         >
           {/* Close button */}
           <button 
-            onClick={() => setActiveVideo(null)}
+            onClick={handleClose}
             className="absolute top-6 right-6 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 p-3 rounded-full transition-all hover:scale-110 cursor-pointer"
             title="Đóng video"
           >
@@ -130,7 +150,7 @@ export default function VideoGallery({ videos }: VideoGalleryProps) {
               <div className="mt-6 pt-4 border-t border-zinc-800 flex justify-end">
                 <button
                   type="button"
-                  onClick={() => setActiveVideo(null)}
+                  onClick={handleClose}
                   className="bg-zinc-800 hover:bg-zinc-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all hover:scale-105 cursor-pointer flex items-center gap-2"
                 >
                   <X size={16} /> Thoát / Đóng video

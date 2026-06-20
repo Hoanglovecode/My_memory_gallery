@@ -1,0 +1,71 @@
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes pulseStar {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+@keyframes driftClouds {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(30px); }
+}
+
+@keyframes fadeInPage {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes particleFloat {
+  0% { transform: translateY(0); opacity: 0; }
+  50% { opacity: 0.8; }
+  100% { transform: translateY(-60px); opacity: 0; }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+  animation-fill-mode: both;
+}
+
+.animate-pulse-star {
+  animation: pulseStar 2.5s ease-in-out infinite;
+  animation-fill-mode: both;
+}
+
+.animate-drift-clouds {
+  animation: driftClouds 20s ease-in-out infinite;
+  animation-fill-mode: both;
+}
+
+.animate-fade-in-page {
+  animation: fadeInPage 1.2s ease-out both;
+}
+
+.animate-particle-float {
+  animation: particleFloat 6s ease-in-out infinite;
+  animation-fill-mode: both;
+}
+
+/* === Heavenly Floral Theme Animations === */
+
+@keyframes float-petal {
+  0% { transform: translateY(-10vh) rotate(0deg) translateX(0); opacity: 0; }
+  20% { opacity: 0.8; }
+  80% { opacity: 0.8; }
+  100% { transform: translateY(110vh) rotate(360deg) translateX(50px); opacity: 0; }
+}
+
+@keyframes pulse-light {
+  0%, 100% { opacity: 0.5; transform: scale(1); filter: blur(30px); }
+  50% { opacity: 0.8; transform: scale(1.2); filter: blur(40px); }
+}
+
+.animate-petal {
+  animation: float-petal linear infinite both;
+}
+
+.animate-pulse-light {
+  animation: pulse-light 5s ease-in-out infinite both;
+}

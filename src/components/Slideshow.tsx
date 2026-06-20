@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, ArrowLeft } from 'lucide-react';
 import type { Photo, View } from '../types';
 import { optimizeImageUrl } from '../config';
 
@@ -62,7 +62,7 @@ export default function Slideshow({ photos, navigate }: SlideshowProps) {
         <img 
           src={optimizeImageUrl(currentPhoto.imageUrl)} 
           alt={currentPhoto.title}
-          className="w-full h-full object-contain md:object-cover animate-slow-zoom opacity-85"
+          className="w-full h-full object-contain animate-slow-zoom opacity-85"
           loading="lazy"
         />
         {/* Lớp phủ gradient để đọc chữ rõ hơn */}
@@ -103,6 +103,16 @@ export default function Slideshow({ photos, navigate }: SlideshowProps) {
           style={{ width: `${progress}%` }}
         />
       </div>
+
+      {/* Nút Quay lại Trang chủ */}
+      <button 
+        onClick={() => navigate('fantasy')} 
+        className="absolute top-8 left-8 text-white/80 hover:text-white z-50 bg-black/30 hover:bg-black/50 px-4 py-2.5 rounded-full backdrop-blur-xs transition-all hover:scale-105 cursor-pointer border border-white/10 flex items-center gap-1.5 font-medium text-sm shadow-md"
+        title="Quay lại"
+      >
+        <ArrowLeft size={16} />
+        <span>Quay lại</span>
+      </button>
 
       {/* Nút thoát */}
       <button 

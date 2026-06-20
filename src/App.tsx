@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Heart, Image as ImageIcon, Mail, Lock, LogOut, Music, Pause, Film } from 'lucide-react';
+import { Heart, Image as ImageIcon, Mail, Lock, LogOut, Music, Pause, Film, ArrowLeft } from 'lucide-react';
 import type { Photo, Letter, View, Video } from './types';
 import Home from './components/Home';
 import Slideshow from './components/Slideshow';
@@ -11,12 +11,41 @@ import { API_BASE_URL } from './config';
 import BackgroundParticles from './components/BackgroundParticles';
 import ChatbotWidget from './components/ChatbotWidget';
 
+import Hero from './components/Hero';
+import Navbar from './components/Navbar';
+
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<View>('home');
+  const [currentView, setCurrentView] = useState<View>(() => {
+    const hash = window.location.hash;
+    const search = window.location.search;
+    if (hash === '#memories' || search.includes('mode=memories')) {
+      return 'home';
+    }
+    if (hash === '#slideshow' || hash === '#videos' || hash === '#letter' || hash === '#admin' || hash === '#login') {
+      return hash.replace('#', '') as View;
+    }
+    return 'fantasy';
+  });
   const [isAdmin, setIsAdmin] = useState(false);
   const [isPlayingMusic, setIsPlayingMusic] = useState(false);
+  const [wasPlayingBeforeVideo, setWasPlayingBeforeVideo] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      if (hash === '#memories') {
+        setCurrentView('home');
+      } else if (hash === '#fantasy') {
+        setCurrentView('fantasy');
+      } else if (hash === '#slideshow' || hash === '#videos' || hash === '#letter' || hash === '#admin' || hash === '#login') {
+        setCurrentView(hash.replace('#', '') as View);
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
 
   // App State with localStorage cache fallback
   const [photos, setPhotos] = useState<Photo[]>(() => {
@@ -178,13 +207,33 @@ export default function App() {
   // Music toggle
   const toggleMusic = () => {
     if (!audioRef.current) return;
-    
+
     if (isPlayingMusic) {
       audioRef.current.pause();
     } else {
       audioRef.current.play().catch(e => console.log("Auto-play blocked:", e));
     }
     setIsPlayingMusic(!isPlayingMusic);
+  };
+
+  const handlePlayVideo = () => {
+    if (isPlayingMusic) {
+      setWasPlayingBeforeVideo(true);
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+      setIsPlayingMusic(false);
+    }
+  };
+
+  const handleCloseVideo = () => {
+    if (wasPlayingBeforeVideo) {
+      if (audioRef.current) {
+        audioRef.current.play().catch(e => console.log("Failed to resume music:", e));
+      }
+      setIsPlayingMusic(true);
+      setWasPlayingBeforeVideo(false);
+    }
   };
 
   // Autoplay background music with user interaction fallback (due to browser autoplay policies)
@@ -231,11 +280,18 @@ export default function App() {
   }, [isLoading, musicUrl]);
 
   const navigate = (view: View) => {
+    if (view === 'fantasy') {
+      window.location.hash = 'fantasy';
+    } else if (view === 'home') {
+      window.location.hash = 'memories';
+    } else {
+      window.location.hash = view;
+    }
     setCurrentView(view);
     window.scrollTo(0, 0);
   };
 
-  if (isLoading) {
+  if (isLoading && currentView !== 'fantasy') {
     return (
       <div className="fixed inset-0 bg-theme-main flex flex-col items-center justify-center z-[9999]">
         <Heart className="text-theme-accent2 fill-current animate-pulse mb-4 text-[#F2BED1]" size={80} />
@@ -245,217 +301,332 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen animated-gradient text-theme-dark font-sans selection:bg-theme-accent2 selection:text-white relative">
-      {/* Background Particles */}
-      <BackgroundParticles />
-
-      {/* Background Music */}
+    <>
+      {/* Persistent Background Music */}
       <audio ref={audioRef} loop src={musicUrl} />
 
-      {/* Floating Navigation */}
-      <nav className="fixed top-4 left-1/2 -translate-x-1/2 w-[92%] max-w-5xl z-50 px-6 py-4 flex justify-between items-center bg-white/30 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(242,190,209,0.2)] rounded-full transition-all duration-300">
-        <div 
-          className="text-2xl font-bold italic cursor-pointer flex items-center gap-2 select-none hover:opacity-85 transition-opacity"
-          onClick={() => navigate('home')}
-        >
-          <Heart className="text-theme-accent2 fill-current animate-pulse" />
-          Memories
-        </div>
-        <div className="flex gap-2 md:gap-4 text-sm md:text-base font-medium items-center">
-          <button 
-            onClick={() => navigate('slideshow')} 
-            className="hover:text-[#8A5B66] hover:bg-white/40 px-3.5 py-2 rounded-full transition-all duration-300 flex items-center gap-1.5 hidden md:flex cursor-pointer"
-          >
-            <ImageIcon size={18}/> Bật Slideshow
-          </button>
-          <button 
-            onClick={() => navigate('videos')} 
-            className="hover:text-[#8A5B66] hover:bg-white/40 px-3.5 py-2 rounded-full transition-all duration-300 flex items-center gap-1.5 hidden md:flex cursor-pointer"
-          >
-            <Film size={18}/> Video kỷ niệm
-          </button>
-          <button 
-            onClick={() => navigate('letter')} 
-            className="hover:text-[#8A5B66] hover:bg-white/40 px-3.5 py-2 rounded-full transition-all duration-300 flex items-center gap-1.5 hidden md:flex cursor-pointer"
-          >
-            <Mail size={18}/> Thư tình
-          </button>
+      {currentView === 'fantasy' ? (
+        <div className="relative w-full h-screen overflow-y-auto bg-[#FDFBF7] flex flex-col justify-between scroll-smooth selection:bg-theme-accent2 selection:text-white">
+          <Navbar />
           
-          {/* Mobile Nav Icons */}
-          <button 
-            onClick={() => navigate('slideshow')} 
-            className="md:hidden hover:text-theme-accent2 p-2 rounded-full hover:bg-white/40 transition-colors cursor-pointer"
-            title="Slideshow"
-          >
-            <ImageIcon size={20}/>
-          </button>
-          <button 
-            onClick={() => navigate('videos')} 
-            className="md:hidden hover:text-theme-accent2 p-2 rounded-full hover:bg-white/40 transition-colors cursor-pointer"
-            title="Video kỷ niệm"
-          >
-            <Film size={20}/>
-          </button>
-          <button 
-            onClick={() => navigate('letter')} 
-            className="md:hidden hover:text-theme-accent2 p-2 rounded-full hover:bg-white/40 transition-colors cursor-pointer"
-            title="Thư tình"
-          >
-            <Mail size={20}/>
-          </button>
+          {/* Hero Section */}
+          <div className="relative w-full h-screen flex-shrink-0">
+            <Hero navigate={navigate} totalPhotos={photos.length} totalVideos={videos.length} />
+          </div>
 
-          <div className="w-[1px] h-6 bg-theme-dark/20 mx-1 hidden md:block"></div>
+          {/* Footer with Creator Social Media Links */}
+          <footer className="w-full bg-white/20 backdrop-blur-md border-t border-white/20 py-10 mt-auto transition-all duration-300 z-20">
+            <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="text-center md:text-left">
+                <p className="text-base font-serif italic text-[#A7727D] font-bold">
+                  Dự án kỷ niệm được thiết kế bởi Lê Văn Hoàng ❤️
+                </p>
+                <p className="text-xs text-[#A7727D]/70 mt-1.5 font-medium">
+                  © {new Date().getFullYear()} Memories Gallery. All rights reserved.
+                </p>
+              </div>
 
-          {isAdmin ? (
-            <button 
-              onClick={() => { setIsAdmin(false); localStorage.removeItem('admin_token'); localStorage.removeItem('admin_username'); navigate('home'); }} 
-              className="text-rose-400 hover:text-rose-600 p-2 md:px-3.5 md:py-2 rounded-full hover:bg-white/40 transition-all flex items-center gap-1.5 cursor-pointer"
-              title="Đăng xuất"
-            >
-              <LogOut size={18}/>
-              <span className="hidden md:inline">Đăng xuất</span>
-            </button>
-          ) : (
-            <button 
-              onClick={() => navigate('login')} 
-              className="hover:text-theme-accent2 p-2 md:px-3.5 md:py-2 rounded-full hover:bg-white/40 transition-all flex items-center gap-1.5 cursor-pointer"
-              title="Quản trị"
-            >
-              <Lock size={18}/>
-              <span className="hidden md:inline">Quản trị</span>
-            </button>
-          )}
-        </div>
-      </nav>
-
-      {/* Main Content Area */}
-      <main className="pt-28 pb-24 min-h-screen relative">
-        {currentView === 'home' && <Home navigate={navigate} photos={photos} />}
-        {currentView === 'slideshow' && <Slideshow photos={photos} navigate={navigate} />}
-        {currentView === 'videos' && <VideoGallery videos={videos} />}
-        {currentView === 'letter' && <LetterView letters={letters} />}
-        {currentView === 'login' && <Login setIsAdmin={setIsAdmin} navigate={navigate} />}
-        {currentView === 'admin' && isAdmin && (
-          <AdminDashboard 
-            photos={photos} 
-            setPhotos={setPhotos}
-            letters={letters} 
-            setLetters={setLetters}
-            videos={videos}
-            setVideos={setVideos}
-            musicUrl={musicUrl}
-            setMusicUrl={setMusicUrl}
-            musicTitle={musicTitle}
-            setMusicTitle={setMusicTitle}
-            chatbotEnabled={chatbotEnabled}
-            setChatbotEnabled={setChatbotEnabled}
-            chatbotName={chatbotName}
-            setChatbotName={setChatbotName}
-            chatbotWelcomeMessage={chatbotWelcomeMessage}
-            setChatbotWelcomeMessage={setChatbotWelcomeMessage}
-            chatbotSystemPrompt={chatbotSystemPrompt}
-            setChatbotSystemPrompt={setChatbotSystemPrompt}
-            chatbotApiKey={chatbotApiKey}
-            setChatbotApiKey={setChatbotApiKey}
-            creatorFacebook={creatorFacebook}
-            setCreatorFacebook={setCreatorFacebook}
-            creatorLinkedin={creatorLinkedin}
-            setCreatorLinkedin={setCreatorLinkedin}
-            creatorYoutube={creatorYoutube}
-            setCreatorYoutube={setCreatorYoutube}
-            creatorGithub={creatorGithub}
-            setCreatorGithub={setCreatorGithub}
-          />
-        )}
-      </main>
-
-      {/* Footer with Creator Social Media Links */}
-      {currentView !== 'slideshow' && (
-        <footer className="w-full bg-white/20 backdrop-blur-md border-t border-white/20 py-10 mt-auto transition-all duration-300">
-          <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="text-center md:text-left">
-              <p className="text-base font-serif italic text-[#A7727D] font-bold">
-                Dự án kỷ niệm được thiết kế bởi Lê Văn Hoàng ❤️
-              </p>
-              <p className="text-xs text-[#A7727D]/70 mt-1.5 font-medium">
-                © {new Date().getFullYear()} Memories Gallery. All rights reserved.
-              </p>
-            </div>
-            
-            <div className="flex flex-col items-center md:items-end gap-2">
-              <span className="text-xs font-serif italic text-[#A7727D]/80 font-bold">Kết nối với Lê Văn Hoàng</span>
-              <div className="flex gap-4 items-center">
-                {creatorFacebook && (
-                  <a 
-                    href={creatorFacebook} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="w-10 h-10 rounded-full bg-white/80 hover:bg-white flex items-center justify-center border border-white/40 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
-                    title="Facebook"
-                  >
-                    <img src="/assets/social/facebook.png" alt="Facebook" className="w-5 h-5 object-contain" />
-                  </a>
-                )}
-                {creatorLinkedin && (
-                  <a 
-                    href={creatorLinkedin} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="w-10 h-10 rounded-full bg-white/80 hover:bg-white flex items-center justify-center border border-white/40 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
-                    title="LinkedIn"
-                  >
-                    <img src="/assets/social/linkedin.png" alt="LinkedIn" className="w-5 h-5 object-contain" />
-                  </a>
-                )}
-                {creatorYoutube && (
-                  <a 
-                    href={creatorYoutube} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="w-10 h-10 rounded-full bg-white/80 hover:bg-white flex items-center justify-center border border-white/40 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
-                    title="YouTube"
-                  >
-                    <img src="/assets/social/youtube.png" alt="YouTube" className="w-5 h-5 object-contain" />
-                  </a>
-                )}
-                {creatorGithub && (
-                  <a 
-                    href={creatorGithub} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="w-10 h-10 rounded-full bg-white/80 hover:bg-white flex items-center justify-center border border-white/40 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
-                    title="GitHub"
-                  >
-                    <img src="/assets/social/github.png" alt="GitHub" className="w-5 h-5 object-contain" />
-                  </a>
-                )}
+              <div className="flex flex-col items-center md:items-end gap-2">
+                <span className="text-xs font-serif italic text-[#A7727D]/80 font-bold">Kết nối với Lê Văn Hoàng</span>
+                <div className="flex gap-4 items-center">
+                  {creatorFacebook && (
+                    <a
+                      href={creatorFacebook}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-10 h-10 rounded-full bg-white/80 hover:bg-white flex items-center justify-center border border-white/40 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
+                      title="Facebook"
+                    >
+                      <img src="/assets/social/facebook.png" alt="Facebook" className="w-5 h-5 object-contain" />
+                    </a>
+                  )}
+                  {creatorLinkedin && (
+                    <a
+                      href={creatorLinkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-10 h-10 rounded-full bg-white/80 hover:bg-white flex items-center justify-center border border-white/40 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
+                      title="LinkedIn"
+                    >
+                      <img src="/assets/social/linkedin.png" alt="LinkedIn" className="w-5 h-5 object-contain" />
+                    </a>
+                  )}
+                  {creatorYoutube && (
+                    <a
+                      href={creatorYoutube}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-10 h-10 rounded-full bg-white/80 hover:bg-white flex items-center justify-center border border-white/40 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
+                      title="YouTube"
+                    >
+                      <img src="/assets/social/youtube.png" alt="YouTube" className="w-5 h-5 object-contain" />
+                    </a>
+                  )}
+                  {creatorGithub && (
+                    <a
+                      href={creatorGithub}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-10 h-10 rounded-full bg-white/80 hover:bg-white flex items-center justify-center border border-white/40 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
+                      title="GitHub"
+                    >
+                      <img src="/assets/social/github.png" alt="GitHub" className="w-5 h-5 object-contain" />
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
+          </footer>
+
+          {/* AI Chatbot Widget */}
+          {chatbotEnabled && (
+            <ChatbotWidget
+              chatbotName={chatbotName}
+              chatbotWelcomeMessage={chatbotWelcomeMessage}
+            />
+          )}
+
+          {/* Floating Music Controller */}
+          <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 group">
+            <span className="bg-white/90 backdrop-blur-xs text-theme-dark text-xs font-semibold px-3 py-2 rounded-2xl border border-theme-accent1 shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none select-none max-w-[200px] truncate translate-x-2 group-hover:translate-x-0">
+              🎵 {musicTitle || 'Nhạc nền'}
+            </span>
+            <button
+              onClick={toggleMusic}
+              className="p-4 rounded-full bg-theme-accent2 text-white shadow-lg hover:scale-110 transition-transform cursor-pointer flex items-center justify-center"
+              title={isPlayingMusic ? `Tạm dừng: ${musicTitle}` : `Phát nhạc: ${musicTitle}`}
+            >
+              {isPlayingMusic ? <Pause size={24} /> : <Music size={24} />}
+            </button>
           </div>
-        </footer>
-      )}
+        </div>
+      ) : (
+        <div className="min-h-screen animated-gradient text-theme-dark font-sans selection:bg-theme-accent2 selection:text-white relative">
+          {/* Background Particles */}
+          <BackgroundParticles />
 
-      {/* AI Chatbot Widget */}
-      {chatbotEnabled && (
-        <ChatbotWidget 
-          chatbotName={chatbotName} 
-          chatbotWelcomeMessage={chatbotWelcomeMessage} 
-        />
-      )}
+          {/* Floating Navigation */}
+          <nav className="fixed top-4 left-1/2 -translate-x-1/2 w-[92%] max-w-5xl z-50 px-6 py-4 flex justify-between items-center bg-white/30 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(242,190,209,0.2)] rounded-full transition-all duration-300">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => navigate('fantasy')}
+                className="hover:text-theme-accent2 p-1.5 rounded-full hover:bg-white/40 transition-colors cursor-pointer flex items-center justify-center text-theme-dark"
+                title="Quay lại Album"
+              >
+                <ArrowLeft size={20} />
+              </button>
+              <div
+                className="text-2xl font-bold italic cursor-pointer flex items-center gap-2 select-none hover:opacity-85 transition-opacity"
+                onClick={() => navigate('home')}
+              >
+                <Heart className="text-theme-accent2 fill-current animate-pulse" />
+                Memories
+              </div>
+            </div>
+            <div className="flex gap-2 md:gap-4 text-sm md:text-base font-medium items-center">
+              <button
+                onClick={() => navigate('slideshow')}
+                className="hover:text-[#8A5B66] hover:bg-white/40 px-3.5 py-2 rounded-full transition-all duration-300 flex items-center gap-1.5 hidden md:flex cursor-pointer"
+              >
+                <ImageIcon size={18} /> Bật Slideshow
+              </button>
+              <button
+                onClick={() => navigate('videos')}
+                className="hover:text-[#8A5B66] hover:bg-white/40 px-3.5 py-2 rounded-full transition-all duration-300 flex items-center gap-1.5 hidden md:flex cursor-pointer"
+              >
+                <Film size={18} /> Video kỷ niệm
+              </button>
+              <button
+                onClick={() => navigate('letter')}
+                className="hover:text-[#8A5B66] hover:bg-white/40 px-3.5 py-2 rounded-full transition-all duration-300 flex items-center gap-1.5 hidden md:flex cursor-pointer"
+              >
+                <Mail size={18} /> Thư tình
+              </button>
 
-      {/* Floating Music Controller */}
-      <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 group">
-        <span className="bg-white/90 backdrop-blur-xs text-theme-dark text-xs font-semibold px-3 py-2 rounded-2xl border border-theme-accent1 shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none select-none max-w-[200px] truncate translate-x-2 group-hover:translate-x-0">
-          🎵 {musicTitle || 'Nhạc nền'}
-        </span>
-        <button 
-          onClick={toggleMusic}
-          className="p-4 rounded-full bg-theme-accent2 text-white shadow-lg hover:scale-110 transition-transform cursor-pointer flex items-center justify-center"
-          title={isPlayingMusic ? `Tạm dừng: ${musicTitle}` : `Phát nhạc: ${musicTitle}`}
-        >
-          {isPlayingMusic ? <Pause size={24} /> : <Music size={24} />}
-        </button>
-      </div>
-    </div>
+              {/* Mobile Nav Icons */}
+              <button
+                onClick={() => navigate('slideshow')}
+                className="md:hidden hover:text-theme-accent2 p-2 rounded-full hover:bg-white/40 transition-colors cursor-pointer"
+                title="Slideshow"
+              >
+                <ImageIcon size={20} />
+              </button>
+              <button
+                onClick={() => navigate('videos')}
+                className="md:hidden hover:text-theme-accent2 p-2 rounded-full hover:bg-white/40 transition-colors cursor-pointer"
+                title="Video kỷ niệm"
+              >
+                <Film size={20} />
+              </button>
+              <button
+                onClick={() => navigate('letter')}
+                className="md:hidden hover:text-theme-accent2 p-2 rounded-full hover:bg-white/40 transition-colors cursor-pointer"
+                title="Thư tình"
+              >
+                <Mail size={20} />
+              </button>
+
+              <div className="w-[1px] h-6 bg-theme-dark/20 mx-1 hidden md:block"></div>
+
+              {isAdmin ? (
+                <button
+                  onClick={() => { setIsAdmin(false); localStorage.removeItem('admin_token'); localStorage.removeItem('admin_username'); navigate('home'); }}
+                  className="text-rose-400 hover:text-rose-600 p-2 md:px-3.5 md:py-2 rounded-full hover:bg-white/40 transition-all flex items-center gap-1.5 cursor-pointer"
+                  title="Đăng xuất"
+                >
+                  <LogOut size={18} />
+                  <span className="hidden md:inline">Đăng xuất</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => navigate('login')}
+                  className="hover:text-theme-accent2 p-2 md:px-3.5 md:py-2 rounded-full hover:bg-white/40 transition-all flex items-center gap-1.5 cursor-pointer"
+                  title="Quản trị"
+                >
+                  <Lock size={18} />
+                  <span className="hidden md:inline">Quản trị</span>
+                </button>
+              )}
+            </div>
+          </nav>
+
+          {/* Main Content Area */}
+          <main className="pt-28 pb-24 min-h-screen relative">
+            {currentView === 'home' && <Home navigate={navigate} photos={photos} />}
+            {currentView === 'slideshow' && <Slideshow photos={photos} navigate={navigate} />}
+            {currentView === 'videos' && (
+              <VideoGallery
+                videos={videos}
+                navigate={navigate}
+                onPlayVideo={handlePlayVideo}
+                onCloseVideo={handleCloseVideo}
+              />
+            )}
+            {currentView === 'letter' && <LetterView letters={letters} />}
+            {currentView === 'login' && <Login setIsAdmin={setIsAdmin} navigate={navigate} />}
+            {currentView === 'admin' && isAdmin && (
+              <AdminDashboard
+                photos={photos}
+                setPhotos={setPhotos}
+                letters={letters}
+                setLetters={setLetters}
+                videos={videos}
+                setVideos={setVideos}
+                musicUrl={musicUrl}
+                setMusicUrl={setMusicUrl}
+                musicTitle={musicTitle}
+                setMusicTitle={setMusicTitle}
+                chatbotEnabled={chatbotEnabled}
+                setChatbotEnabled={setChatbotEnabled}
+                chatbotName={chatbotName}
+                setChatbotName={setChatbotName}
+                chatbotWelcomeMessage={chatbotWelcomeMessage}
+                setChatbotWelcomeMessage={setChatbotWelcomeMessage}
+                chatbotSystemPrompt={chatbotSystemPrompt}
+                setChatbotSystemPrompt={setChatbotSystemPrompt}
+                chatbotApiKey={chatbotApiKey}
+                setChatbotApiKey={setChatbotApiKey}
+                creatorFacebook={creatorFacebook}
+                setCreatorFacebook={setCreatorFacebook}
+                creatorLinkedin={creatorLinkedin}
+                setCreatorLinkedin={setCreatorLinkedin}
+                creatorYoutube={creatorYoutube}
+                setCreatorYoutube={setCreatorYoutube}
+                creatorGithub={creatorGithub}
+                setCreatorGithub={setCreatorGithub}
+              />
+            )}
+          </main>
+
+          {/* Footer with Creator Social Media Links */}
+          {currentView !== 'slideshow' && (
+            <footer className="w-full bg-white/20 backdrop-blur-md border-t border-white/20 py-10 mt-auto transition-all duration-300">
+              <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="text-center md:text-left">
+                  <p className="text-base font-serif italic text-[#A7727D] font-bold">
+                    Dự án kỷ niệm được thiết kế bởi Lê Văn Hoàng ❤️
+                  </p>
+                  <p className="text-xs text-[#A7727D]/70 mt-1.5 font-medium">
+                    © {new Date().getFullYear()} Memories Gallery. All rights reserved.
+                  </p>
+                </div>
+
+                <div className="flex flex-col items-center md:items-end gap-2">
+                  <span className="text-xs font-serif italic text-[#A7727D]/80 font-bold">Kết nối với Lê Văn Hoàng</span>
+                  <div className="flex gap-4 items-center">
+                    {creatorFacebook && (
+                      <a
+                        href={creatorFacebook}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-10 h-10 rounded-full bg-white/80 hover:bg-white flex items-center justify-center border border-white/40 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
+                        title="Facebook"
+                      >
+                        <img src="/assets/social/facebook.png" alt="Facebook" className="w-5 h-5 object-contain" />
+                      </a>
+                    )}
+                    {creatorLinkedin && (
+                      <a
+                        href={creatorLinkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-10 h-10 rounded-full bg-white/80 hover:bg-white flex items-center justify-center border border-white/40 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
+                        title="LinkedIn"
+                      >
+                        <img src="/assets/social/linkedin.png" alt="LinkedIn" className="w-5 h-5 object-contain" />
+                      </a>
+                    )}
+                    {creatorYoutube && (
+                      <a
+                        href={creatorYoutube}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-10 h-10 rounded-full bg-white/80 hover:bg-white flex items-center justify-center border border-white/40 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
+                        title="YouTube"
+                      >
+                        <img src="/assets/social/youtube.png" alt="YouTube" className="w-5 h-5 object-contain" />
+                      </a>
+                    )}
+                    {creatorGithub && (
+                      <a
+                        href={creatorGithub}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-10 h-10 rounded-full bg-white/80 hover:bg-white flex items-center justify-center border border-white/40 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
+                        title="GitHub"
+                      >
+                        <img src="/assets/social/github.png" alt="GitHub" className="w-5 h-5 object-contain" />
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </footer>
+          )}
+
+          {/* AI Chatbot Widget */}
+          {chatbotEnabled && (
+            <ChatbotWidget
+              chatbotName={chatbotName}
+              chatbotWelcomeMessage={chatbotWelcomeMessage}
+            />
+          )}
+
+          {/* Floating Music Controller */}
+          <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 group">
+            <span className="bg-white/90 backdrop-blur-xs text-theme-dark text-xs font-semibold px-3 py-2 rounded-2xl border border-theme-accent1 shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none select-none max-w-[200px] truncate translate-x-2 group-hover:translate-x-0">
+              🎵 {musicTitle || 'Nhạc nền'}
+            </span>
+            <button
+              onClick={toggleMusic}
+              className="p-4 rounded-full bg-theme-accent2 text-white shadow-lg hover:scale-110 transition-transform cursor-pointer flex items-center justify-center"
+              title={isPlayingMusic ? `Tạm dừng: ${musicTitle}` : `Phát nhạc: ${musicTitle}`}
+            >
+              {isPlayingMusic ? <Pause size={24} /> : <Music size={24} />}
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
