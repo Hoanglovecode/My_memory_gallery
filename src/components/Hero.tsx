@@ -72,16 +72,16 @@ export default function Hero({ navigate, totalPhotos, totalVideos }: HeroProps) 
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 1.2, delay: 0.5 }}
-          className="lg:w-[50%] flex flex-col md:flex-row items-center justify-center lg:justify-end gap-6"
+          className="lg:w-[52%] flex flex-row flex-wrap items-center justify-center lg:justify-end gap-3 md:gap-6"
         >
           {/* Card 1 — View Video */}
           <div
             onClick={() => navigate('videos')}
-            className="w-[160px] h-[220px] rounded-[2rem] bg-white/40 border border-white/60 backdrop-blur-xl shadow-[0_8px_32px_rgba(244,143,177,0.15)] flex flex-col items-center justify-center p-4 cursor-pointer hover:bg-white/60 transition-all duration-300 group hover:-translate-y-2"
+            className="w-[105px] h-[150px] md:w-[160px] md:h-[220px] rounded-[1.5rem] md:rounded-[2rem] bg-white/40 border border-white/60 backdrop-blur-xl shadow-[0_8px_32px_rgba(244,143,177,0.15)] flex flex-col items-center justify-center p-3 md:p-4 cursor-pointer hover:bg-white/60 transition-all duration-300 group hover:-translate-y-2"
           >
-            <div className="w-12 h-12 rounded-full border border-[#E57373]/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform bg-white/50 text-[#E57373]">
+            <div className="w-9 h-9 md:w-12 md:h-12 rounded-full border border-[#E57373]/30 flex items-center justify-center mb-2 md:mb-4 group-hover:scale-110 transition-transform bg-white/50 text-[#E57373]">
               {/* Film/Video icon */}
-              <svg width="18" height="18" viewBox="0 0 24 24" style={{ fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }}>
+              <svg width="14" height="14" className="md:w-[18px] md:h-[18px]" viewBox="0 0 24 24" style={{ fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }}>
                 <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18" />
                 <line x1="7" y1="2" x2="7" y2="22" />
                 <line x1="17" y1="2" x2="17" y2="22" />
@@ -92,36 +92,36 @@ export default function Hero({ navigate, totalPhotos, totalVideos }: HeroProps) 
                 <line x1="17" y1="17" x2="22" y2="17" />
               </svg>
             </div>
-            <span className="font-cinzel text-xs text-[#4A2545] font-semibold uppercase tracking-widest text-center">View Video</span>
+            <span className="font-cinzel text-[9px] md:text-xs text-[#4A2545] font-semibold uppercase tracking-widest text-center">View Video</span>
           </div>
 
           {/* Card 2 — Total Memories (Highlight) */}
-          <div className="w-[170px] h-[240px] rounded-[2rem] bg-gradient-to-br from-[#FFF9C4]/60 to-[#FCE4EC]/60 border border-white/80 backdrop-blur-xl shadow-[0_8px_32px_rgba(244,143,177,0.2)] flex flex-col items-center justify-center p-4 hover:scale-105 transition-transform duration-300">
+          <div className="w-[115px] h-[160px] md:w-[170px] md:h-[240px] rounded-[1.5rem] md:rounded-[2rem] bg-gradient-to-br from-[#FFF9C4]/60 to-[#FCE4EC]/60 border border-white/80 backdrop-blur-xl shadow-[0_8px_32px_rgba(244,143,177,0.2)] flex flex-col items-center justify-center p-3 md:p-4 hover:scale-105 transition-transform duration-300">
             <h3
-              className="text-5xl text-[#E57373] mb-3 drop-shadow-sm font-semibold"
+              className="text-3xl md:text-5xl text-[#E57373] mb-1 md:mb-3 drop-shadow-sm font-semibold"
               style={{ fontFamily: "'Cormorant Garamond', serif" }}
             >
               {totalPhotos + totalVideos}
             </h3>
-            <span className="font-cinzel text-[11px] text-[#4A2545] font-bold uppercase tracking-widest text-center leading-loose">
+            <span className="font-cinzel text-[9px] md:text-[11px] text-[#4A2545] font-bold uppercase tracking-widest text-center leading-normal md:leading-loose">
               Total<br />Memories
             </span>
           </div>
 
-          {/* Card 3 — View Pictures (Hidden on small) */}
+          {/* Card 3 — View Images */}
           <div
             onClick={() => navigate('slideshow')}
-            className="hidden md:flex w-[160px] h-[220px] rounded-[2rem] bg-white/40 border border-white/60 backdrop-blur-xl shadow-[0_8px_32px_rgba(244,143,177,0.15)] flex-col items-center justify-center p-4 cursor-pointer hover:bg-white/60 transition-all duration-300 group hover:-translate-y-2"
+            className="flex w-[105px] h-[150px] md:w-[160px] md:h-[220px] rounded-[1.5rem] md:rounded-[2rem] bg-white/40 border border-white/60 backdrop-blur-xl shadow-[0_8px_32px_rgba(244,143,177,0.15)] flex-col items-center justify-center p-3 md:p-4 cursor-pointer hover:bg-white/60 transition-all duration-300 group hover:-translate-y-2"
           >
-            <div className="w-12 h-12 rounded-full border border-[#81C784]/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform bg-white/50 text-[#81C784]">
+            <div className="w-9 h-9 md:w-12 md:h-12 rounded-full border border-[#81C784]/30 flex items-center justify-center mb-2 md:mb-4 group-hover:scale-110 transition-transform bg-white/50 text-[#81C784]">
               {/* Image/Photo icon */}
-              <svg width="18" height="18" viewBox="0 0 24 24" style={{ fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }}>
+              <svg width="14" height="14" className="md:w-[18px] md:h-[18px]" viewBox="0 0 24 24" style={{ fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }}>
                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
                 <circle cx="8.5" cy="8.5" r="1.5" />
                 <polyline points="21 15 16 10 5 21" />
               </svg>
             </div>
-            <span className="font-cinzel text-xs text-[#4A2545] font-semibold uppercase tracking-widest text-center">View Images</span>
+            <span className="font-cinzel text-[9px] md:text-xs text-[#4A2545] font-semibold uppercase tracking-widest text-center">View Images</span>
           </div>
         </motion.div>
 
