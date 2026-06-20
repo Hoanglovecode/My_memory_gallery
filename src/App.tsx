@@ -310,7 +310,7 @@ export default function App() {
           <Navbar />
           
           {/* Hero Section */}
-          <div className="relative w-full h-screen flex-shrink-0">
+          <div className="relative w-full min-h-screen lg:h-screen flex-shrink-0">
             <Hero navigate={navigate} totalPhotos={photos.length} totalVideos={videos.length} />
           </div>
 

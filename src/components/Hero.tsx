@@ -10,7 +10,7 @@ interface HeroProps {
 
 export default function Hero({ navigate, totalPhotos, totalVideos }: HeroProps) {
   return (
-    <section className="relative w-full h-screen overflow-hidden bg-[#FDFBF7]">
+    <section className="relative w-full min-h-screen lg:h-screen overflow-y-visible lg:overflow-hidden bg-[#FDFBF7]">
       {/* Background Sky */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-gradient-to-b from-[#E0F7FA] via-[#FCE4EC] to-[#FFF9C4]"></div>
@@ -44,23 +44,23 @@ export default function Hero({ navigate, totalPhotos, totalVideos }: HeroProps) 
       </div>
 
       {/* Content Layout */}
-      <div className="relative z-20 w-full h-full flex flex-col lg:flex-row items-center justify-center lg:justify-between px-8 md:px-24">
+      <div className="relative z-20 w-full min-h-screen lg:h-full flex flex-col lg:flex-row items-center justify-center lg:justify-between px-4 sm:px-8 md:px-24 py-16 lg:py-0">
 
         {/* Left Typography */}
         <motion.div
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 1.2, delay: 0.2 }}
-          className="lg:w-[45%] text-center lg:text-left mb-12 lg:mb-0"
+          className="lg:w-[45%] text-center lg:text-left mb-8 lg:mb-0"
         >
           <h2
-            className="text-5xl md:text-7xl lg:text-[6rem] leading-[1.05] text-[#4A2545] mb-6 drop-shadow-sm"
+            className="text-4xl sm:text-5xl md:text-7xl lg:text-[6rem] leading-[1.05] text-[#4A2545] mb-4 md:mb-6 drop-shadow-sm"
             style={{ fontFamily: "'Cormorant Garamond', serif" }}
           >
             MY <span className="italic text-[#E57373]">ALBUM</span>
           </h2>
           <p
-            className="text-xl md:text-2xl text-[#5D4037] max-w-md mx-auto lg:mx-0 font-medium leading-relaxed"
+            className="text-base sm:text-lg md:text-2xl text-[#5D4037] max-w-md mx-auto lg:mx-0 font-medium leading-relaxed"
             style={{ fontFamily: "'Cormorant Garamond', serif" }}
           >
             "This project is designed for storing images and videos, with continuous improvements being made to enhance the product."
@@ -72,16 +72,16 @@ export default function Hero({ navigate, totalPhotos, totalVideos }: HeroProps) 
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 1.2, delay: 0.5 }}
-          className="lg:w-[52%] flex flex-row flex-wrap items-center justify-center lg:justify-end gap-3 md:gap-6"
+          className="lg:w-[52%] flex flex-row flex-wrap items-center justify-center lg:justify-end gap-2 sm:gap-3 md:gap-6"
         >
           {/* Card 1 — View Video */}
           <div
             onClick={() => navigate('videos')}
-            className="w-[105px] h-[150px] md:w-[160px] md:h-[220px] rounded-[1.5rem] md:rounded-[2rem] bg-white/40 border border-white/60 backdrop-blur-xl shadow-[0_8px_32px_rgba(244,143,177,0.15)] flex flex-col items-center justify-center p-3 md:p-4 cursor-pointer hover:bg-white/60 transition-all duration-300 group hover:-translate-y-2"
+            className="w-[95px] h-[135px] sm:w-[110px] sm:h-[155px] md:w-[160px] md:h-[220px] rounded-[1.2rem] sm:rounded-[1.5rem] md:rounded-[2rem] bg-white/40 border border-white/60 backdrop-blur-xl shadow-[0_8px_32px_rgba(244,143,177,0.15)] flex flex-col items-center justify-center p-2.5 sm:p-3 md:p-4 cursor-pointer hover:bg-white/60 transition-all duration-300 group hover:-translate-y-2"
           >
-            <div className="w-9 h-9 md:w-12 md:h-12 rounded-full border border-[#E57373]/30 flex items-center justify-center mb-2 md:mb-4 group-hover:scale-110 transition-transform bg-white/50 text-[#E57373]">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-12 md:h-12 rounded-full border border-[#E57373]/30 flex items-center justify-center mb-1.5 sm:mb-2 md:mb-4 group-hover:scale-110 transition-transform bg-white/50 text-[#E57373]">
               {/* Film/Video icon */}
-              <svg width="14" height="14" className="md:w-[18px] md:h-[18px]" viewBox="0 0 24 24" style={{ fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }}>
+              <svg width="12" height="12" className="sm:w-[14px] sm:h-[14px] md:w-[18px] md:h-[18px]" viewBox="0 0 24 24" style={{ fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }}>
                 <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18" />
                 <line x1="7" y1="2" x2="7" y2="22" />
                 <line x1="17" y1="2" x2="17" y2="22" />
@@ -92,18 +92,18 @@ export default function Hero({ navigate, totalPhotos, totalVideos }: HeroProps) 
                 <line x1="17" y1="17" x2="22" y2="17" />
               </svg>
             </div>
-            <span className="font-cinzel text-[9px] md:text-xs text-[#4A2545] font-semibold uppercase tracking-widest text-center">View Video</span>
+            <span className="font-cinzel text-[8px] sm:text-[9px] md:text-xs text-[#4A2545] font-semibold uppercase tracking-wider md:tracking-widest text-center">View Video</span>
           </div>
 
           {/* Card 2 — Total Memories (Highlight) */}
-          <div className="w-[115px] h-[160px] md:w-[170px] md:h-[240px] rounded-[1.5rem] md:rounded-[2rem] bg-gradient-to-br from-[#FFF9C4]/60 to-[#FCE4EC]/60 border border-white/80 backdrop-blur-xl shadow-[0_8px_32px_rgba(244,143,177,0.2)] flex flex-col items-center justify-center p-3 md:p-4 hover:scale-105 transition-transform duration-300">
+          <div className="w-[105px] h-[145px] sm:w-[120px] sm:h-[165px] md:w-[170px] md:h-[240px] rounded-[1.2rem] sm:rounded-[1.5rem] md:rounded-[2rem] bg-gradient-to-br from-[#FFF9C4]/60 to-[#FCE4EC]/60 border border-white/80 backdrop-blur-xl shadow-[0_8px_32px_rgba(244,143,177,0.2)] flex flex-col items-center justify-center p-2.5 sm:p-3 md:p-4 hover:scale-105 transition-transform duration-300">
             <h3
-              className="text-3xl md:text-5xl text-[#E57373] mb-1 md:mb-3 drop-shadow-sm font-semibold"
+              className="text-2xl sm:text-3xl md:text-5xl text-[#E57373] mb-0.5 sm:mb-1 md:mb-3 drop-shadow-sm font-semibold"
               style={{ fontFamily: "'Cormorant Garamond', serif" }}
             >
               {totalPhotos + totalVideos}
             </h3>
-            <span className="font-cinzel text-[9px] md:text-[11px] text-[#4A2545] font-bold uppercase tracking-widest text-center leading-normal md:leading-loose">
+            <span className="font-cinzel text-[8px] sm:text-[9px] md:text-[11px] text-[#4A2545] font-bold uppercase tracking-wider md:tracking-widest text-center leading-normal md:leading-loose">
               Total<br />Memories
             </span>
           </div>
@@ -111,17 +111,17 @@ export default function Hero({ navigate, totalPhotos, totalVideos }: HeroProps) 
           {/* Card 3 — View Images */}
           <div
             onClick={() => navigate('slideshow')}
-            className="flex w-[105px] h-[150px] md:w-[160px] md:h-[220px] rounded-[1.5rem] md:rounded-[2rem] bg-white/40 border border-white/60 backdrop-blur-xl shadow-[0_8px_32px_rgba(244,143,177,0.15)] flex-col items-center justify-center p-3 md:p-4 cursor-pointer hover:bg-white/60 transition-all duration-300 group hover:-translate-y-2"
+            className="flex w-[95px] h-[135px] sm:w-[110px] sm:h-[155px] md:w-[160px] md:h-[220px] rounded-[1.2rem] sm:rounded-[1.5rem] md:rounded-[2rem] bg-white/40 border border-white/60 backdrop-blur-xl shadow-[0_8px_32px_rgba(244,143,177,0.15)] flex-col items-center justify-center p-2.5 sm:p-3 md:p-4 cursor-pointer hover:bg-white/60 transition-all duration-300 group hover:-translate-y-2"
           >
-            <div className="w-9 h-9 md:w-12 md:h-12 rounded-full border border-[#81C784]/30 flex items-center justify-center mb-2 md:mb-4 group-hover:scale-110 transition-transform bg-white/50 text-[#81C784]">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-12 md:h-12 rounded-full border border-[#81C784]/30 flex items-center justify-center mb-1.5 sm:mb-2 md:mb-4 group-hover:scale-110 transition-transform bg-white/50 text-[#81C784]">
               {/* Image/Photo icon */}
-              <svg width="14" height="14" className="md:w-[18px] md:h-[18px]" viewBox="0 0 24 24" style={{ fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }}>
+              <svg width="12" height="12" className="sm:w-[14px] sm:h-[14px] md:w-[18px] md:h-[18px]" viewBox="0 0 24 24" style={{ fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }}>
                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
                 <circle cx="8.5" cy="8.5" r="1.5" />
                 <polyline points="21 15 16 10 5 21" />
               </svg>
             </div>
-            <span className="font-cinzel text-[9px] md:text-xs text-[#4A2545] font-semibold uppercase tracking-widest text-center">View Images</span>
+            <span className="font-cinzel text-[8px] sm:text-[9px] md:text-xs text-[#4A2545] font-semibold uppercase tracking-wider md:tracking-widest text-center">View Images</span>
           </div>
         </motion.div>
 
