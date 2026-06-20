@@ -53,7 +53,8 @@ export default function Hero({ navigate, totalPhotos, totalVideos }: HeroProps) 
           transition={{ duration: 1.2, delay: 0.2 }}
           className="lg:w-[45%] text-center lg:text-left mb-8 lg:mb-0"
         >
-          <motion.h2
+          {/* Floating sway container for title */}
+          <motion.div
             animate={{
               y: [0, -5, 0],
               rotate: [0, -0.5, 0.5, 0],
@@ -63,11 +64,54 @@ export default function Hero({ navigate, totalPhotos, totalVideos }: HeroProps) 
               repeat: Infinity,
               ease: "easeInOut",
             }}
-            className="text-4xl sm:text-5xl md:text-7xl lg:text-[6rem] leading-[1.05] text-[#4A2545] mb-4 md:mb-6 drop-shadow-sm select-none"
-            style={{ fontFamily: "'Cormorant Garamond', serif" }}
           >
-            MY <span className="italic text-[#E57373]">ALBUM</span>
-          </motion.h2>
+            <motion.h2
+              variants={{
+                hidden: {},
+                visible: {
+                  transition: {
+                    staggerChildren: 0.08,
+                  }
+                }
+              }}
+              initial="hidden"
+              animate="visible"
+              className="text-4xl sm:text-5xl md:text-7xl lg:text-[6rem] leading-[1.05] text-[#4A2545] mb-4 md:mb-6 drop-shadow-sm select-none flex flex-row justify-center lg:justify-start flex-wrap"
+              style={{ fontFamily: "'Cormorant Garamond', serif" }}
+            >
+              {/* Letters of "MY" */}
+              {["M", "Y"].map((letter, index) => (
+                <motion.span
+                  key={`my-${index}`}
+                  variants={{
+                    hidden: { opacity: 0, y: -100 },
+                    visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 120, damping: 10 } }
+                  }}
+                  className="inline-block"
+                >
+                  {letter}
+                </motion.span>
+              ))}
+
+              {/* Space */}
+              <span className="inline-block w-[0.25em]">&nbsp;</span>
+
+              {/* Letters of "ALBUM" (italic and colored) */}
+              {["A", "L", "B", "U", "M"].map((letter, index) => (
+                <motion.span
+                  key={`album-${index}`}
+                  variants={{
+                    hidden: { opacity: 0, y: -100 },
+                    visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 120, damping: 10 } }
+                  }}
+                  className="inline-block italic text-[#E57373]"
+                >
+                  {letter}
+                </motion.span>
+              ))}
+            </motion.h2>
+          </motion.div>
+
           <motion.p
             animate={{
               y: [0, -3, 0],
@@ -79,8 +123,7 @@ export default function Hero({ navigate, totalPhotos, totalVideos }: HeroProps) 
               ease: "easeInOut",
               delay: 0.3,
             }}
-            className="text-base sm:text-lg md:text-2xl text-[#5D4037] max-w-md mx-auto lg:mx-0 font-medium leading-relaxed select-none"
-            style={{ fontFamily: "'Cormorant Garamond', serif" }}
+            className="text-base sm:text-lg md:text-2xl text-[#5D4037] max-w-md mx-auto lg:mx-0 font-medium leading-relaxed select-none font-garamond"
           >
             "This project is designed for storing images and videos, with continuous improvements being made to enhance the product."
           </motion.p>
@@ -98,7 +141,7 @@ export default function Hero({ navigate, totalPhotos, totalVideos }: HeroProps) 
             onClick={() => navigate('videos')}
             animate={{
               y: [0, -6, 0],
-              rotate: [0, -2, 2, -2, 2, 0],
+              rotate: [0, -3, 3, -3, 3, 0],
             }}
             transition={{
               y: {
@@ -107,9 +150,9 @@ export default function Hero({ navigate, totalPhotos, totalVideos }: HeroProps) 
                 ease: "easeInOut",
               },
               rotate: {
-                duration: 1.2,
+                duration: 0.5,
                 repeat: Infinity,
-                repeatDelay: 3,
+                repeatDelay: 2,
                 ease: "easeInOut",
               }
             }}
@@ -161,7 +204,7 @@ export default function Hero({ navigate, totalPhotos, totalVideos }: HeroProps) 
             onClick={() => navigate('slideshow')}
             animate={{
               y: [0, -6, 0],
-              rotate: [0, 2, -2, 2, -2, 0],
+              rotate: [0, 3, -3, 3, -3, 0],
             }}
             transition={{
               y: {
@@ -171,9 +214,9 @@ export default function Hero({ navigate, totalPhotos, totalVideos }: HeroProps) 
                 delay: 0.2,
               },
               rotate: {
-                duration: 1.2,
+                duration: 0.5,
                 repeat: Infinity,
-                repeatDelay: 3,
+                repeatDelay: 2,
                 ease: "easeInOut",
                 delay: 0.5,
               }
