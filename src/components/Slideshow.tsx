@@ -62,11 +62,11 @@ export default function Slideshow({ photos, navigate }: SlideshowProps) {
         <img 
           src={optimizeImageUrl(currentPhoto.imageUrl)} 
           alt={currentPhoto.title}
-          className="w-full h-full object-contain animate-slow-zoom opacity-85"
+          className="w-full h-full object-contain animate-slow-zoom opacity-100"
           loading="lazy"
         />
-        {/* Lớp phủ gradient để đọc chữ rõ hơn */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/25 to-transparent" />
+        {/* Lớp phủ gradient ở cạnh dưới để đọc chữ rõ hơn mà không làm tối toàn bộ ảnh */}
+        <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/70 via-black/10 to-transparent pointer-events-none" />
       </div>
 
       {/* Nút Quay lại (Prev) */}
