@@ -1,15 +1,14 @@
 import { useState } from 'react';
-import { Play, Calendar, Film, X, ArrowLeft } from 'lucide-react';
-import type { Video, View } from '../types';
+import { Play, Calendar, Film, X } from 'lucide-react';
+import type { Video } from '../types';
 
 interface VideoGalleryProps {
   videos: Video[];
-  navigate: (view: View) => void;
   onPlayVideo: () => void;
   onCloseVideo: () => void;
 }
 
-export default function VideoGallery({ videos, navigate, onPlayVideo, onCloseVideo }: VideoGalleryProps) {
+export default function VideoGallery({ videos, onPlayVideo, onCloseVideo }: VideoGalleryProps) {
   const [activeVideo, setActiveVideo] = useState<Video | null>(null);
 
   const handleClose = () => {
@@ -19,15 +18,6 @@ export default function VideoGallery({ videos, navigate, onPlayVideo, onCloseVid
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 animate-fade-in relative">
-      {/* Back Button */}
-      <button
-        onClick={() => navigate('fantasy')}
-        className="absolute top-4 left-4 flex items-center gap-2 text-theme-dark hover:text-theme-accent2 font-semibold text-sm transition-colors bg-white/60 hover:bg-white px-4 py-2 rounded-full border border-theme-dark/10 shadow-sm cursor-pointer z-10"
-        title="Quay lại"
-      >
-        <ArrowLeft size={16} />
-        <span>Quay lại</span>
-      </button>
       <div className="text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-serif font-bold text-theme-dark mb-4 flex items-center justify-center gap-3">
           <Film className="text-theme-accent2 animate-pulse" size={40} />

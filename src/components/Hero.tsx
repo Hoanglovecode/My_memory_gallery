@@ -123,7 +123,7 @@ export default function Hero({ navigate, totalPhotos, totalVideos }: HeroProps) 
               ease: "easeInOut",
               delay: 0.3,
             }}
-            className="text-base sm:text-lg md:text-2xl text-[#5D4037] max-w-md mx-auto lg:mx-0 font-medium leading-relaxed select-none font-garamond"
+            className="text-2xl sm:text-3xl md:text-4xl text-[#E57373] max-w-md mx-auto lg:mx-0 font-semibold leading-relaxed select-none font-caveat"
           >
             "This project is designed for storing images and videos, with continuous improvements being made to enhance the product."
           </motion.p>
@@ -235,7 +235,6 @@ export default function Hero({ navigate, totalPhotos, totalVideos }: HeroProps) 
             <span className="font-cinzel text-[8px] sm:text-[9px] md:text-xs text-[#4A2545] font-semibold uppercase tracking-wider md:tracking-widest text-center">View Images</span>
           </motion.div>
         </motion.div>
-
       </div>
     </section>
   );

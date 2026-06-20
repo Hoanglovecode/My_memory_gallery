@@ -498,7 +498,6 @@ export default function App() {
             {currentView === 'videos' && (
               <VideoGallery
                 videos={videos}
-                navigate={navigate}
                 onPlayVideo={handlePlayVideo}
                 onCloseVideo={handleCloseVideo}
               />
