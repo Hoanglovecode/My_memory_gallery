@@ -406,24 +406,25 @@ export default function App() {
           <BackgroundParticles />
 
           {/* Floating Navigation */}
-          <nav className="fixed top-4 left-1/2 -translate-x-1/2 w-[92%] max-w-5xl z-50 px-6 py-4 flex justify-between items-center bg-white/30 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(242,190,209,0.2)] rounded-full transition-all duration-300">
-            <div className="flex items-center gap-2">
+          {/* Floating Navigation */}
+          <nav className="fixed top-4 left-1/2 -translate-x-1/2 w-[92%] max-w-5xl z-50 px-3 py-2.5 md:px-6 md:py-4 flex justify-between items-center bg-white/30 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(242,190,209,0.2)] rounded-full transition-all duration-300">
+            <div className="flex items-center gap-1 sm:gap-2">
               <button
                 onClick={() => navigate('fantasy')}
-                className="hover:text-theme-accent2 p-1.5 rounded-full hover:bg-white/40 transition-colors cursor-pointer flex items-center justify-center text-theme-dark"
+                className="hover:text-theme-accent2 p-1 md:p-1.5 rounded-full hover:bg-white/40 transition-colors cursor-pointer flex items-center justify-center text-theme-dark"
                 title="Quay lại Album"
               >
-                <ArrowLeft size={20} />
+                <ArrowLeft size={16} className="md:w-5 md:h-5" />
               </button>
               <div
-                className="text-2xl font-bold italic cursor-pointer flex items-center gap-2 select-none hover:opacity-85 transition-opacity"
+                className="text-lg sm:text-xl md:text-2xl font-bold italic cursor-pointer flex items-center gap-1.5 md:gap-2 select-none hover:opacity-85 transition-opacity"
                 onClick={() => navigate('home')}
               >
-                <Heart className="text-theme-accent2 fill-current animate-pulse" />
-                Memories
+                <Heart className="text-theme-accent2 fill-current animate-pulse w-[18px] h-[18px] md:w-6 md:h-6" />
+                <span className="leading-none">Memories</span>
               </div>
             </div>
-            <div className="flex gap-2 md:gap-4 text-sm md:text-base font-medium items-center">
+            <div className="flex gap-1 md:gap-4 text-sm md:text-base font-medium items-center">
               <button
                 onClick={() => navigate('slideshow')}
                 className="hover:text-[#8A5B66] hover:bg-white/40 px-3.5 py-2 rounded-full transition-all duration-300 flex items-center gap-1.5 hidden md:flex cursor-pointer"
@@ -446,24 +447,24 @@ export default function App() {
               {/* Mobile Nav Icons */}
               <button
                 onClick={() => navigate('slideshow')}
-                className="md:hidden hover:text-theme-accent2 p-2 rounded-full hover:bg-white/40 transition-colors cursor-pointer"
+                className="md:hidden hover:text-theme-accent2 p-1.5 rounded-full hover:bg-white/40 transition-colors cursor-pointer"
                 title="Slideshow"
               >
-                <ImageIcon size={20} />
+                <ImageIcon size={18} />
               </button>
               <button
                 onClick={() => navigate('videos')}
-                className="md:hidden hover:text-theme-accent2 p-2 rounded-full hover:bg-white/40 transition-colors cursor-pointer"
+                className="md:hidden hover:text-theme-accent2 p-1.5 rounded-full hover:bg-white/40 transition-colors cursor-pointer"
                 title="Video kỷ niệm"
               >
-                <Film size={20} />
+                <Film size={18} />
               </button>
               <button
                 onClick={() => navigate('letter')}
-                className="md:hidden hover:text-theme-accent2 p-2 rounded-full hover:bg-white/40 transition-colors cursor-pointer"
+                className="md:hidden hover:text-theme-accent2 p-1.5 rounded-full hover:bg-white/40 transition-colors cursor-pointer"
                 title="Thư tình"
               >
-                <Mail size={20} />
+                <Mail size={18} />
               </button>
 
               <div className="w-[1px] h-6 bg-theme-dark/20 mx-1 hidden md:block"></div>
@@ -471,7 +472,7 @@ export default function App() {
               {isAdmin ? (
                 <button
                   onClick={() => { setIsAdmin(false); localStorage.removeItem('admin_token'); localStorage.removeItem('admin_username'); navigate('home'); }}
-                  className="text-rose-400 hover:text-rose-600 p-2 md:px-3.5 md:py-2 rounded-full hover:bg-white/40 transition-all flex items-center gap-1.5 cursor-pointer"
+                  className="text-rose-400 hover:text-rose-600 p-1.5 md:px-3.5 md:py-2 rounded-full hover:bg-white/40 transition-all flex items-center gap-1.5 cursor-pointer"
                   title="Đăng xuất"
                 >
                   <LogOut size={18} />
@@ -480,7 +481,7 @@ export default function App() {
               ) : (
                 <button
                   onClick={() => navigate('login')}
-                  className="hover:text-theme-accent2 p-2 md:px-3.5 md:py-2 rounded-full hover:bg-white/40 transition-all flex items-center gap-1.5 cursor-pointer"
+                  className="hover:text-theme-accent2 p-1.5 md:px-3.5 md:py-2 rounded-full hover:bg-white/40 transition-all flex items-center gap-1.5 cursor-pointer"
                   title="Quản trị"
                 >
                   <Lock size={18} />
