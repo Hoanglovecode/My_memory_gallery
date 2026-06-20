@@ -53,18 +53,37 @@ export default function Hero({ navigate, totalPhotos, totalVideos }: HeroProps) 
           transition={{ duration: 1.2, delay: 0.2 }}
           className="lg:w-[45%] text-center lg:text-left mb-8 lg:mb-0"
         >
-          <h2
-            className="text-4xl sm:text-5xl md:text-7xl lg:text-[6rem] leading-[1.05] text-[#4A2545] mb-4 md:mb-6 drop-shadow-sm"
+          <motion.h2
+            animate={{
+              y: [0, -5, 0],
+              rotate: [0, -0.5, 0.5, 0],
+            }}
+            transition={{
+              duration: 6,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className="text-4xl sm:text-5xl md:text-7xl lg:text-[6rem] leading-[1.05] text-[#4A2545] mb-4 md:mb-6 drop-shadow-sm select-none"
             style={{ fontFamily: "'Cormorant Garamond', serif" }}
           >
             MY <span className="italic text-[#E57373]">ALBUM</span>
-          </h2>
-          <p
-            className="text-base sm:text-lg md:text-2xl text-[#5D4037] max-w-md mx-auto lg:mx-0 font-medium leading-relaxed"
+          </motion.h2>
+          <motion.p
+            animate={{
+              y: [0, -3, 0],
+              x: [0, 1, -1, 0],
+            }}
+            transition={{
+              duration: 5,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 0.3,
+            }}
+            className="text-base sm:text-lg md:text-2xl text-[#5D4037] max-w-md mx-auto lg:mx-0 font-medium leading-relaxed select-none"
             style={{ fontFamily: "'Cormorant Garamond', serif" }}
           >
             "This project is designed for storing images and videos, with continuous improvements being made to enhance the product."
-          </p>
+          </motion.p>
         </motion.div>
 
         {/* Right Glass Cards Layout */}
@@ -75,9 +94,27 @@ export default function Hero({ navigate, totalPhotos, totalVideos }: HeroProps) 
           className="lg:w-[52%] flex flex-row flex-wrap items-center justify-center lg:justify-end gap-2 sm:gap-3 md:gap-6"
         >
           {/* Card 1 — View Video */}
-          <div
+          <motion.div
             onClick={() => navigate('videos')}
-            className="w-[95px] h-[135px] sm:w-[110px] sm:h-[155px] md:w-[160px] md:h-[220px] rounded-[1.2rem] sm:rounded-[1.5rem] md:rounded-[2rem] bg-white/40 border border-white/60 backdrop-blur-xl shadow-[0_8px_32px_rgba(244,143,177,0.15)] flex flex-col items-center justify-center p-2.5 sm:p-3 md:p-4 cursor-pointer hover:bg-white/60 transition-all duration-300 group hover:-translate-y-2"
+            animate={{
+              y: [0, -6, 0],
+              rotate: [0, -2, 2, -2, 2, 0],
+            }}
+            transition={{
+              y: {
+                duration: 4,
+                repeat: Infinity,
+                ease: "easeInOut",
+              },
+              rotate: {
+                duration: 1.2,
+                repeat: Infinity,
+                repeatDelay: 3,
+                ease: "easeInOut",
+              }
+            }}
+            whileHover={{ scale: 1.06, y: -12 }}
+            className="w-[95px] h-[135px] sm:w-[110px] sm:h-[155px] md:w-[160px] md:h-[220px] rounded-[1.2rem] sm:rounded-[1.5rem] md:rounded-[2rem] bg-white/40 border border-white/60 backdrop-blur-xl shadow-[0_8px_32px_rgba(244,143,177,0.15)] flex flex-col items-center justify-center p-2.5 sm:p-3 md:p-4 cursor-pointer hover:bg-white/60 transition-colors duration-300 group"
           >
             <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-12 md:h-12 rounded-full border border-[#E57373]/30 flex items-center justify-center mb-1.5 sm:mb-2 md:mb-4 group-hover:scale-110 transition-transform bg-white/50 text-[#E57373]">
               {/* Film/Video icon */}
@@ -93,10 +130,21 @@ export default function Hero({ navigate, totalPhotos, totalVideos }: HeroProps) 
               </svg>
             </div>
             <span className="font-cinzel text-[8px] sm:text-[9px] md:text-xs text-[#4A2545] font-semibold uppercase tracking-wider md:tracking-widest text-center">View Video</span>
-          </div>
+          </motion.div>
 
           {/* Card 2 — Total Memories (Highlight) */}
-          <div className="w-[105px] h-[145px] sm:w-[120px] sm:h-[165px] md:w-[170px] md:h-[240px] rounded-[1.2rem] sm:rounded-[1.5rem] md:rounded-[2rem] bg-gradient-to-br from-[#FFF9C4]/60 to-[#FCE4EC]/60 border border-white/80 backdrop-blur-xl shadow-[0_8px_32px_rgba(244,143,177,0.2)] flex flex-col items-center justify-center p-2.5 sm:p-3 md:p-4 hover:scale-105 transition-transform duration-300">
+          <motion.div
+            animate={{
+              y: [0, -4, 0],
+            }}
+            transition={{
+              duration: 4.5,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            whileHover={{ scale: 1.04 }}
+            className="w-[105px] h-[145px] sm:w-[120px] sm:h-[165px] md:w-[170px] md:h-[240px] rounded-[1.2rem] sm:rounded-[1.5rem] md:rounded-[2rem] bg-gradient-to-br from-[#FFF9C4]/60 to-[#FCE4EC]/60 border border-white/80 backdrop-blur-xl shadow-[0_8px_32px_rgba(244,143,177,0.2)] flex flex-col items-center justify-center p-2.5 sm:p-3 md:p-4 transition-transform duration-300"
+          >
             <h3
               className="text-2xl sm:text-3xl md:text-5xl text-[#E57373] mb-0.5 sm:mb-1 md:mb-3 drop-shadow-sm font-semibold"
               style={{ fontFamily: "'Cormorant Garamond', serif" }}
@@ -106,12 +154,32 @@ export default function Hero({ navigate, totalPhotos, totalVideos }: HeroProps) 
             <span className="font-cinzel text-[8px] sm:text-[9px] md:text-[11px] text-[#4A2545] font-bold uppercase tracking-wider md:tracking-widest text-center leading-normal md:leading-loose">
               Total<br />Memories
             </span>
-          </div>
+          </motion.div>
 
           {/* Card 3 — View Images */}
-          <div
+          <motion.div
             onClick={() => navigate('slideshow')}
-            className="flex w-[95px] h-[135px] sm:w-[110px] sm:h-[155px] md:w-[160px] md:h-[220px] rounded-[1.2rem] sm:rounded-[1.5rem] md:rounded-[2rem] bg-white/40 border border-white/60 backdrop-blur-xl shadow-[0_8px_32px_rgba(244,143,177,0.15)] flex-col items-center justify-center p-2.5 sm:p-3 md:p-4 cursor-pointer hover:bg-white/60 transition-all duration-300 group hover:-translate-y-2"
+            animate={{
+              y: [0, -6, 0],
+              rotate: [0, 2, -2, 2, -2, 0],
+            }}
+            transition={{
+              y: {
+                duration: 4,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 0.2,
+              },
+              rotate: {
+                duration: 1.2,
+                repeat: Infinity,
+                repeatDelay: 3,
+                ease: "easeInOut",
+                delay: 0.5,
+              }
+            }}
+            whileHover={{ scale: 1.06, y: -12 }}
+            className="flex w-[95px] h-[135px] sm:w-[110px] sm:h-[155px] md:w-[160px] md:h-[220px] rounded-[1.2rem] sm:rounded-[1.5rem] md:rounded-[2rem] bg-white/40 border border-white/60 backdrop-blur-xl shadow-[0_8px_32px_rgba(244,143,177,0.15)] flex-col items-center justify-center p-2.5 sm:p-3 md:p-4 cursor-pointer hover:bg-white/60 transition-colors duration-300 group"
           >
             <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-12 md:h-12 rounded-full border border-[#81C784]/30 flex items-center justify-center mb-1.5 sm:mb-2 md:mb-4 group-hover:scale-110 transition-transform bg-white/50 text-[#81C784]">
               {/* Image/Photo icon */}
@@ -122,7 +190,7 @@ export default function Hero({ navigate, totalPhotos, totalVideos }: HeroProps) 
               </svg>
             </div>
             <span className="font-cinzel text-[8px] sm:text-[9px] md:text-xs text-[#4A2545] font-semibold uppercase tracking-wider md:tracking-widest text-center">View Images</span>
-          </div>
+          </motion.div>
         </motion.div>
 
       </div>
