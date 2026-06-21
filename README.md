@@ -6,16 +6,29 @@ A beautiful React + TypeScript + Vite application designed for storing images an
 
 "This project is designed for storing images and videos, with continuous improvements being made to enhance the product."
 
+### Screenshots
+
+#### Core Features
 ![My Album](./screenshots/album-home.png)
 ![Edit Memory](./screenshots/edit-memory.png)
 ![Add Video](./screenshots/add-video.png)
 ![Manage Memories](./screenshots/manage-memories.png)
 
+#### Advanced Features
+![Add Music](./screenshots/add-music.png)
+![Chatbot Configuration](./screenshots/chatbot-config.png)
+![Social Links Manager](./screenshots/social-links.png)
+![Access Control](./screenshots/access-control.png)
+
 ## Features
 
 - 📸 Store and organize memories with images and videos
 - 🎬 Create video memories with metadata
+- 🎵 Add music backgrounds to memories
 - 📝 Add titles and descriptions to memories
+- 💬 AI Chatbot integration for interactive conversations
+- 🔗 Social media and creator links management
+- 📊 Access control and usage statistics
 - 🎯 Slideshow functionality
 - 💬 Interactive UI with a beautiful pink theme
 - 📅 Organize memories by date
