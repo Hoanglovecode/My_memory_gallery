@@ -1,4 +1,33 @@
-# React + TypeScript + Vite
+# My Memory Gallery
+
+A beautiful React + TypeScript + Vite application designed for storing images and videos with continuous improvements to enhance the product.
+
+## Project Overview
+
+"This project is designed for storing images and videos, with continuous improvements being made to enhance the product."
+
+![My Album](./screenshots/album-home.png)
+![Edit Memory](./screenshots/edit-memory.png)
+![Add Video](./screenshots/add-video.png)
+![Manage Memories](./screenshots/manage-memories.png)
+
+## Features
+
+- 📸 Store and organize memories with images and videos
+- 🎬 Create video memories with metadata
+- 📝 Add titles and descriptions to memories
+- 🎯 Slideshow functionality
+- 💬 Interactive UI with a beautiful pink theme
+- 📅 Organize memories by date
+
+## Tech Stack
+
+- **React** - UI framework
+- **TypeScript** - Type safety
+- **Vite** - Build tool with HMR
+- **ESLint** - Code quality
+
+## Project Setup
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
@@ -43,7 +72,7 @@ export default defineConfig([
 ])
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-plugin-react-dom) and update your config:
 
 ```js
 // eslint.config.js
