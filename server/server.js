@@ -21,6 +21,7 @@ app.use('/api/videos', require('./routes/videos'));
 app.use('/api/letters', require('./routes/letters'));
 app.use('/api/settings', require('./routes/settings'));
 app.use('/api/chatbot', require('./routes/chatbot'));
+app.use('/api/analytics', require('./routes/analytics'));
 
 // Basic Route
 app.get('/', (req, res) => {

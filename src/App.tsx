@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Heart, Image as ImageIcon, Mail, Lock, LogOut, Music, Pause, Film, ArrowLeft } from 'lucide-react';
+import { Heart, Image as ImageIcon, Mail, Lock, LogOut, Music, Pause, Film, ArrowLeft, Eye } from 'lucide-react';
 import type { Photo, Letter, View, Video } from './types';
 import Home from './components/Home';
 import Slideshow from './components/Slideshow';
@@ -203,6 +203,115 @@ export default function App() {
     loadData();
   }, []);
 
+  const [publicViews, setPublicViews] = useState<number>(0);
+  const [todayUnique, setTodayUnique] = useState<number>(0);
+  const [todayDate, setTodayDate] = useState<string>('');
+  const [showVisitorNotification, setShowVisitorNotification] = useState<boolean>(false);
+
+  // Track visitor on mount & load public views
+  useEffect(() => {
+    const trackVisit = async () => {
+      try {
+        let referrer = 'Trực tiếp';
+        if (document.referrer) {
+          try {
+            const refUrl = new URL(document.referrer);
+            referrer = refUrl.hostname || document.referrer;
+            // Clean up common referrers
+            if (referrer.includes('facebook.com')) referrer = 'Facebook';
+            else if (referrer.includes('instagram.com')) referrer = 'Instagram';
+            else if (referrer.includes('google.')) referrer = 'Google';
+            else if (referrer.includes('linkedin.com')) referrer = 'LinkedIn';
+            else if (referrer.includes('youtube.com')) referrer = 'YouTube';
+            else if (referrer.includes('github.com')) referrer = 'GitHub';
+          } catch (e) {
+            referrer = document.referrer;
+          }
+        }
+
+        // Detect iPhone models based on screen resolution and device pixel ratio
+        const getIphoneModel = (): string => {
+          const ua = navigator.userAgent;
+          const isIOS = /iPad|iPhone|iPod/.test(ua) || 
+                        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+          if (!isIOS) return '';
+
+          const width = window.screen.width;
+          const height = window.screen.height;
+          const ratio = window.devicePixelRatio;
+          const portraitWidth = Math.min(width, height);
+          const portraitHeight = Math.max(width, height);
+          
+          const w = portraitWidth * ratio;
+          const h = portraitHeight * ratio;
+
+          if (w === 1290 && h === 2796) return 'iPhone 14/15 Pro Max';
+          if (w === 1179 && h === 2556) return 'iPhone 14/15 Pro';
+          if (w === 1284 && h === 2778) return 'iPhone 12/13/14 Pro Max/Plus';
+          if (w === 1170 && h === 2532) return 'iPhone 12/13/14 Pro/Standard';
+          if (w === 1080 && h === 2340) return 'iPhone 12/13 mini';
+          if (w === 1242 && h === 2688) return 'iPhone XS Max / 11 Pro Max';
+          if (w === 828 && h === 1792) return 'iPhone XR / 11';
+          if (w === 1125 && h === 2436) return 'iPhone X / XS / 11 Pro';
+          if (w === 1242 && h === 2208) return 'iPhone 6s/7/8 Plus';
+          if (w === 750 && h === 1334) return 'iPhone 6/7/8 / SE (2/3)';
+          if (w === 640 && h === 1136) return 'iPhone 5/5s/SE (1)';
+          
+          return 'iPhone';
+        };
+
+        const iphoneModel = getIphoneModel();
+        const clientOs = iphoneModel ? `iOS (${iphoneModel})` : undefined;
+
+        // If already tracked in session, just fetch the views
+        if (sessionStorage.getItem('tracked_visit')) {
+          const res = await fetch(`${API_BASE_URL}/analytics/public-views`);
+          if (res.ok) {
+            const data = await res.json();
+            setPublicViews(data.totalViews);
+            setTodayUnique(data.todayUnique || 0);
+            setTodayDate(data.todayDate || '');
+            setShowVisitorNotification(true);
+          }
+          return;
+        }
+
+        const res = await fetch(`${API_BASE_URL}/analytics/track`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ 
+            page: window.location.pathname || '/',
+            referrer,
+            clientOs
+          })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setPublicViews(data.totalViews);
+          setTodayUnique(data.todayUnique || 0);
+          setTodayDate(data.todayDate || '');
+          setShowVisitorNotification(true);
+          sessionStorage.setItem('tracked_visit', 'true');
+        }
+      } catch (err) {
+        console.warn('Failed to handle visitor analytics:', err);
+      }
+    };
+    trackVisit();
+  }, []);
+
+  // Auto-close visitor notification after 8 seconds
+  useEffect(() => {
+    if (showVisitorNotification && todayUnique > 0) {
+      const timer = setTimeout(() => {
+        setShowVisitorNotification(false);
+      }, 8000);
+      return () => clearTimeout(timer);
+    }
+  }, [showVisitorNotification, todayUnique]);
+
 
   // Music toggle
   const toggleMusic = () => {
@@ -305,6 +414,28 @@ export default function App() {
       {/* Persistent Background Music */}
       <audio ref={audioRef} loop src={musicUrl} />
 
+      {/* Visitor Stats Toast Notification */}
+      {showVisitorNotification && todayUnique > 0 && (
+        <div className="fixed top-28 left-1/2 -translate-x-1/2 z-[999] w-[92%] max-w-lg md:max-w-xl bg-white/95 backdrop-blur-lg border border-[#FCE4EC] shadow-[0_15px_40px_rgba(242,190,209,0.35)] rounded-[2rem] p-5 md:p-6 flex items-center gap-4.5 animate-scale-up transition-all duration-500 hover:shadow-[0_20px_50px_rgba(242,190,209,0.45)]">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#FFF9C4] to-[#FCE4EC] flex items-center justify-center text-3xl shadow-inner flex-shrink-0 animate-bounce">
+            🎉
+          </div>
+          <div className="flex-1 text-left">
+            <p className="text-xs md:text-sm text-gray-400 font-bold uppercase tracking-widest font-serif">Thống kê ngày {todayDate}</p>
+            <p className="text-base md:text-lg font-semibold text-theme-dark mt-1 leading-relaxed">
+              Hôm nay có tổng cộng <strong className="text-[#E57373] font-extrabold text-lg md:text-xl drop-shadow-sm">{todayUnique} khách mới</strong> truy cập trang web!
+            </p>
+          </div>
+          <button 
+            onClick={() => setShowVisitorNotification(false)}
+            className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-2 rounded-full cursor-pointer transition-colors duration-200 text-sm flex items-center justify-center w-8 h-8"
+            title="Đóng"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       {currentView === 'fantasy' ? (
         <div className="relative w-full h-screen overflow-y-auto bg-[#FDFBF7] flex flex-col justify-between scroll-smooth selection:bg-theme-accent2 selection:text-white">
           <Navbar />
@@ -385,6 +516,20 @@ export default function App() {
               chatbotWelcomeMessage={chatbotWelcomeMessage}
             />
           )}
+
+          {/* Floating Views Counter */}
+          <div className="fixed bottom-6 left-6 z-50 flex items-center gap-2 group">
+            <div 
+              className="p-4 rounded-full bg-white/40 border border-white/60 backdrop-blur-md text-theme-dark shadow-lg hover:scale-110 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer animate-fade-in"
+              title={`Tổng lượt xem: ${publicViews}`}
+            >
+              <Eye size={20} className="text-theme-accent2 animate-pulse" />
+              <span className="text-xs font-bold font-serif">{publicViews}</span>
+            </div>
+            <span className="bg-white/90 backdrop-blur-xs text-theme-dark text-xs font-semibold px-3 py-2 rounded-2xl border border-theme-accent1 shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none select-none translate-x-[-2px] group-hover:translate-x-0 whitespace-nowrap">
+              Lượt xem trang
+            </span>
+          </div>
 
           {/* Floating Music Controller */}
           <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 group">
@@ -611,6 +756,20 @@ export default function App() {
               chatbotWelcomeMessage={chatbotWelcomeMessage}
             />
           )}
+
+          {/* Floating Views Counter */}
+          <div className="fixed bottom-6 left-6 z-50 flex items-center gap-2 group">
+            <div 
+              className="p-4 rounded-full bg-white/40 border border-white/60 backdrop-blur-md text-theme-dark shadow-lg hover:scale-110 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer animate-fade-in"
+              title={`Tổng lượt xem: ${publicViews}`}
+            >
+              <Eye size={20} className="text-theme-accent2 animate-pulse" />
+              <span className="text-xs font-bold font-serif">{publicViews}</span>
+            </div>
+            <span className="bg-white/90 backdrop-blur-xs text-theme-dark text-xs font-semibold px-3 py-2 rounded-2xl border border-theme-accent1 shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none select-none translate-x-[-2px] group-hover:translate-x-0 whitespace-nowrap">
+              Lượt xem trang
+            </span>
+          </div>
 
           {/* Floating Music Controller */}
           <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 group">

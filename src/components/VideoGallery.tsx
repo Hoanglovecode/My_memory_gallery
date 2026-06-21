@@ -23,9 +23,6 @@ export default function VideoGallery({ videos, onPlayVideo, onCloseVideo }: Vide
           <Film className="text-theme-accent2 animate-pulse" size={40} />
           Video Kỷ Niệm
         </h1>
-        <p className="text-lg text-gray-600 italic">
-          "Những khoảnh khắc chuyển động của tình yêu."
-        </p>
       </div>
 
       {videos.length > 0 ? (

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Image as ImageIcon, X } from 'lucide-react';
+import { Image as ImageIcon, X, Heart, Sparkles } from 'lucide-react';
 import type { Photo, View } from '../types';
 import { optimizeImageUrl } from '../config';
 
@@ -32,21 +32,20 @@ export default function Home({ navigate, photos }: HomeProps) {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[85vh] px-4 text-center animate-fade-in relative overflow-x-hidden">
-      <h1 className="text-5xl md:text-7xl font-serif font-bold mb-4 text-theme-dark tracking-wider drop-shadow-md">
-        Our Memories
+      <h1 className="text-5xl md:text-7xl font-serif font-bold mb-16 text-theme-dark tracking-wider drop-shadow-md">
+        Ảnh Kỷ Niệm
       </h1>
-      <p className="text-lg md:text-xl text-gray-500 mb-20 italic font-medium">
-        "Mỗi bức ảnh là một câu chuyện tình yêu của chúng mình"
-      </p>
 
       {photos.length > 0 ? (
         <div className="flex flex-col lg:flex-row items-center justify-center gap-32 lg:gap-52 w-full max-w-7xl mb-28 px-4">
           
           {/* Carousel 1 - Chiều kim đồng hồ */}
           <div className="flex flex-col items-center w-full lg:w-1/2">
-            <h3 className="text-2xl font-serif italic mb-12 text-[#A7727D] font-bold tracking-wide">
-              Kỷ Niệm Ngọt Ngào 🌸
-            </h3>
+            <div className="mb-12 flex justify-center hover:scale-110 transition-transform duration-300">
+              <div className="w-14 h-14 rounded-full bg-white/60 border border-white/80 backdrop-blur-md shadow-[0_8px_32px_rgba(244,143,177,0.15)] flex items-center justify-center">
+                <Heart className="w-7 h-7 text-[#E57373] animate-pulse fill-[#E57373]/40" />
+              </div>
+            </div>
             <div className="carousel-container-compact" onClick={() => navigate('slideshow')}>
               <div className="carousel-spin-cw group">
                 {carousel1Photos.map((photo, index) => (
@@ -79,9 +78,11 @@ export default function Home({ navigate, photos }: HomeProps) {
 
           {/* Carousel 2 - Ngược chiều kim đồng hồ */}
           <div className="flex flex-col items-center w-full lg:w-1/2 mt-16 lg:mt-0">
-            <h3 className="text-2xl font-serif italic mb-12 text-[#A7727D] font-bold tracking-wide">
-              Khoảnh Khắc Bên Nhau ✨
-            </h3>
+            <div className="mb-12 flex justify-center hover:scale-110 transition-transform duration-300">
+              <div className="w-14 h-14 rounded-full bg-white/60 border border-white/80 backdrop-blur-md shadow-[0_8px_32px_rgba(244,143,177,0.15)] flex items-center justify-center">
+                <Sparkles className="w-7 h-7 text-[#E6C280] animate-pulse" />
+              </div>
+            </div>
             <div className="carousel-container-compact" onClick={() => navigate('slideshow')}>
               <div className="carousel-spin-ccw group">
                 {carousel2Photos.map((photo, index) => (

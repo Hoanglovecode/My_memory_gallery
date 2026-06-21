@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Lock, Plus, Trash2, Save, CheckCircle, Upload, Edit2, Film, Music, Sparkles, GripVertical } from 'lucide-react';
+import { Lock, Plus, Trash2, Save, CheckCircle, Upload, Edit2, Film, Music, Sparkles, GripVertical, BarChart2, Eye, Users, Globe } from 'lucide-react';
 import type { Photo, Letter, Video } from '../types';
 import { API_BASE_URL } from '../config';
 
@@ -78,7 +78,7 @@ export default function AdminDashboard({
     };
   };
 
-  const [activeTab, setActiveTab] = useState<'photos' | 'letter' | 'videos' | 'music' | 'chatbot' | 'social'>('photos');
+  const [activeTab, setActiveTab] = useState<'photos' | 'letter' | 'videos' | 'music' | 'chatbot' | 'social' | 'analytics'>('photos');
   const [showAddForm, setShowAddForm] = useState(false);
   const [newPhoto, setNewPhoto] = useState({ title: '', description: '', eventDate: '', imageUrl: '' });
   const [uploadMode, setUploadMode] = useState<'file' | 'url'>('file');
@@ -121,6 +121,38 @@ export default function AdminDashboard({
     setEditYoutube(creatorYoutube);
     setEditGithub(creatorGithub);
   }, [creatorFacebook, creatorLinkedin, creatorYoutube, creatorGithub]);
+
+  // Analytics states
+  const [analyticsData, setAnalyticsData] = useState<{
+    totalViews: number;
+    uniqueVisitors: number;
+    recentVisits: any[];
+  } | null>(null);
+  const [loadingAnalytics, setLoadingAnalytics] = useState(false);
+
+  useEffect(() => {
+    if (activeTab === 'analytics') {
+      const fetchAnalytics = async () => {
+        setLoadingAnalytics(true);
+        try {
+          const response = await fetch(`${API_BASE_URL}/analytics/stats`, {
+            headers: getAuthHeaders()
+          });
+          if (response.ok) {
+            const data = await response.json();
+            setAnalyticsData(data);
+          } else {
+            showToast('Không thể tải thống kê truy cập!', 'error');
+          }
+        } catch (err) {
+          showToast('Lỗi kết nối máy chủ thống kê!', 'error');
+        } finally {
+          setLoadingAnalytics(false);
+        }
+      };
+      fetchAnalytics();
+    }
+  }, [activeTab]);
 
   const [testStatus, setTestStatus] = useState<'idle' | 'testing' | 'success' | 'failed'>('idle');
   const [testError, setTestError] = useState('');
@@ -791,6 +823,14 @@ export default function AdminDashboard({
           }`}
         >
           Mạng Xã Hội Creator
+        </button>
+        <button 
+          onClick={() => setActiveTab('analytics')} 
+          className={`pb-3 px-6 font-bold text-lg transition-colors cursor-pointer ${
+            activeTab === 'analytics' ? 'text-theme-dark border-b-4 border-theme-dark' : 'text-gray-400 hover:text-theme-dark'
+          }`}
+        >
+          Thống kê truy cập
         </button>
       </div>
 
@@ -1499,6 +1539,135 @@ export default function AdminDashboard({
               </button>
             </div>
           </form>
+        </div>
+      )}
+
+      {/* Tùy chọn Thống kê truy cập */}
+      {activeTab === 'analytics' && (
+        <div className="bg-white p-8 rounded-2xl shadow-md border border-gray-100 animate-fade-in font-medium">
+          <h3 className="text-2xl font-bold text-theme-dark mb-6 flex items-center gap-2">
+            <BarChart2 size={24} className="text-theme-accent2" /> Thống kê truy cập hệ thống
+          </h3>
+          <p className="text-sm text-gray-500 mb-8 font-normal">Theo dõi tổng lượng truy cập, số lượng người truy cập duy nhất và nhật ký hoạt động.</p>
+
+          {loadingAnalytics && !analyticsData ? (
+            <div className="flex flex-col items-center justify-center py-12">
+              <div className="w-10 h-10 border-4 border-[#A7727D] border-t-transparent rounded-full animate-spin mb-4"></div>
+              <p className="text-gray-500 font-medium">Đang tải dữ liệu thống kê...</p>
+            </div>
+          ) : (
+            <div>
+              {/* KPI Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 font-normal">
+                {/* Total Views Card */}
+                <div className="bg-gradient-to-br from-[#FCE4EC]/50 to-[#FFF9C4]/30 border border-[#FCE4EC] rounded-2xl p-6 flex items-center gap-5 shadow-xs">
+                  <div className="w-14 h-14 rounded-2xl bg-white/80 border border-white/60 shadow-xs flex items-center justify-center text-[#E57373]">
+                    <Eye size={28} />
+                  </div>
+                  <div>
+                    <h4 className="text-sm text-gray-500 font-bold uppercase tracking-wider">Tổng lượt truy cập</h4>
+                    <p className="text-3xl font-bold text-gray-800 mt-1 font-serif">
+                      {analyticsData?.totalViews || 0}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Unique Visitors Card */}
+                <div className="bg-gradient-to-br from-[#E0F7FA]/40 to-[#E8F5E9]/30 border border-[#B2EBF2]/40 rounded-2xl p-6 flex items-center gap-5 shadow-xs">
+                  <div className="w-14 h-14 rounded-2xl bg-white/80 border border-white/60 shadow-xs flex items-center justify-center text-[#81C784]">
+                    <Users size={28} />
+                  </div>
+                  <div>
+                    <h4 className="text-sm text-gray-500 font-bold uppercase tracking-wider">Khách truy cập duy nhất</h4>
+                    <p className="text-3xl font-bold text-gray-800 mt-1 font-serif">
+                      {analyticsData?.uniqueVisitors || 0}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Recent Access List */}
+              <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
+                <h4 className="font-bold text-lg text-theme-dark mb-4 flex items-center gap-2">
+                  <Globe size={20} className="text-theme-accent2" /> Nhật ký truy cập gần đây (Tối đa 100)
+                </h4>
+                
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm text-gray-500">
+                    <thead className="text-xs text-gray-700 uppercase bg-gray-100/80 rounded-lg">
+                      <tr>
+                        <th className="px-4 py-3 rounded-l-lg font-bold">Thời gian</th>
+                        <th className="px-4 py-3 font-bold">Địa chỉ IP</th>
+                        <th className="px-4 py-3 font-bold text-center">Số lần truy cập (IP)</th>
+                        <th className="px-4 py-3 font-bold">Vị trí</th>
+                        <th className="px-4 py-3 font-bold">Nhà mạng (ISP)</th>
+                        <th className="px-4 py-3 font-bold">Nguồn</th>
+                        <th className="px-4 py-3 font-bold">Thiết bị</th>
+                        <th className="px-4 py-3 rounded-r-lg font-bold">Trang</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 font-normal">
+                      {analyticsData?.recentVisits && analyticsData.recentVisits.length > 0 ? (
+                        analyticsData.recentVisits.map((visit: any) => {
+                          const date = new Date(visit.timestamp);
+                          const formattedTime = date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' ' + date.toLocaleDateString('vi-VN');
+                          
+                          return (
+                            <tr key={visit._id} className="hover:bg-white transition-colors">
+                              <td className="px-4 py-3.5 whitespace-nowrap text-gray-700 font-medium">{formattedTime}</td>
+                              <td className="px-4 py-3.5 font-mono text-xs text-blue-600 font-bold">{visit.ip || 'N/A'}</td>
+                              <td className="px-4 py-3.5 whitespace-nowrap text-center">
+                                <span className="inline-block px-2.5 py-1 rounded-full text-xs font-bold bg-theme-accent2/10 text-theme-dark border border-theme-accent2/20">
+                                  {visit.totalIpVisits || 1} lần
+                                </span>
+                              </td>
+                              <td className="px-4 py-3.5 whitespace-nowrap text-gray-700 font-medium">
+                                {visit.country && visit.country !== 'Local/Unknown' ? (
+                                  <span className="flex items-center gap-1">
+                                    🌍 {visit.country}{visit.city ? `, ${visit.city}` : ''}
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-400">Nội bộ / Chưa rõ</span>
+                                )}
+                              </td>
+                              <td className="px-4 py-3.5 whitespace-nowrap text-xs text-gray-500 max-w-[150px] truncate" title={visit.isp}>
+                                {visit.isp || <span className="text-gray-300">-</span>}
+                              </td>
+                              <td className="px-4 py-3.5 whitespace-nowrap">
+                                <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
+                                  visit.referrer === 'Facebook' ? 'bg-blue-50 text-blue-700 border border-blue-100' :
+                                  visit.referrer === 'Instagram' ? 'bg-pink-50 text-pink-700 border border-pink-100 animate-pulse' :
+                                  visit.referrer === 'Google' ? 'bg-green-50 text-green-700 border border-green-100' :
+                                  visit.referrer === 'LinkedIn' ? 'bg-indigo-50 text-indigo-700 border border-indigo-100' :
+                                  visit.referrer === 'YouTube' ? 'bg-red-50 text-red-700 border border-red-100' :
+                                  visit.referrer === 'GitHub' ? 'bg-gray-100 text-gray-800 border border-gray-200' :
+                                  visit.referrer === 'Trực tiếp' || !visit.referrer ? 'bg-gray-50 text-gray-700 border border-gray-200' :
+                                  'bg-[#FFD1DC] text-[#4A2545] border border-[#FFD1DC]/80'
+                                }`}>
+                                  {visit.referrer || 'Trực tiếp'}
+                                </span>
+                              </td>
+                              <td className="px-4 py-3.5 whitespace-nowrap text-xs">
+                                <div className="flex flex-col gap-0.5">
+                                  <span className="font-semibold text-gray-700">{visit.browser}</span>
+                                  <span className="text-gray-400 text-[10px]">{visit.os}</span>
+                                </div>
+                              </td>
+                              <td className="px-4 py-3.5 font-mono text-xs text-theme-dark font-semibold">{visit.page}</td>
+                            </tr>
+                          );
+                        })
+                      ) : (
+                        <tr>
+                          <td colSpan={8} className="text-center py-8 text-gray-400 font-medium">Chưa có nhật ký truy cập nào.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
