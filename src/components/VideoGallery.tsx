@@ -37,9 +37,9 @@ export default function VideoGallery({ videos, onPlayVideo, onCloseVideo }: Vide
               }}
             >
               {/* Video Thumbnail (Auto preview from first frame) */}
-              <div className="h-56 relative bg-black flex items-center justify-center overflow-hidden">
+              <div className="h-44 sm:h-48 md:h-56 relative bg-black flex items-center justify-center overflow-hidden">
                 <video 
-                  src={video.videoUrl} 
+                  src={video.videoUrl.includes('#') ? video.videoUrl : `${video.videoUrl}#t=0.001`} 
                   className="w-full h-full object-cover opacity-80 group-hover:scale-105 group-hover:opacity-90 transition-all duration-500"
                   preload="metadata"
                   muted
