@@ -42,36 +42,15 @@ router.post('/track', async (req, res) => {
     const browser = clientBrowser || parsedUA.browser;
     const os = clientOs || parsedUA.os;
 
-    let country = 'Local/Unknown';
-    let city = '';
-    let isp = '';
-
-    const isLocal = ip === '127.0.0.1' || ip === '::1' || ip.startsWith('192.168.') || ip.startsWith('10.') || ip.startsWith('172.16.');
-    if (!isLocal) {
-      try {
-        const geoRes = await fetch(`http://ip-api.com/json/${ip}?fields=status,message,country,city,isp`);
-        if (geoRes.ok) {
-          const geoData = await geoRes.json();
-          if (geoData.status === 'success') {
-            country = geoData.country || 'Unknown';
-            city = geoData.city || '';
-            isp = geoData.isp || '';
-          }
-        }
-      } catch (err) {
-        console.error('Failed to resolve visitor location:', err.message);
-      }
-    }
-
     const newVisit = new Visitor({
       ip,
       userAgent,
       browser,
       os,
       page: page || '/',
-      country,
-      city,
-      isp,
+      country: 'Local/Unknown',
+      city: '',
+      isp: '',
       referrer: referrer || 'Direct'
     });
 
@@ -99,7 +78,28 @@ router.post('/track', async (req, res) => {
     ]);
     const todayUnique = todayUniqueResult.length > 0 ? todayUniqueResult[0].count : 0;
 
+    // Send response immediately to the client to make the page load super fast!
     res.json({ success: true, totalViews, todayUnique, todayDate });
+
+    // Perform geolocation lookup asynchronously in the background
+    const isLocal = ip === '127.0.0.1' || ip === '::1' || ip.startsWith('192.168.') || ip.startsWith('10.') || ip.startsWith('172.16.');
+    if (!isLocal) {
+      fetch(`http://ip-api.com/json/${ip}?fields=status,message,country,city,isp`)
+        .then(async (geoRes) => {
+          if (geoRes.ok) {
+            const geoData = await geoRes.json();
+            if (geoData.status === 'success') {
+              newVisit.country = geoData.country || 'Unknown';
+              newVisit.city = geoData.city || '';
+              newVisit.isp = geoData.isp || '';
+              await newVisit.save();
+            }
+          }
+        })
+        .catch((err) => {
+          console.error('Failed to resolve visitor location in background:', err.message);
+        });
+    }
   } catch (err) {
     console.error('Error tracking visit:', err.message);
     res.status(500).json({ error: 'Server error' });

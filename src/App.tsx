@@ -207,10 +207,37 @@ export default function App() {
     loadData();
   }, []);
 
-  const [publicViews, setPublicViews] = useState<number>(0);
-  const [todayUnique, setTodayUnique] = useState<number>(0);
-  const [todayDate, setTodayDate] = useState<string>('');
-  const [showVisitorNotification, setShowVisitorNotification] = useState<boolean>(false);
+  const [publicViews, setPublicViews] = useState<number>(() => {
+    try {
+      const cached = localStorage.getItem('cached_public_views');
+      return cached ? parseInt(cached, 10) : 0;
+    } catch {
+      return 0;
+    }
+  });
+  const [todayUnique, setTodayUnique] = useState<number>(() => {
+    try {
+      const cached = localStorage.getItem('cached_today_unique');
+      return cached ? parseInt(cached, 10) : 0;
+    } catch {
+      return 0;
+    }
+  });
+  const [todayDate, setTodayDate] = useState<string>(() => {
+    try {
+      return localStorage.getItem('cached_today_date') || '';
+    } catch {
+      return '';
+    }
+  });
+  const [showVisitorNotification, setShowVisitorNotification] = useState<boolean>(() => {
+    try {
+      const cached = localStorage.getItem('cached_today_unique');
+      return cached ? parseInt(cached, 10) > 0 : false;
+    } catch {
+      return false;
+    }
+  });
 
   // Track visitor on mount & load public views
   useEffect(() => {
@@ -275,6 +302,10 @@ export default function App() {
             setPublicViews(data.totalViews);
             setTodayUnique(data.todayUnique || 0);
             setTodayDate(data.todayDate || '');
+            
+            localStorage.setItem('cached_public_views', String(data.totalViews));
+            localStorage.setItem('cached_today_unique', String(data.todayUnique || 0));
+            localStorage.setItem('cached_today_date', data.todayDate || '');
             setShowVisitorNotification(true);
           }
           return;
@@ -296,6 +327,10 @@ export default function App() {
           setPublicViews(data.totalViews);
           setTodayUnique(data.todayUnique || 0);
           setTodayDate(data.todayDate || '');
+
+          localStorage.setItem('cached_public_views', String(data.totalViews));
+          localStorage.setItem('cached_today_unique', String(data.todayUnique || 0));
+          localStorage.setItem('cached_today_date', data.todayDate || '');
           setShowVisitorNotification(true);
           sessionStorage.setItem('tracked_visit', 'true');
         }
