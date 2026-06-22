@@ -113,8 +113,15 @@ export default function App() {
   useEffect(() => {
     async function loadData() {
       try {
-        // 1. Fetch photos
-        const photosRes = await fetch(`${API_BASE_URL}/photos`);
+        // Fetch all resources in parallel to optimize loading times
+        const [photosRes, videosRes, lettersRes, settingsRes] = await Promise.all([
+          fetch(`${API_BASE_URL}/photos`),
+          fetch(`${API_BASE_URL}/videos`),
+          fetch(`${API_BASE_URL}/letters`),
+          fetch(`${API_BASE_URL}/settings`)
+        ]);
+
+        // 1. Process photos
         if (photosRes.ok) {
           const photosData = await photosRes.json();
           // Backend returns _id instead of id, so we map it
@@ -132,8 +139,7 @@ export default function App() {
           localStorage.setItem('cached_photos', JSON.stringify(mappedPhotos));
         }
 
-        // 2. Fetch videos
-        const videosRes = await fetch(`${API_BASE_URL}/videos`);
+        // 2. Process videos
         if (videosRes.ok) {
           const videosData = await videosRes.json();
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -150,16 +156,14 @@ export default function App() {
           localStorage.setItem('cached_videos', JSON.stringify(mappedVideos));
         }
 
-        // 3. Fetch letters
-        const lettersRes = await fetch(`${API_BASE_URL}/letters`);
+        // 3. Process letters
         if (lettersRes.ok) {
           const lettersData = await lettersRes.json();
           setLetters(lettersData);
           localStorage.setItem('cached_letters', JSON.stringify(lettersData));
         }
 
-        // 3.5. Fetch music and chatbot settings
-        const settingsRes = await fetch(`${API_BASE_URL}/settings`);
+        // 3.5. Process music and chatbot settings
         if (settingsRes.ok) {
           const settingsData = await settingsRes.json();
           if (settingsData.musicUrl) setMusicUrl(settingsData.musicUrl);
@@ -197,7 +201,7 @@ export default function App() {
       } finally {
         setTimeout(() => {
           setIsLoading(false);
-        }, 800);
+        }, 200);
       }
     }
     loadData();
