@@ -190,7 +190,7 @@ export default function ChatbotWidget({ chatbotName, chatbotWelcomeMessage }: Ch
   ];
 
   return (
-    <div className="fixed bottom-24 right-6 z-[99] flex flex-col items-end pointer-events-none">
+    <div className="fixed bottom-6 right-6 md:bottom-24 z-[99] flex flex-col items-end pointer-events-none">
       {/* Chat Window */}
       {isOpen && (
         <div className="w-[350px] sm:w-[380px] h-[520px] bg-white/95 backdrop-blur-md border border-theme-accent1/30 shadow-[0_12px_40px_rgba(167,114,125,0.15)] rounded-3xl flex flex-col mb-4 overflow-hidden animate-scale-up relative pointer-events-auto">

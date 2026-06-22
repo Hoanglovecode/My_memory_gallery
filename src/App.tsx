@@ -501,7 +501,7 @@ export default function App() {
           </div>
 
           {/* Footer with Creator Social Media Links */}
-          <footer className="w-full bg-white/20 backdrop-blur-md border-t border-white/20 py-10 mt-auto transition-all duration-300 z-20">
+          <footer className="w-full bg-white/20 backdrop-blur-md border-t border-white/20 pt-10 pb-28 md:py-10 mt-auto transition-all duration-300 z-20">
             <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="text-center md:text-left">
                 <p className="text-base font-serif italic text-[#A7727D] font-bold">
@@ -609,7 +609,7 @@ export default function App() {
           </div>
 
           {/* Floating Music Controller */}
-          <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 group pointer-events-none">
+          <div className="fixed bottom-6 left-28 md:left-auto md:right-6 z-50 flex items-center gap-2 group pointer-events-none">
             <span className="bg-white/90 backdrop-blur-xs text-theme-dark text-xs font-semibold px-3 py-2 rounded-2xl border border-theme-accent1 shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none select-none max-w-[200px] truncate translate-x-2 group-hover:translate-x-0">
               🎵 {musicTitle || 'Nhạc nền'}
             </span>
@@ -766,7 +766,7 @@ export default function App() {
 
           {/* Footer with Creator Social Media Links */}
           {currentView !== 'slideshow' && (
-            <footer className="w-full bg-white/20 backdrop-blur-md border-t border-white/20 py-10 mt-auto transition-all duration-300">
+            <footer className="w-full bg-white/20 backdrop-blur-md border-t border-white/20 pt-10 pb-28 md:py-10 mt-auto transition-all duration-300">
               <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="text-center md:text-left">
                   <p className="text-base font-serif italic text-[#A7727D] font-bold">
@@ -875,7 +875,7 @@ export default function App() {
           </div>
 
           {/* Floating Music Controller */}
-          <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 group pointer-events-none">
+          <div className="fixed bottom-6 left-28 md:left-auto md:right-6 z-50 flex items-center gap-2 group pointer-events-none">
             <span className="bg-white/90 backdrop-blur-xs text-theme-dark text-xs font-semibold px-3 py-2 rounded-2xl border border-theme-accent1 shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none select-none max-w-[200px] truncate translate-x-2 group-hover:translate-x-0">
               🎵 {musicTitle || 'Nhạc nền'}
             </span>
