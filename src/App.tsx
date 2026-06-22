@@ -603,14 +603,14 @@ export default function App() {
               <Eye size={20} className="text-theme-accent2 animate-pulse" />
               <span className="text-xs font-bold font-serif">{publicViews}</span>
             </div>
-            <span className="bg-white/90 backdrop-blur-xs text-theme-dark text-xs font-semibold px-3 py-2 rounded-2xl border border-theme-accent1 shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none select-none translate-x-[-2px] group-hover:translate-x-0 whitespace-nowrap">
+            <span className="hidden md:inline-block bg-white/90 backdrop-blur-xs text-theme-dark text-xs font-semibold px-3 py-2 rounded-2xl border border-theme-accent1 shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none select-none translate-x-[-2px] group-hover:translate-x-0 whitespace-nowrap">
               Lượt xem trang
             </span>
           </div>
 
           {/* Floating Music Controller */}
           <div className="fixed bottom-6 left-28 md:left-auto md:right-6 z-50 flex items-center gap-2 group pointer-events-none">
-            <span className="bg-white/90 backdrop-blur-xs text-theme-dark text-xs font-semibold px-3 py-2 rounded-2xl border border-theme-accent1 shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none select-none max-w-[200px] truncate translate-x-2 group-hover:translate-x-0">
+            <span className="hidden md:inline-block bg-white/90 backdrop-blur-xs text-theme-dark text-xs font-semibold px-3 py-2 rounded-2xl border border-theme-accent1 shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none select-none max-w-[200px] truncate translate-x-2 group-hover:translate-x-0">
               🎵 {musicTitle || 'Nhạc nền'}
             </span>
             <button
@@ -869,14 +869,14 @@ export default function App() {
               <Eye size={20} className="text-theme-accent2 animate-pulse" />
               <span className="text-xs font-bold font-serif">{publicViews}</span>
             </div>
-            <span className="bg-white/90 backdrop-blur-xs text-theme-dark text-xs font-semibold px-3 py-2 rounded-2xl border border-theme-accent1 shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none select-none translate-x-[-2px] group-hover:translate-x-0 whitespace-nowrap">
+            <span className="hidden md:inline-block bg-white/90 backdrop-blur-xs text-theme-dark text-xs font-semibold px-3 py-2 rounded-2xl border border-theme-accent1 shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none select-none translate-x-[-2px] group-hover:translate-x-0 whitespace-nowrap">
               Lượt xem trang
             </span>
           </div>
 
           {/* Floating Music Controller */}
           <div className="fixed bottom-6 left-28 md:left-auto md:right-6 z-50 flex items-center gap-2 group pointer-events-none">
-            <span className="bg-white/90 backdrop-blur-xs text-theme-dark text-xs font-semibold px-3 py-2 rounded-2xl border border-theme-accent1 shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none select-none max-w-[200px] truncate translate-x-2 group-hover:translate-x-0">
+            <span className="hidden md:inline-block bg-white/90 backdrop-blur-xs text-theme-dark text-xs font-semibold px-3 py-2 rounded-2xl border border-theme-accent1 shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none select-none max-w-[200px] truncate translate-x-2 group-hover:translate-x-0">
               🎵 {musicTitle || 'Nhạc nền'}
             </span>
             <button
