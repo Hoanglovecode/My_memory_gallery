@@ -32,6 +32,8 @@ interface AdminDashboardProps {
   setCreatorYoutube: React.Dispatch<React.SetStateAction<string>>;
   creatorGithub: string;
   setCreatorGithub: React.Dispatch<React.SetStateAction<string>>;
+  creatorTiktok: string;
+  setCreatorTiktok: React.Dispatch<React.SetStateAction<string>>;
 }
 
 interface Toast {
@@ -68,7 +70,9 @@ export default function AdminDashboard({
   creatorYoutube,
   setCreatorYoutube,
   creatorGithub,
-  setCreatorGithub
+  setCreatorGithub,
+  creatorTiktok,
+  setCreatorTiktok
 }: AdminDashboardProps) {
   const getAuthHeaders = () => {
     const token = localStorage.getItem('admin_token');
@@ -100,6 +104,7 @@ export default function AdminDashboard({
   const [editLinkedin, setEditLinkedin] = useState(creatorLinkedin);
   const [editYoutube, setEditYoutube] = useState(creatorYoutube);
   const [editGithub, setEditGithub] = useState(creatorGithub);
+  const [editTiktok, setEditTiktok] = useState(creatorTiktok);
 
   useEffect(() => {
     setEditMusicTitle(musicTitle);
@@ -120,7 +125,8 @@ export default function AdminDashboard({
     setEditLinkedin(creatorLinkedin);
     setEditYoutube(creatorYoutube);
     setEditGithub(creatorGithub);
-  }, [creatorFacebook, creatorLinkedin, creatorYoutube, creatorGithub]);
+    setEditTiktok(creatorTiktok);
+  }, [creatorFacebook, creatorLinkedin, creatorYoutube, creatorGithub, creatorTiktok]);
 
   // Analytics states
   const [analyticsData, setAnalyticsData] = useState<{
@@ -622,7 +628,8 @@ export default function AdminDashboard({
           creatorFacebook: editFacebook,
           creatorLinkedin: editLinkedin,
           creatorYoutube: editYoutube,
-          creatorGithub: editGithub
+          creatorGithub: editGithub,
+          creatorTiktok: editTiktok
         })
       });
 
@@ -636,6 +643,7 @@ export default function AdminDashboard({
       setCreatorLinkedin(data.creatorLinkedin);
       setCreatorYoutube(data.creatorYoutube);
       setCreatorGithub(data.creatorGithub);
+      setCreatorTiktok(data.creatorTiktok);
       showToast('Cập nhật liên kết mạng xã hội thành công! 🌐');
     } catch (err: any) {
       showToast(err.message || 'Lỗi kết nối server', 'error');
@@ -1526,6 +1534,17 @@ export default function AdminDashboard({
                 placeholder="https://github.com/username"
                 value={editGithub} 
                 onChange={e => setEditGithub(e.target.value)}
+                className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-theme-accent1 outline-none focus:border-theme-dark transition-all"
+              />
+            </div>
+
+            <div>
+              <label className="block font-bold text-gray-700 mb-2">Đường dẫn TikTok</label>
+              <input 
+                type="url" 
+                placeholder="https://tiktok.com/@username"
+                value={editTiktok} 
+                onChange={e => setEditTiktok(e.target.value)}
                 className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-theme-accent1 outline-none focus:border-theme-dark transition-all"
               />
             </div>

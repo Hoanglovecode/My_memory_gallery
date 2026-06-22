@@ -94,6 +94,7 @@ export default function App() {
   const [creatorLinkedin, setCreatorLinkedin] = useState<string>(() => getCachedSetting('creatorLinkedin', 'https://www.linkedin.com/in/hoangalgoict/'));
   const [creatorYoutube, setCreatorYoutube] = useState<string>(() => getCachedSetting('creatorYoutube', 'https://www.youtube.com/@Algoict_Official'));
   const [creatorGithub, setCreatorGithub] = useState<string>(() => getCachedSetting('creatorGithub', 'https://github.com/Hoanglovecode'));
+  const [creatorTiktok, setCreatorTiktok] = useState<string>(() => getCachedSetting('creatorTiktok', 'https://www.tiktok.com/@hoang_algoict'));
   const [chatbotName, setChatbotName] = useState<string>(() => getCachedSetting('chatbotName', 'AI Love Bot'));
   const [chatbotWelcomeMessage, setChatbotWelcomeMessage] = useState<string>(() => getCachedSetting('chatbotWelcomeMessage', 'Chào em! Anh là trợ lý tình yêu của hai bạn. Hôm nay em muốn trò chuyện gì nào? 💕'));
   const [chatbotSystemPrompt, setChatbotSystemPrompt] = useState<string>(() => getCachedSetting('chatbotSystemPrompt', ''));
@@ -177,6 +178,7 @@ export default function App() {
           if (settingsData.creatorLinkedin) setCreatorLinkedin(settingsData.creatorLinkedin);
           if (settingsData.creatorYoutube) setCreatorYoutube(settingsData.creatorYoutube);
           if (settingsData.creatorGithub) setCreatorGithub(settingsData.creatorGithub);
+          if (settingsData.creatorTiktok) setCreatorTiktok(settingsData.creatorTiktok);
 
           // Create settings copy without large base64 audio data for local storage caching to prevent QuotaExceededError
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -244,7 +246,18 @@ export default function App() {
     const trackVisit = async () => {
       try {
         let referrer = 'Trực tiếp';
-        if (document.referrer) {
+        
+        // Try reading ref or source query params first (highest accuracy for profile links)
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlRef = urlParams.get('ref') || urlParams.get('utm_source') || urlParams.get('source');
+        
+        if (urlRef) {
+          if (urlRef.toLowerCase() === 'tiktok') referrer = 'TikTok';
+          else if (urlRef.toLowerCase() === 'facebook') referrer = 'Facebook';
+          else if (urlRef.toLowerCase() === 'instagram') referrer = 'Instagram';
+          else if (urlRef.toLowerCase() === 'youtube') referrer = 'YouTube';
+          else referrer = urlRef.charAt(0).toUpperCase() + urlRef.slice(1);
+        } else if (document.referrer) {
           try {
             const refUrl = new URL(document.referrer);
             referrer = refUrl.hostname || document.referrer;
@@ -255,6 +268,7 @@ export default function App() {
             else if (referrer.includes('linkedin.com')) referrer = 'LinkedIn';
             else if (referrer.includes('youtube.com')) referrer = 'YouTube';
             else if (referrer.includes('github.com')) referrer = 'GitHub';
+            else if (referrer.includes('tiktok.com')) referrer = 'TikTok';
           } catch (e) {
             referrer = document.referrer;
           }
@@ -543,6 +557,17 @@ export default function App() {
                       <img src="/assets/social/github.png" alt="GitHub" className="w-5 h-5 object-contain" />
                     </a>
                   )}
+                  {creatorTiktok && (
+                    <a
+                      href={creatorTiktok}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-10 h-10 rounded-full bg-white/80 hover:bg-white flex items-center justify-center border border-white/40 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
+                      title="TikTok"
+                    >
+                      <img src="/assets/social/tiktok.png" alt="TikTok" className="w-5 h-5 object-contain" />
+                    </a>
+                  )}
                 </div>
               </div>
             </div>
@@ -718,6 +743,8 @@ export default function App() {
                 setCreatorYoutube={setCreatorYoutube}
                 creatorGithub={creatorGithub}
                 setCreatorGithub={setCreatorGithub}
+                creatorTiktok={creatorTiktok}
+                setCreatorTiktok={setCreatorTiktok}
               />
             )}
           </main>
@@ -780,6 +807,17 @@ export default function App() {
                         title="GitHub"
                       >
                         <img src="/assets/social/github.png" alt="GitHub" className="w-5 h-5 object-contain" />
+                      </a>
+                    )}
+                    {creatorTiktok && (
+                      <a
+                        href={creatorTiktok}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-10 h-10 rounded-full bg-white/80 hover:bg-white flex items-center justify-center border border-white/40 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
+                        title="TikTok"
+                      >
+                        <img src="/assets/social/tiktok.png" alt="TikTok" className="w-5 h-5 object-contain" />
                       </a>
                     )}
                   </div>

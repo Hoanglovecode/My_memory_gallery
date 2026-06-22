@@ -44,6 +44,10 @@ const SettingsSchema = new mongoose.Schema({
   creatorGithub: {
     type: String,
     default: 'https://github.com/Hoanglovecode'
+  },
+  creatorTiktok: {
+    type: String,
+    default: 'https://www.tiktok.com/@hoang_algoict'
   }
 }, {
   timestamps: true
