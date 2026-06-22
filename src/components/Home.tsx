@@ -61,7 +61,7 @@ export default function Home({ navigate, photos }: HomeProps) {
                     }}
                   >
                     <img
-                      src={optimizeImageUrl(photo.imageUrl)}
+                      src={optimizeImageUrl(photo.imageUrl, 400)}
                       alt={photo.title}
                       className="w-full h-full object-cover"
                       loading="lazy"
@@ -98,7 +98,7 @@ export default function Home({ navigate, photos }: HomeProps) {
                     }}
                   >
                     <img
-                      src={optimizeImageUrl(photo.imageUrl)}
+                      src={optimizeImageUrl(photo.imageUrl, 400)}
                       alt={photo.title}
                       className="w-full h-full object-cover"
                       loading="lazy"
@@ -153,7 +153,7 @@ export default function Home({ navigate, photos }: HomeProps) {
               }}
             >
               <img 
-                src={optimizeImageUrl(selectedPhoto.imageUrl)} 
+                src={optimizeImageUrl(selectedPhoto.imageUrl, 800)} 
                 alt={selectedPhoto.title} 
                 className="w-full h-full object-cover"
                 loading="lazy"
