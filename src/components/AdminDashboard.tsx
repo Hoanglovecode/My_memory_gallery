@@ -34,6 +34,8 @@ interface AdminDashboardProps {
   setCreatorGithub: React.Dispatch<React.SetStateAction<string>>;
   creatorTiktok: string;
   setCreatorTiktok: React.Dispatch<React.SetStateAction<string>>;
+  creatorInstagram: string;
+  setCreatorInstagram: React.Dispatch<React.SetStateAction<string>>;
 }
 
 interface Toast {
@@ -72,7 +74,9 @@ export default function AdminDashboard({
   creatorGithub,
   setCreatorGithub,
   creatorTiktok,
-  setCreatorTiktok
+  setCreatorTiktok,
+  creatorInstagram,
+  setCreatorInstagram
 }: AdminDashboardProps) {
   const getAuthHeaders = () => {
     const token = localStorage.getItem('admin_token');
@@ -105,6 +109,7 @@ export default function AdminDashboard({
   const [editYoutube, setEditYoutube] = useState(creatorYoutube);
   const [editGithub, setEditGithub] = useState(creatorGithub);
   const [editTiktok, setEditTiktok] = useState(creatorTiktok);
+  const [editInstagram, setEditInstagram] = useState(creatorInstagram);
 
   useEffect(() => {
     setEditMusicTitle(musicTitle);
@@ -126,7 +131,8 @@ export default function AdminDashboard({
     setEditYoutube(creatorYoutube);
     setEditGithub(creatorGithub);
     setEditTiktok(creatorTiktok);
-  }, [creatorFacebook, creatorLinkedin, creatorYoutube, creatorGithub, creatorTiktok]);
+    setEditInstagram(creatorInstagram);
+  }, [creatorFacebook, creatorLinkedin, creatorYoutube, creatorGithub, creatorTiktok, creatorInstagram]);
 
   // Analytics states
   const [analyticsData, setAnalyticsData] = useState<{
@@ -629,7 +635,8 @@ export default function AdminDashboard({
           creatorLinkedin: editLinkedin,
           creatorYoutube: editYoutube,
           creatorGithub: editGithub,
-          creatorTiktok: editTiktok
+          creatorTiktok: editTiktok,
+          creatorInstagram: editInstagram
         })
       });
 
@@ -644,6 +651,7 @@ export default function AdminDashboard({
       setCreatorYoutube(data.creatorYoutube);
       setCreatorGithub(data.creatorGithub);
       setCreatorTiktok(data.creatorTiktok);
+      setCreatorInstagram(data.creatorInstagram);
       showToast('Cập nhật liên kết mạng xã hội thành công! 🌐');
     } catch (err: any) {
       showToast(err.message || 'Lỗi kết nối server', 'error');
@@ -1545,6 +1553,17 @@ export default function AdminDashboard({
                 placeholder="https://tiktok.com/@username"
                 value={editTiktok} 
                 onChange={e => setEditTiktok(e.target.value)}
+                className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-theme-accent1 outline-none focus:border-theme-dark transition-all"
+              />
+            </div>
+
+            <div>
+              <label className="block font-bold text-gray-700 mb-2">Đường dẫn Instagram</label>
+              <input 
+                type="url" 
+                placeholder="https://instagram.com/username"
+                value={editInstagram} 
+                onChange={e => setEditInstagram(e.target.value)}
                 className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-theme-accent1 outline-none focus:border-theme-dark transition-all"
               />
             </div>

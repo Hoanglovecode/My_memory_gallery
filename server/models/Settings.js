@@ -48,6 +48,10 @@ const SettingsSchema = new mongoose.Schema({
   creatorTiktok: {
     type: String,
     default: 'https://www.tiktok.com/@hoang_algoict'
+  },
+  creatorInstagram: {
+    type: String,
+    default: 'https://www.instagram.com/vhoang2_7/'
   }
 }, {
   timestamps: true

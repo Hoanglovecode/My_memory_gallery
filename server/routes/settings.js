@@ -45,7 +45,8 @@ router.put('/', auth, async (req, res) => {
     creatorLinkedin,
     creatorYoutube,
     creatorGithub,
-    creatorTiktok
+    creatorTiktok,
+    creatorInstagram
   } = req.body;
 
   try {
@@ -62,7 +63,8 @@ router.put('/', auth, async (req, res) => {
         creatorLinkedin,
         creatorYoutube,
         creatorGithub,
-        creatorTiktok
+        creatorTiktok,
+        creatorInstagram
       };
       if (chatbotApiKey && chatbotApiKey !== '********') {
         initSettings.chatbotApiKey = chatbotApiKey;
@@ -80,6 +82,7 @@ router.put('/', auth, async (req, res) => {
       if (creatorYoutube !== undefined) settings.creatorYoutube = creatorYoutube;
       if (creatorGithub !== undefined) settings.creatorGithub = creatorGithub;
       if (creatorTiktok !== undefined) settings.creatorTiktok = creatorTiktok;
+      if (creatorInstagram !== undefined) settings.creatorInstagram = creatorInstagram;
       
       // Only update API key if it's changed and not the masked placeholder
       if (chatbotApiKey !== undefined && chatbotApiKey !== '********') {

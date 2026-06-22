@@ -95,6 +95,7 @@ export default function App() {
   const [creatorYoutube, setCreatorYoutube] = useState<string>(() => getCachedSetting('creatorYoutube', 'https://www.youtube.com/@Algoict_Official'));
   const [creatorGithub, setCreatorGithub] = useState<string>(() => getCachedSetting('creatorGithub', 'https://github.com/Hoanglovecode'));
   const [creatorTiktok, setCreatorTiktok] = useState<string>(() => getCachedSetting('creatorTiktok', 'https://www.tiktok.com/@hoang_algoict'));
+  const [creatorInstagram, setCreatorInstagram] = useState<string>(() => getCachedSetting('creatorInstagram', 'https://www.instagram.com/vhoang2_7/'));
   const [chatbotName, setChatbotName] = useState<string>(() => getCachedSetting('chatbotName', 'AI Love Bot'));
   const [chatbotWelcomeMessage, setChatbotWelcomeMessage] = useState<string>(() => getCachedSetting('chatbotWelcomeMessage', 'Chào em! Anh là trợ lý tình yêu của hai bạn. Hôm nay em muốn trò chuyện gì nào? 💕'));
   const [chatbotSystemPrompt, setChatbotSystemPrompt] = useState<string>(() => getCachedSetting('chatbotSystemPrompt', ''));
@@ -179,6 +180,7 @@ export default function App() {
           if (settingsData.creatorYoutube) setCreatorYoutube(settingsData.creatorYoutube);
           if (settingsData.creatorGithub) setCreatorGithub(settingsData.creatorGithub);
           if (settingsData.creatorTiktok) setCreatorTiktok(settingsData.creatorTiktok);
+          if (settingsData.creatorInstagram) setCreatorInstagram(settingsData.creatorInstagram);
 
           // Create settings copy without large base64 audio data for local storage caching to prevent QuotaExceededError
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -568,6 +570,17 @@ export default function App() {
                       <img src="/assets/social/tiktok.png" alt="TikTok" className="w-5 h-5 object-contain" />
                     </a>
                   )}
+                  {creatorInstagram && (
+                    <a
+                      href={creatorInstagram}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-10 h-10 rounded-full bg-white/80 hover:bg-white flex items-center justify-center border border-white/40 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
+                      title="Instagram"
+                    >
+                      <img src="/assets/social/instagram.png" alt="Instagram" className="w-5 h-5 object-contain" />
+                    </a>
+                  )}
                 </div>
               </div>
             </div>
@@ -745,6 +758,8 @@ export default function App() {
                 setCreatorGithub={setCreatorGithub}
                 creatorTiktok={creatorTiktok}
                 setCreatorTiktok={setCreatorTiktok}
+                creatorInstagram={creatorInstagram}
+                setCreatorInstagram={setCreatorInstagram}
               />
             )}
           </main>
@@ -818,6 +833,17 @@ export default function App() {
                         title="TikTok"
                       >
                         <img src="/assets/social/tiktok.png" alt="TikTok" className="w-5 h-5 object-contain" />
+                      </a>
+                    )}
+                    {creatorInstagram && (
+                      <a
+                        href={creatorInstagram}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-10 h-10 rounded-full bg-white/80 hover:bg-white flex items-center justify-center border border-white/40 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer"
+                        title="Instagram"
+                      >
+                        <img src="/assets/social/instagram.png" alt="Instagram" className="w-5 h-5 object-contain" />
                       </a>
                     )}
                   </div>
