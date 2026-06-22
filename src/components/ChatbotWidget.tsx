@@ -190,10 +190,10 @@ export default function ChatbotWidget({ chatbotName, chatbotWelcomeMessage }: Ch
   ];
 
   return (
-    <div className="fixed bottom-24 right-6 z-[99] flex flex-col items-end">
+    <div className="fixed bottom-24 right-6 z-[99] flex flex-col items-end pointer-events-none">
       {/* Chat Window */}
       {isOpen && (
-        <div className="w-[350px] sm:w-[380px] h-[520px] bg-white/95 backdrop-blur-md border border-theme-accent1/30 shadow-[0_12px_40px_rgba(167,114,125,0.15)] rounded-3xl flex flex-col mb-4 overflow-hidden animate-scale-up relative">
+        <div className="w-[350px] sm:w-[380px] h-[520px] bg-white/95 backdrop-blur-md border border-theme-accent1/30 shadow-[0_12px_40px_rgba(167,114,125,0.15)] rounded-3xl flex flex-col mb-4 overflow-hidden animate-scale-up relative pointer-events-auto">
           {/* Header */}
           <div className="bg-gradient-to-r from-theme-accent2 to-[#F8C4B4] p-4 text-white flex justify-between items-center shadow-sm">
             <div className="flex items-center gap-2.5">
@@ -294,7 +294,7 @@ export default function ChatbotWidget({ chatbotName, chatbotWelcomeMessage }: Ch
             <button 
               type="submit" 
               disabled={isTyping || !inputText.trim()}
-              className="p-2.5 bg-theme-accent2 text-white rounded-full hover:scale-105 active:scale-95 disabled:opacity-50 disabled:scale-100 transition-all cursor-pointer flex items-center justify-center"
+              className="p-2.5 bg-theme-accent2 text-white rounded-full hover:scale-105 active:scale-95 disabled:opacity-50 disabled:scale-100 transition-all cursor-pointer flex items-center justify-center pointer-events-auto"
             >
               <Send size={18} />
             </button>
@@ -305,13 +305,13 @@ export default function ChatbotWidget({ chatbotName, chatbotWelcomeMessage }: Ch
       {/* Floating Button */}
       <button 
         onClick={handleToggle}
-        className="p-4 rounded-full bg-theme-accent2 text-white shadow-[0_6px_20px_rgba(242,190,209,0.5)] hover:scale-110 active:scale-95 transition-all cursor-pointer flex items-center justify-center relative animate-bounce"
+        className="p-4 rounded-full bg-theme-accent2 text-white shadow-[0_6px_20px_rgba(242,190,209,0.5)] hover:scale-110 active:scale-95 transition-all cursor-pointer flex items-center justify-center relative animate-bounce pointer-events-auto"
         title="Trò chuyện AI"
       >
         <MessageCircle size={26} />
         <Heart size={10} className="absolute top-3.5 right-3.5 fill-current text-white animate-pulse" />
         {hasNewMessage && (
-          <span className="absolute top-0 right-0 w-3.5 h-3.5 bg-rose-500 rounded-full border-2 border-white"></span>
+          <span className="absolute top-0 right-0 w-3.5 h-3.5 bg-rose-500 rounded-full border-2 border-white pointer-events-none"></span>
         )}
       </button>
     </div>

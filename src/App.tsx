@@ -518,9 +518,9 @@ export default function App() {
           )}
 
           {/* Floating Views Counter */}
-          <div className="fixed bottom-6 left-6 z-50 flex items-center gap-2 group">
+          <div className="fixed bottom-6 left-6 z-50 flex items-center gap-2 group pointer-events-none">
             <div 
-              className="p-4 rounded-full bg-white/40 border border-white/60 backdrop-blur-md text-theme-dark shadow-lg hover:scale-110 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer animate-fade-in"
+              className="p-4 rounded-full bg-white/40 border border-white/60 backdrop-blur-md text-theme-dark shadow-lg hover:scale-110 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer animate-fade-in pointer-events-auto"
               title={`Tổng lượt xem: ${publicViews}`}
             >
               <Eye size={20} className="text-theme-accent2 animate-pulse" />
@@ -532,13 +532,13 @@ export default function App() {
           </div>
 
           {/* Floating Music Controller */}
-          <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 group">
+          <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 group pointer-events-none">
             <span className="bg-white/90 backdrop-blur-xs text-theme-dark text-xs font-semibold px-3 py-2 rounded-2xl border border-theme-accent1 shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none select-none max-w-[200px] truncate translate-x-2 group-hover:translate-x-0">
               🎵 {musicTitle || 'Nhạc nền'}
             </span>
             <button
               onClick={toggleMusic}
-              className="p-4 rounded-full bg-theme-accent2 text-white shadow-lg hover:scale-110 transition-transform cursor-pointer flex items-center justify-center"
+              className="p-4 rounded-full bg-theme-accent2 text-white shadow-lg hover:scale-110 transition-transform cursor-pointer flex items-center justify-center pointer-events-auto"
               title={isPlayingMusic ? `Tạm dừng: ${musicTitle}` : `Phát nhạc: ${musicTitle}`}
             >
               {isPlayingMusic ? <Pause size={24} /> : <Music size={24} />}
@@ -758,9 +758,9 @@ export default function App() {
           )}
 
           {/* Floating Views Counter */}
-          <div className="fixed bottom-6 left-6 z-50 flex items-center gap-2 group">
+          <div className="fixed bottom-6 left-6 z-50 flex items-center gap-2 group pointer-events-none">
             <div 
-              className="p-4 rounded-full bg-white/40 border border-white/60 backdrop-blur-md text-theme-dark shadow-lg hover:scale-110 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer animate-fade-in"
+              className="p-4 rounded-full bg-white/40 border border-white/60 backdrop-blur-md text-theme-dark shadow-lg hover:scale-110 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer animate-fade-in pointer-events-auto"
               title={`Tổng lượt xem: ${publicViews}`}
             >
               <Eye size={20} className="text-theme-accent2 animate-pulse" />
@@ -772,13 +772,13 @@ export default function App() {
           </div>
 
           {/* Floating Music Controller */}
-          <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 group">
+          <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 group pointer-events-none">
             <span className="bg-white/90 backdrop-blur-xs text-theme-dark text-xs font-semibold px-3 py-2 rounded-2xl border border-theme-accent1 shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none select-none max-w-[200px] truncate translate-x-2 group-hover:translate-x-0">
               🎵 {musicTitle || 'Nhạc nền'}
             </span>
             <button
               onClick={toggleMusic}
-              className="p-4 rounded-full bg-theme-accent2 text-white shadow-lg hover:scale-110 transition-transform cursor-pointer flex items-center justify-center"
+              className="p-4 rounded-full bg-theme-accent2 text-white shadow-lg hover:scale-110 transition-transform cursor-pointer flex items-center justify-center pointer-events-auto"
               title={isPlayingMusic ? `Tạm dừng: ${musicTitle}` : `Phát nhạc: ${musicTitle}`}
             >
               {isPlayingMusic ? <Pause size={24} /> : <Music size={24} />}
