@@ -26,4 +26,4 @@ export interface Video {
   user?: string;
 }
 
-export type View = 'home' | 'slideshow' | 'letter' | 'admin' | 'login' | 'videos' | 'fantasy';
+export type View = 'home' | 'slideshow' | 'letter' | 'admin' | 'login' | 'videos' | 'fantasy' | 'synapse';

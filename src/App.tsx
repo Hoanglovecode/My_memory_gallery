@@ -13,6 +13,7 @@ import ChatbotWidget from './components/ChatbotWidget';
 
 import Hero from './components/Hero';
 import Navbar from './components/Navbar';
+import SynapseLanding from './components/SynapseLanding';
 
 
 export default function App() {
@@ -22,10 +23,10 @@ export default function App() {
     if (hash === '#memories' || search.includes('mode=memories')) {
       return 'home';
     }
-    if (hash === '#slideshow' || hash === '#videos' || hash === '#letter' || hash === '#admin' || hash === '#login') {
+    if (hash === '#slideshow' || hash === '#videos' || hash === '#letter' || hash === '#admin' || hash === '#login' || hash === '#synapse') {
       return hash.replace('#', '') as View;
     }
-    return 'fantasy';
+    return 'synapse';
   });
   const [isAdmin, setIsAdmin] = useState(false);
   const [isPlayingMusic, setIsPlayingMusic] = useState(false);
@@ -39,8 +40,10 @@ export default function App() {
         setCurrentView('home');
       } else if (hash === '#fantasy') {
         setCurrentView('fantasy');
-      } else if (hash === '#slideshow' || hash === '#videos' || hash === '#letter' || hash === '#admin' || hash === '#login') {
+      } else if (hash === '#slideshow' || hash === '#videos' || hash === '#letter' || hash === '#admin' || hash === '#login' || hash === '#synapse') {
         setCurrentView(hash.replace('#', '') as View);
+      } else {
+        setCurrentView('synapse');
       }
     };
     window.addEventListener('hashchange', handleHashChange);
@@ -446,6 +449,8 @@ export default function App() {
   const navigate = (view: View) => {
     if (view === 'fantasy') {
       window.location.hash = 'fantasy';
+    } else if (view === 'synapse') {
+      window.location.hash = 'synapse';
     } else if (view === 'home') {
       window.location.hash = 'memories';
     } else {
@@ -455,7 +460,7 @@ export default function App() {
     window.scrollTo(0, 0);
   };
 
-  if (isLoading && currentView !== 'fantasy') {
+  if (isLoading && currentView !== 'fantasy' && currentView !== 'synapse') {
     return (
       <div className="fixed inset-0 bg-theme-main flex flex-col items-center justify-center z-[9999]">
         <Heart className="text-theme-accent2 fill-current animate-pulse mb-4 text-[#F2BED1]" size={80} />
@@ -491,9 +496,11 @@ export default function App() {
         </div>
       )}
 
-      {currentView === 'fantasy' ? (
+      {currentView === 'synapse' ? (
+        <SynapseLanding navigate={navigate} />
+      ) : currentView === 'fantasy' ? (
         <div className="relative w-full h-screen overflow-y-auto bg-[#FDFBF7] flex flex-col justify-between scroll-smooth selection:bg-theme-accent2 selection:text-white">
-          <Navbar />
+          <Navbar onBack={() => navigate('synapse')} />
           
           {/* Hero Section */}
           <div className="relative w-full min-h-screen lg:h-screen flex-shrink-0">
