@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring, useMotionTemplate } from 'framer-motion';
 import type { View } from '../types';
+import CamelVoiceAI from './CamelVoiceAI';
 
 interface SynapseLandingProps {
   navigate: (view: View) => void;
@@ -189,6 +190,7 @@ export default function SynapseLanding({ navigate }: SynapseLandingProps) {
   const [entranceComplete, setEntranceComplete] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isCamelSpeaking, setIsCamelSpeaking] = useState(false);
   
   const heroVideoRef = useRef<HTMLVideoElement>(null);
   const targetTimeRef = useRef(0);
@@ -221,12 +223,12 @@ export default function SynapseLanding({ navigate }: SynapseLandingProps) {
   useEffect(() => {
     if (heroVideoRef.current) heroVideoRef.current.pause();
 
-    const handleMouseMove = (e: MouseEvent) => {
+    const handleScrub = (movementX: number) => {
       const video = heroVideoRef.current;
       if (!video || isNaN(video.duration)) return;
       
       const sensitivity = 0.8;
-      const deltaSeconds = (e.movementX / 100) * 0.5 * sensitivity;
+      const deltaSeconds = (movementX / 100) * 0.5 * sensitivity;
       
       let newTime = targetTimeRef.current + deltaSeconds;
       newTime = Math.max(0, Math.min(video.duration, newTime));
@@ -238,8 +240,34 @@ export default function SynapseLanding({ navigate }: SynapseLandingProps) {
       }
     };
 
+    const handleMouseMove = (e: MouseEvent) => {
+      handleScrub(e.movementX);
+    };
+
+    let lastTouchX = 0;
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        lastTouchX = e.touches[0].clientX;
+      }
+    };
+    
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        const currentTouchX = e.touches[0].clientX;
+        const movementX = currentTouchX - lastTouchX;
+        handleScrub(movementX * 1.5); // Slightly higher sensitivity for touch
+        lastTouchX = currentTouchX;
+      }
+    };
+
     window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener('touchstart', handleTouchStart);
+    window.addEventListener('touchmove', handleTouchMove);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+    };
   }, []);
 
   const handleHeroSeeked = () => {
@@ -254,7 +282,7 @@ export default function SynapseLanding({ navigate }: SynapseLandingProps) {
   const [downloadHovered, setDownloadHovered] = useState(false);
 
   return (
-    <main className="relative w-full bg-black text-white selection:bg-white/20">
+    <main className="relative w-full overflow-x-hidden bg-black text-white selection:bg-white/20">
       <GlobalStyles />
 
       {/* NAVBAR */}
@@ -262,9 +290,9 @@ export default function SynapseLanding({ navigate }: SynapseLandingProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: entranceComplete ? 1 : 0 }}
         transition={{ duration: 0.8 }}
-        className="fixed top-0 left-0 w-full h-20 px-4 sm:px-8 flex items-center justify-between z-50 pointer-events-auto"
+        className="fixed top-0 left-0 right-0 h-20 px-4 sm:px-8 flex items-center justify-between z-50 pointer-events-auto"
       >
-        <div className="flex items-center gap-2 w-full sm:w-auto">
+        <div className={`flex items-center gap-2 ${isMenuOpen && isMobile ? 'w-full' : 'w-auto'}`}>
           {/* Logo Pill */}
           <motion.div
             animate={{ 
@@ -286,10 +314,9 @@ export default function SynapseLanding({ navigate }: SynapseLandingProps) {
             {/* Mobile version (always visible unless menu open) */}
             <motion.div 
               onClick={() => navigate('fantasy')}
-              className="h-9 px-4 bg-white/15 backdrop-blur-md rounded-[10px] flex md:hidden items-center gap-2 cursor-pointer transition-colors"
+              className="h-9 px-3 bg-white/15 backdrop-blur-md rounded-[10px] flex md:hidden items-center justify-center cursor-pointer transition-colors"
             >
-              <SynapseXLogo className="w-[14px] h-[14px] text-white" />
-              <span className="text-[13px] font-medium tracking-tight text-white">Memories</span>
+              <SynapseXLogo className="w-[16px] h-[16px] text-white" />
             </motion.div>
           </motion.div>
 
@@ -311,7 +338,7 @@ export default function SynapseLanding({ navigate }: SynapseLandingProps) {
               initial={{ opacity: 0, x: 15 }}
               animate={{ opacity: isMenuOpen ? 1 : 0, x: isMenuOpen ? 0 : 15 }}
               transition={{ duration: 0.2 }}
-              className="flex items-center gap-6 px-4 whitespace-nowrap"
+              className="flex items-center gap-3 sm:gap-6 px-2 sm:px-4 whitespace-nowrap"
             >
               <NavLink label="Giới Thiệu" onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })} />
               <NavLink label="Hành Trình" onClick={() => window.scrollTo({ top: window.innerHeight * 2, behavior: 'smooth' })} />
@@ -327,6 +354,14 @@ export default function SynapseLanding({ navigate }: SynapseLandingProps) {
           whileHover={{ scale: 1.03, backgroundColor: '#e2e2e6' }}
           whileTap={{ scale: 0.97 }}
           onClick={() => navigate('fantasy')}
+          animate={{
+            opacity: isMenuOpen && isMobile ? 0 : 1,
+            scale: isMenuOpen && isMobile ? 0.8 : 1,
+          }}
+          style={{
+            pointerEvents: isMenuOpen && isMobile ? 'none' : 'auto',
+            display: isMenuOpen && isMobile ? 'none' : 'flex'
+          }}
           className="h-9 px-3.5 sm:h-12 sm:px-6 bg-white rounded-full flex items-center gap-2 text-black flex-shrink-0 ml-4 cursor-pointer"
         >
           <i className="bi bi-heart-fill text-[14px] sm:text-[18px] text-rose-500" />
@@ -338,22 +373,42 @@ export default function SynapseLanding({ navigate }: SynapseLandingProps) {
 
       {/* SECTION 1: HERO */}
       <section className="relative h-[100dvh] w-full overflow-hidden flex flex-col pt-20 sm:pt-24 pb-8 sm:pb-12 px-4 sm:px-6 md:px-8">
+        {/* Camel Voice AI component */}
+        <CamelVoiceAI onSpeakStateChange={setIsCamelSpeaking} />
+
         <video 
           ref={heroVideoRef}
           src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260622_083515_290e5a10-0b95-41af-a5e2-32b6389baa4d.mp4" 
-          className="absolute inset-0 w-full h-full object-cover z-0"
+          className="absolute inset-0 w-full h-full object-cover object-center z-0"
           muted 
           playsInline 
           preload="auto"
           onSeeked={handleHeroSeeked}
         />
+        
+        {/* Glow overlay for Camel when speaking */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: isCamelSpeaking ? 1 : 0 }}
+          transition={{ duration: 0.3 }}
+          className="absolute inset-0 z-0 pointer-events-none mix-blend-screen"
+          style={{
+            background: 'radial-gradient(circle at 50% 50%, rgba(251, 191, 36, 0.15) 0%, rgba(251, 191, 36, 0) 50%)'
+          }}
+        >
+          <motion.div 
+            animate={isCamelSpeaking ? { scale: [1, 1.05, 1], opacity: [0.3, 0.6, 0.3] } : {}}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute left-1/2 top-[45%] -translate-x-1/2 -translate-y-1/2 w-[30vh] h-[30vh] md:w-[40vh] md:h-[40vh] rounded-full border border-amber-400/30 blur-md"
+          />
+        </motion.div>
         <div 
           className="absolute inset-0 z-0 pointer-events-none opacity-5" 
           style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '24px 24px' }} 
         />
         
         {/* Watermark */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none mt-[50px] z-0">
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none mt-[50px] z-0 overflow-hidden">
           <h2 
             className="watermark-font uppercase tracking-[-4px] leading-none text-[clamp(120px,30vw,521px)] font-bold text-transparent bg-clip-text"
             style={{ backgroundImage: 'radial-gradient(circle, rgba(142,127,148,0) 0%, #8E7F94 70%)', opacity: 0.10 }}
@@ -366,9 +421,9 @@ export default function SynapseLanding({ navigate }: SynapseLandingProps) {
         <div className="flex-1" />
 
         {/* Bottom Typography */}
-        <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between w-full z-10 relative">
-          <div className="flex flex-col gap-4">
-            <h1 className="text-white font-light leading-[0.95] tracking-[-0.03em] text-[clamp(40px,10vw,100px)]">
+        <div className="flex flex-col gap-4 sm:gap-6 md:flex-row md:items-end md:justify-between w-full z-10 relative">
+          <div className="flex flex-col gap-3 sm:gap-4">
+            <h1 className="text-white font-light leading-[0.95] tracking-[-0.03em] text-[clamp(32px,9vw,100px)] whitespace-nowrap">
               <ScrambleIn text="Kỷ Niệm" delay={200} triggered={entranceComplete} />
               <br />
               <ScrambleIn text="Yêu Thương" delay={500} triggered={entranceComplete} />
@@ -377,12 +432,12 @@ export default function SynapseLanding({ navigate }: SynapseLandingProps) {
               initial={{ y: 25, opacity: 0 }}
               animate={entranceComplete ? { y: 0, opacity: 1 } : { y: 25, opacity: 0 }}
               transition={{ duration: 0.9, delay: 0.2, ease: [0.215, 0.610, 0.355, 1.000] }}
-              className="max-w-sm text-[13px] sm:text-[15px] text-white/60 leading-relaxed"
+              className="max-w-xs sm:max-w-sm text-[12px] sm:text-[15px] text-white/60 leading-relaxed"
             >
               Nơi những khoảnh khắc vô giá của tình yêu được lưu giữ mãi mãi. Memories giúp chúng ta lưu trữ từng bức ảnh, thước phim và dòng thư tình ngọt ngào theo năm tháng.
             </motion.p>
           </div>
-          <h1 className="text-white font-light leading-[0.95] tracking-[-0.03em] text-[clamp(40px,10vw,100px)] text-left md:text-right">
+          <h1 className="text-white font-light leading-[0.95] tracking-[-0.03em] text-[clamp(32px,9vw,100px)] text-left md:text-right whitespace-nowrap">
             <ScrambleIn text="Một" delay={700} triggered={entranceComplete} />
             <br />
             <ScrambleIn text="Hành Trình" delay={1000} triggered={entranceComplete} />
@@ -395,14 +450,14 @@ export default function SynapseLanding({ navigate }: SynapseLandingProps) {
         <video 
           src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260622_092455_089c54f8-3b03-4966-9df1-e9746063d0ef.mp4" 
           autoPlay muted loop playsInline
-          className="absolute inset-0 w-full h-full object-cover z-0" 
+          className="absolute inset-0 w-full h-full object-cover object-center z-0" 
         />
         <div className="absolute inset-x-0 top-0 h-[180px] bg-gradient-to-b from-[#010103] to-transparent z-10" />
         
         <div className="relative z-20 h-full flex items-center justify-center" style={{ perspective: '400px' }}>
           <motion.p 
             style={{ transform: cinematicTransform, opacity: cinematicOpacity, transformStyle: 'preserve-3d' }}
-            className="max-w-5xl font-sans font-normal text-[22px] sm:text-[30px] md:text-[36px] lg:text-[42px] text-white leading-[1.35] tracking-[-0.02em] select-none px-6 sm:px-12 text-center"
+            className="w-full max-w-5xl font-sans font-normal text-[14px] sm:text-[30px] md:text-[36px] lg:text-[42px] text-white leading-[1.35] tracking-[-0.02em] select-none px-6 sm:px-12 text-center"
           >
             Một không gian kỷ niệm được dựng nên từ những câu chuyện và khoảnh khắc vô giá của chúng ta. Nơi thời gian như ngừng lại sau mỗi góc nhìn, nơi tiếng cười và những cái ôm ấm áp được tái hiện sống động nhất. Từng chặng đường chúng ta đã đi qua đều được ghi lại trọn vẹn, lọc đi những ồn ào của cuộc sống để giữ lại cảm xúc chân thật nhất.
           </motion.p>
@@ -462,7 +517,7 @@ export default function SynapseLanding({ navigate }: SynapseLandingProps) {
       </section>
 
       {/* SECTION 4: TECHNOLOGY / ADAPTIVE */}
-      <section className="relative h-[100dvh] w-full flex flex-col py-12 sm:py-16 px-8 sm:px-12 md:px-16 overflow-hidden">
+      <section className="relative min-h-[100dvh] w-full flex flex-col py-16 px-6 sm:px-12 md:px-16">
         <video 
           src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260622_095750_32a52ce0-2005-45c9-9093-41f03fde9530.mp4" 
           autoPlay muted loop playsInline
@@ -484,7 +539,7 @@ export default function SynapseLanding({ navigate }: SynapseLandingProps) {
             whileInView={{ y: 0, opacity: 1 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 1.0, delay: 0.2 }}
-            className="text-white/50 text-[13px] sm:text-[15px] leading-relaxed max-w-xs md:text-right md:pt-2"
+            className="w-full max-w-xs text-white/50 text-[13px] sm:text-[15px] leading-relaxed md:text-right md:pt-2"
           >
             Trang web lưu trữ những thước phim và hình ảnh đáng nhớ trong cuộc sống của chúng ta. Nơi tình yêu và kỷ niệm được ghi dấu trọn vẹn.
           </motion.p>
@@ -497,7 +552,7 @@ export default function SynapseLanding({ navigate }: SynapseLandingProps) {
           whileInView="visible"
           viewport={{ once: true, amount: 0.3 }}
           variants={{ visible: { transition: { staggerChildren: 0.1, delayChildren: 0.3 } } }}
-          className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-6 w-full"
+          className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 w-full"
         >
           {[
             { title: "Kho Ảnh Kỷ Niệm", desc: "Nơi lưu giữ từng khoảnh khắc ngọt ngào rạng rỡ của hai ta." },
@@ -532,7 +587,7 @@ export default function SynapseLanding({ navigate }: SynapseLandingProps) {
             <h2 className="text-white font-light text-[clamp(28px,6vw,56px)] leading-[1.15] tracking-[-0.02em] mb-10">
               Ba phần. Trọn khoảnh khắc.
             </h2>
-            <p className="text-white/45 text-[15px] sm:text-[17px] leading-relaxed max-w-xl mx-auto">
+            <p className="w-full max-w-xl mx-auto text-white/45 text-[15px] sm:text-[17px] leading-relaxed">
               Từ những hình ảnh đáng nhớ, thước phim sống động cho đến những lá thư tay tràn đầy tình cảm yêu thương.
             </p>
           </motion.div>
@@ -580,7 +635,7 @@ export default function SynapseLanding({ navigate }: SynapseLandingProps) {
               <SynapseXLogo className="w-[18px] h-[18px] text-white/70" />
               <span className="text-[15px] font-medium text-white/70 tracking-tight">Memories</span>
             </div>
-            <p className="text-white/40 text-[14px] sm:text-[15px] leading-relaxed max-w-sm">
+            <p className="w-full max-w-sm text-white/40 text-[14px] sm:text-[15px] leading-relaxed">
               Nơi lưu trữ những kỷ niệm đẹp đẽ của tình yêu, đồng hành cùng năm tháng dài lâu của đôi ta.
             </p>
           </div>
