@@ -30,6 +30,15 @@ export default function CamelVoiceAI({ onSpeakStateChange, chatbotWelcomeMessage
   const synthesisRef = useRef<SpeechSynthesis | null>(null);
   const voiceRef = useRef<SpeechSynthesisVoice | null>(null);
 
+  const selectVoice = useCallback((voices: SpeechSynthesisVoice[]) => {
+    const viVoice =
+      voices.find(v => v.lang === 'vi-VN') ||
+      voices.find(v => v.lang.startsWith('vi')) ||
+      voices.find(v => v.name.toLowerCase().includes('viet')) ||
+      voices.find(v => v.name.includes('Tiếng Việt'));
+    voiceRef.current = viVoice || null;
+  }, []);
+
   // Initialize
   useEffect(() => {
     let currentSessionId = localStorage.getItem('chatbot_session_id');
@@ -76,24 +85,29 @@ export default function CamelVoiceAI({ onSpeakStateChange, chatbotWelcomeMessage
           }, 300);
         };
 
-        // Load voices and select a male Vietnamese voice
-        const loadVoices = () => {
-          const voices = synthesisRef.current?.getVoices() || [];
-          // Strict search for Vietnamese
-          let viVoice = voices.find(v => 
-            (v.lang.includes('vi') || v.name.toLowerCase().includes('vietnam') || v.name.includes('Tiếng Việt')) && 
-            (v.name.includes('An') || v.name.toLowerCase().includes('male'))
-          );
-          if (!viVoice) {
-            viVoice = voices.find(v => v.lang.includes('vi') || v.name.toLowerCase().includes('vietnam') || v.name.includes('Tiếng Việt'));
-          }
-          voiceRef.current = viVoice || voices[0];
+        const loadVoices = (): Promise<void> => {
+          return new Promise((resolve) => {
+            const voices = synthesisRef.current?.getVoices() || [];
+            if (voices.length > 0) {
+              selectVoice(voices);
+              resolve();
+              return;
+            }
+            
+            // Wait for voices to load
+            if (synthesisRef.current) {
+              synthesisRef.current.onvoiceschanged = () => {
+                const v = synthesisRef.current?.getVoices() || [];
+                selectVoice(v);
+                resolve();
+              };
+            }
+          });
         };
 
-        loadVoices();
-        if (synthesisRef.current.onvoiceschanged !== undefined) {
-          synthesisRef.current.onvoiceschanged = loadVoices;
-        }
+        loadVoices().then(() => {
+          console.log('[TTS] Voice selected:', voiceRef.current?.name ?? 'none');
+        });
         
         setIsSpeechSupported(true);
       } catch (err) {
@@ -108,6 +122,11 @@ export default function CamelVoiceAI({ onSpeakStateChange, chatbotWelcomeMessage
 
   const speak = useCallback((text: string) => {
     if (!synthesisRef.current || !isSpeechSupported) return;
+
+    if (!voiceRef.current) {
+      const voices = synthesisRef.current.getVoices();
+      selectVoice(voices);
+    }
 
     // Prevent collision by nullifying the callbacks of the active utterance before canceling
     if (currentUtteranceRef.current) {
@@ -165,7 +184,7 @@ export default function CamelVoiceAI({ onSpeakStateChange, chatbotWelcomeMessage
     };
 
     synthesisRef.current.speak(utterance);
-  }, [onSpeakStateChange, isSpeechSupported]);
+  }, [onSpeakStateChange, isSpeechSupported, selectVoice]);
 
   // Initial Auto-Greeting on first user interaction
   useEffect(() => {
