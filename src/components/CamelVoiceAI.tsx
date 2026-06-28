@@ -23,11 +23,12 @@ export default function CamelVoiceAI({ onSpeakStateChange, chatbotWelcomeMessage
   const isProcessingRef = useRef(false);
   const currentUtteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   
+  const [isSpeechSupported, setIsSpeechSupported] = useState(false);
+
   // Speech objects
   const recognitionRef = useRef<any>(null);
   const synthesisRef = useRef<SpeechSynthesis | null>(null);
   const voiceRef = useRef<SpeechSynthesisVoice | null>(null);
-  const isSpeechSupported = 'speechSynthesis' in window && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
 
   // Initialize
   useEffect(() => {
@@ -38,58 +39,70 @@ export default function CamelVoiceAI({ onSpeakStateChange, chatbotWelcomeMessage
     }
     setSessionId(currentSessionId);
 
-    if (isSpeechSupported) {
-      synthesisRef.current = window.speechSynthesis;
-      
-      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-      recognitionRef.current = new SpeechRecognition();
-      recognitionRef.current.continuous = false;
-      recognitionRef.current.interimResults = false;
-      recognitionRef.current.lang = 'vi-VN';
+    const hasSpeechProps = 'speechSynthesis' in window && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
 
-      recognitionRef.current.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript;
-        setUserTranscript(transcript);
-        setAiReply(''); // Clear previous AI reply when new input is recognized
-        handleUserSpeak(transcript);
-      };
+    if (hasSpeechProps) {
+      try {
+        synthesisRef.current = window.speechSynthesis;
+        
+        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        recognitionRef.current = new SpeechRecognition();
+        recognitionRef.current.continuous = false;
+        recognitionRef.current.interimResults = false;
+        recognitionRef.current.lang = 'vi-VN';
 
-      recognitionRef.current.onerror = (event: any) => {
-        console.error('Speech recognition error', event.error);
-        setIsListening(false);
-      };
+        recognitionRef.current.onresult = (event: any) => {
+          const transcript = event.results[0][0].transcript;
+          setUserTranscript(transcript);
+          setAiReply(''); // Clear previous AI reply when new input is recognized
+          handleUserSpeak(transcript);
+        };
 
-      recognitionRef.current.onend = () => {
-        setIsListening(false);
-        // Auto-restart listening if in continuous mode and not currently processing or speaking
-        setTimeout(() => {
-          if (continuousRef.current && !isProcessingRef.current && !isSpeakingRef.current) {
-            try {
-              recognitionRef.current?.start();
-              setIsListening(true);
-            } catch (e) { console.error(e); }
+        recognitionRef.current.onerror = (event: any) => {
+          console.error('Speech recognition error', event.error);
+          setIsListening(false);
+        };
+
+        recognitionRef.current.onend = () => {
+          setIsListening(false);
+          // Auto-restart listening if in continuous mode and not currently processing or speaking
+          setTimeout(() => {
+            if (continuousRef.current && !isProcessingRef.current && !isSpeakingRef.current) {
+              try {
+                recognitionRef.current?.start();
+                setIsListening(true);
+              } catch (e) { console.error(e); }
+            }
+          }, 300);
+        };
+
+        // Load voices and select a male Vietnamese voice
+        const loadVoices = () => {
+          const voices = synthesisRef.current?.getVoices() || [];
+          // Strict search for Vietnamese
+          let viVoice = voices.find(v => 
+            (v.lang.includes('vi') || v.name.toLowerCase().includes('vietnam') || v.name.includes('Tiếng Việt')) && 
+            (v.name.includes('An') || v.name.toLowerCase().includes('male'))
+          );
+          if (!viVoice) {
+            viVoice = voices.find(v => v.lang.includes('vi') || v.name.toLowerCase().includes('vietnam') || v.name.includes('Tiếng Việt'));
           }
-        }, 300);
-      };
+          voiceRef.current = viVoice || voices[0];
+        };
 
-      // Load voices and select a male Vietnamese voice
-      const loadVoices = () => {
-        const voices = synthesisRef.current?.getVoices() || [];
-        // Strict search for Vietnamese
-        let viVoice = voices.find(v => 
-          (v.lang.includes('vi') || v.name.toLowerCase().includes('vietnam') || v.name.includes('Tiếng Việt')) && 
-          (v.name.includes('An') || v.name.toLowerCase().includes('male'))
-        );
-        if (!viVoice) {
-          viVoice = voices.find(v => v.lang.includes('vi') || v.name.toLowerCase().includes('vietnam') || v.name.includes('Tiếng Việt'));
+        loadVoices();
+        if (synthesisRef.current.onvoiceschanged !== undefined) {
+          synthesisRef.current.onvoiceschanged = loadVoices;
         }
-        voiceRef.current = viVoice || voices[0];
-      };
-
-      loadVoices();
-      if (synthesisRef.current.onvoiceschanged !== undefined) {
-        synthesisRef.current.onvoiceschanged = loadVoices;
+        
+        setIsSpeechSupported(true);
+      } catch (err) {
+        console.error('Failed to initialize Speech Recognition:', err);
+        setIsSpeechSupported(false);
+        recognitionRef.current = null;
       }
+    } else {
+      setIsSpeechSupported(false);
     }
   }, []);
 
