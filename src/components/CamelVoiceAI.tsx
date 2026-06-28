@@ -15,10 +15,13 @@ export default function CamelVoiceAI({ onSpeakStateChange, chatbotWelcomeMessage
   const [hasGreeted, setHasGreeted] = useState(false);
   const [sessionId, setSessionId] = useState<string>('');
   const [isContinuousMode, setIsContinuousMode] = useState(false);
+  const [userTranscript, setUserTranscript] = useState<string>('');
+  const [aiReply, setAiReply] = useState<string>('');
   
   const continuousRef = useRef(false);
   const isSpeakingRef = useRef(false);
   const isProcessingRef = useRef(false);
+  const currentUtteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   
   // Speech objects
   const recognitionRef = useRef<any>(null);
@@ -46,6 +49,8 @@ export default function CamelVoiceAI({ onSpeakStateChange, chatbotWelcomeMessage
 
       recognitionRef.current.onresult = (event: any) => {
         const transcript = event.results[0][0].transcript;
+        setUserTranscript(transcript);
+        setAiReply(''); // Clear previous AI reply when new input is recognized
         handleUserSpeak(transcript);
       };
 
@@ -91,10 +96,24 @@ export default function CamelVoiceAI({ onSpeakStateChange, chatbotWelcomeMessage
   const speak = useCallback((text: string) => {
     if (!synthesisRef.current || !isSpeechSupported) return;
 
+    // Prevent collision by nullifying the callbacks of the active utterance before canceling
+    if (currentUtteranceRef.current) {
+      currentUtteranceRef.current.onstart = null;
+      currentUtteranceRef.current.onend = null;
+      currentUtteranceRef.current.onerror = null;
+    }
+
     // Cancel any ongoing speech
     synthesisRef.current.cancel();
 
+    // Mark as speaking immediately to block microphone from restarting prematurely
+    setIsSpeaking(true);
+    isSpeakingRef.current = true;
+    onSpeakStateChange(true);
+
     const utterance = new SpeechSynthesisUtterance(text);
+    currentUtteranceRef.current = utterance;
+
     if (voiceRef.current) {
       utterance.voice = voiceRef.current;
     }
@@ -112,6 +131,7 @@ export default function CamelVoiceAI({ onSpeakStateChange, chatbotWelcomeMessage
       setIsSpeaking(false);
       isSpeakingRef.current = false;
       onSpeakStateChange(false);
+      currentUtteranceRef.current = null;
       
       // Auto-resume listening after speaking if continuous mode is ON
       if (continuousRef.current) {
@@ -128,6 +148,7 @@ export default function CamelVoiceAI({ onSpeakStateChange, chatbotWelcomeMessage
       setIsSpeaking(false);
       isSpeakingRef.current = false;
       onSpeakStateChange(false);
+      currentUtteranceRef.current = null;
     };
 
     synthesisRef.current.speak(utterance);
@@ -168,7 +189,7 @@ export default function CamelVoiceAI({ onSpeakStateChange, chatbotWelcomeMessage
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          message: text + " (Hãy trả lời tôi bằng Tiếng Việt một cách tự nhiên và ngắn gọn nhé)",
+          message: text + " (Hãy trả lời tôi bằng Tiếng Việt một cách tự nhiên và ngắn gọn dưới 30 từ nhé)",
           sessionId: sessionId
         })
       });
@@ -176,6 +197,7 @@ export default function CamelVoiceAI({ onSpeakStateChange, chatbotWelcomeMessage
       const data = await response.json();
       const reply = data.reply || "Xin lỗi em, hình như có chút trục trặc kết nối...";
       
+      setAiReply(reply);
       speak(reply);
     } catch (err) {
       console.error(err);
@@ -197,6 +219,12 @@ export default function CamelVoiceAI({ onSpeakStateChange, chatbotWelcomeMessage
       continuousRef.current = false;
       setIsContinuousMode(false);
       
+      if (currentUtteranceRef.current) {
+        currentUtteranceRef.current.onstart = null;
+        currentUtteranceRef.current.onend = null;
+        currentUtteranceRef.current.onerror = null;
+      }
+
       if (isSpeaking) {
         synthesisRef.current?.cancel();
         setIsSpeaking(false);
@@ -211,6 +239,8 @@ export default function CamelVoiceAI({ onSpeakStateChange, chatbotWelcomeMessage
       // Turn ON continuous mode
       continuousRef.current = true;
       setIsContinuousMode(true);
+      setUserTranscript('');
+      setAiReply('');
       try {
         recognitionRef.current?.start();
         setIsListening(true);
@@ -219,6 +249,20 @@ export default function CamelVoiceAI({ onSpeakStateChange, chatbotWelcomeMessage
       }
     }
   };
+
+  // Clean up synthesis and recognition on unmount
+  useEffect(() => {
+    return () => {
+      if (synthesisRef.current) {
+        synthesisRef.current.cancel();
+      }
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.abort();
+        } catch (e) {}
+      }
+    };
+  }, []);
 
   return (
     <div className="fixed right-4 sm:right-10 top-1/2 -translate-y-1/2 z-50 flex flex-col items-center gap-4">
@@ -256,16 +300,45 @@ export default function CamelVoiceAI({ onSpeakStateChange, chatbotWelcomeMessage
         )}
       </motion.button>
 
-      {/* Status Text */}
-      <motion.div 
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: (isListening || isSpeaking || isProcessing) ? 1 : 0, x: (isListening || isSpeaking || isProcessing) ? 0 : 20 }}
-        className="absolute right-full mr-4 whitespace-nowrap bg-black/60 text-white px-4 py-2 rounded-full text-sm font-serif backdrop-blur-md border border-white/10 shadow-lg pointer-events-none"
-      >
-        {isListening ? "Đang nghe bạn nói..." : 
-         isProcessing ? "Đang suy nghĩ..." : 
-         isSpeaking ? "Lạc đà đang trả lời..." : ""}
-      </motion.div>
+      {/* Conversation Card */}
+      {(isListening || isProcessing || isSpeaking || userTranscript || aiReply) && (
+        <motion.div
+          initial={{ opacity: 0, x: 20, scale: 0.95 }}
+          animate={{ opacity: 1, x: 0, scale: 1 }}
+          className="absolute right-full mr-4 top-1/2 -translate-y-1/2 w-64 sm:w-80 p-4 rounded-3xl bg-black/80 text-white backdrop-blur-xl border border-white/10 shadow-2xl flex flex-col gap-3 pointer-events-auto"
+        >
+          {/* Status Header */}
+          <div className="flex items-center gap-2 pb-2 border-b border-white/10">
+            <span className={`w-2.5 h-2.5 rounded-full ${
+              isListening ? 'bg-rose-500 animate-ping' : 
+              isProcessing ? 'bg-blue-500 animate-pulse' : 
+              isSpeaking ? 'bg-amber-400 animate-pulse' : 'bg-green-500'
+            }`} />
+            <span className="text-[12px] font-medium text-white/60 tracking-wider uppercase">
+              {isListening ? "Đang lắng nghe..." : 
+               isProcessing ? "Đang suy nghĩ..." : 
+               isSpeaking ? "Lạc đà đang nói..." : "Sẵn sàng"}
+            </span>
+          </div>
+
+          {/* Transcript details */}
+          <div className="flex flex-col gap-2.5 max-h-48 overflow-y-auto pr-1">
+            {userTranscript && (
+              <div className="flex flex-col text-left">
+                <span className="text-[11px] font-bold text-rose-400 uppercase tracking-wider">Bạn:</span>
+                <p className="text-white/90 text-sm leading-relaxed">{userTranscript}</p>
+              </div>
+            )}
+            
+            {aiReply && (
+              <div className="flex flex-col text-left border-t border-white/5 pt-2">
+                <span className="text-[11px] font-bold text-amber-400 uppercase tracking-wider">Lạc đà:</span>
+                <p className="text-white/90 text-sm leading-relaxed">{aiReply}</p>
+              </div>
+            )}
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 }
