@@ -203,7 +203,7 @@ export default function CamelVoiceAI({ onSpeakStateChange, chatbotWelcomeMessage
         },
         body: JSON.stringify({
           message: text + " (Hãy trả lời tôi bằng Tiếng Việt một cách tự nhiên và ngắn gọn dưới 30 từ nhé)",
-          sessionId: sessionId
+          sessionId: localStorage.getItem('chatbot_session_id') || sessionId
         })
       });
 
