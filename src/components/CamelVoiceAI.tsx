@@ -220,21 +220,22 @@ export default function CamelVoiceAI({ onSpeakStateChange, chatbotWelcomeMessage
     }
   };
 
-  if (!isSpeechSupported) return null;
-
   return (
-    <div className="fixed right-6 sm:right-10 top-1/2 -translate-y-1/2 z-50 flex flex-col items-center gap-4">
+    <div className="fixed right-4 sm:right-10 top-1/2 -translate-y-1/2 z-50 flex flex-col items-center gap-4">
       {/* Microphone Button */}
       <motion.button
         onClick={toggleListening}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        className={`relative w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center border border-white/20 shadow-[0_0_40px_rgba(255,255,255,0.1)] transition-all duration-300 backdrop-blur-xl cursor-pointer
-          ${isContinuousMode ? 'ring-4 ring-amber-400/50' : ''}
-          ${isListening ? 'bg-rose-500/80 text-white' : 
+        whileHover={{ scale: isSpeechSupported ? 1.1 : 1 }}
+        whileTap={{ scale: isSpeechSupported ? 0.9 : 1 }}
+        className={`relative w-14 h-14 sm:w-20 sm:h-20 rounded-full flex items-center justify-center border shadow-[0_0_40px_rgba(255,255,255,0.1)] transition-all duration-300 backdrop-blur-xl cursor-pointer
+          ${!isSpeechSupported ? 'bg-gray-500/50 text-white/50 border-white/10' :
+            isContinuousMode ? 'ring-4 ring-amber-400/50 border-white/20' : 'border-white/20'}
+          ${isSpeechSupported ? (
+            isListening ? 'bg-rose-500/80 text-white' : 
             isSpeaking ? 'bg-amber-400/80 text-theme-dark' : 
             isProcessing ? 'bg-blue-500/80 text-white' : 
-            'bg-white/10 text-white hover:bg-white/20'}`}
+            'bg-white/10 text-white hover:bg-white/20'
+          ) : ''}`}
       >
         {isProcessing ? (
           <Loader2 className="w-8 h-8 sm:w-10 sm:h-10 animate-spin" />
