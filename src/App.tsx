@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Heart, Image as ImageIcon, Mail, Lock, LogOut, Music, Pause, Film, ArrowLeft, Eye } from 'lucide-react';
+import { Heart, Image as ImageIcon, Lock, LogOut, Music, Pause, Film, ArrowLeft, Eye } from 'lucide-react';
 import type { Photo, View, Video } from './types';
 import Home from './components/Home';
 import Slideshow from './components/Slideshow';
@@ -29,7 +29,7 @@ export default function App() {
   });
   const [isAdmin, setIsAdmin] = useState(false);
   const [isPlayingMusic, setIsPlayingMusic] = useState(false);
-  const [isCamelSpeaking, setIsCamelSpeaking] = useState(false);
+
   const [wasPlayingBeforeVideo, setWasPlayingBeforeVideo] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -481,7 +481,7 @@ export default function App() {
         </div>
       )}
 
-      <CamelVoiceAI onSpeakStateChange={setIsCamelSpeaking} chatbotWelcomeMessage={chatbotWelcomeMessage} />
+      <CamelVoiceAI onSpeakStateChange={() => {}} chatbotWelcomeMessage={chatbotWelcomeMessage} />
 
       {currentView === 'fantasy' ? (
         <div className="relative w-full h-screen overflow-y-auto bg-[#FDFBF7] flex flex-col justify-between scroll-smooth selection:bg-theme-accent2 selection:text-white">
