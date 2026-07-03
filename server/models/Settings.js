@@ -15,11 +15,11 @@ const SettingsSchema = new mongoose.Schema({
   },
   chatbotName: {
     type: String,
-    default: 'AI Love Bot'
+    default: 'AI Assistant'
   },
   chatbotWelcomeMessage: {
     type: String,
-    default: 'Chào em! Anh là trợ lý tình yêu của hai bạn. Hôm nay em muốn trò chuyện gì nào? 💕'
+    default: 'Chào bạn! Mình là trợ lý ảo. Hôm nay bạn muốn trò chuyện gì nào? ✨'
   },
   chatbotSystemPrompt: {
     type: String,

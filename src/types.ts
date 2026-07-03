@@ -8,14 +8,6 @@ export interface Photo {
   user?: string;
 }
 
-export interface Letter {
-  id?: string;
-  title: string;
-  content: string;
-  username?: string;
-  user?: string;
-}
-
 export interface Video {
   id: string;
   title: string;
@@ -26,4 +18,4 @@ export interface Video {
   user?: string;
 }
 
-export type View = 'home' | 'slideshow' | 'letter' | 'admin' | 'login' | 'videos' | 'fantasy' | 'synapse';
+export type View = 'home' | 'slideshow' | 'admin' | 'login' | 'videos' | 'fantasy';

@@ -60,7 +60,7 @@ export default function VideoGallery({ videos, onPlayVideo, onCloseVideo }: Vide
                     {video.eventDate}
                   </div>
                   <div className="bg-[#E6C280]/90 backdrop-blur-xs text-theme-dark px-3 py-1 rounded-full text-xs font-bold">
-                    Bởi: {video.username === 'bangaituonglai' ? 'Bạn gái tương lai' : 'Hoàng'}
+                    Bởi: {video.username || 'Admin'}
                   </div>
                 </div>
               </div>
@@ -125,7 +125,7 @@ export default function VideoGallery({ videos, onPlayVideo, onCloseVideo }: Vide
                     {activeVideo.eventDate}
                   </div>
                   <div className="text-sm text-theme-dark font-bold bg-[#E6C280] px-3 py-1 rounded-full w-fit flex items-center">
-                    Đăng bởi: {activeVideo.username === 'bangaituonglai' ? 'Bạn gái tương lai' : 'Hoàng'}
+                    Đăng bởi: {activeVideo.username || 'Admin'}
                   </div>
                 </div>
               </div>

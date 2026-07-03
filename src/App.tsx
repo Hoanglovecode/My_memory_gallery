@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Heart, Image as ImageIcon, Mail, Lock, LogOut, Music, Pause, Film, ArrowLeft, Eye } from 'lucide-react';
-import type { Photo, Letter, View, Video } from './types';
+import type { Photo, View, Video } from './types';
 import Home from './components/Home';
 import Slideshow from './components/Slideshow';
-import LetterView from './components/LetterView';
 import Login from './components/Login';
 import AdminDashboard from './components/AdminDashboard';
 import VideoGallery from './components/VideoGallery';
@@ -13,7 +12,7 @@ import ChatbotWidget from './components/ChatbotWidget';
 
 import Hero from './components/Hero';
 import Navbar from './components/Navbar';
-import SynapseLanding from './components/SynapseLanding';
+import CamelVoiceAI from './components/CamelVoiceAI';
 
 
 export default function App() {
@@ -23,13 +22,14 @@ export default function App() {
     if (hash === '#memories' || search.includes('mode=memories')) {
       return 'home';
     }
-    if (hash === '#slideshow' || hash === '#videos' || hash === '#letter' || hash === '#admin' || hash === '#login' || hash === '#synapse') {
+    if (hash === '#slideshow' || hash === '#videos' || hash === '#admin' || hash === '#login') {
       return hash.replace('#', '') as View;
     }
-    return 'synapse';
+    return 'fantasy';
   });
   const [isAdmin, setIsAdmin] = useState(false);
   const [isPlayingMusic, setIsPlayingMusic] = useState(false);
+  const [isCamelSpeaking, setIsCamelSpeaking] = useState(false);
   const [wasPlayingBeforeVideo, setWasPlayingBeforeVideo] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -40,10 +40,10 @@ export default function App() {
         setCurrentView('home');
       } else if (hash === '#fantasy') {
         setCurrentView('fantasy');
-      } else if (hash === '#slideshow' || hash === '#videos' || hash === '#letter' || hash === '#admin' || hash === '#login' || hash === '#synapse') {
+      } else if (hash === '#slideshow' || hash === '#videos' || hash === '#admin' || hash === '#login') {
         setCurrentView(hash.replace('#', '') as View);
       } else {
-        setCurrentView('synapse');
+        setCurrentView('fantasy');
       }
     };
     window.addEventListener('hashchange', handleHashChange);
@@ -67,14 +67,7 @@ export default function App() {
       return [];
     }
   });
-  const [letters, setLetters] = useState<Letter[]>(() => {
-    try {
-      const cached = localStorage.getItem('cached_letters');
-      return cached ? JSON.parse(cached) : [];
-    } catch {
-      return [];
-    }
-  });
+
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getCachedSetting = (key: string, defaultValue: any): any => {
@@ -99,8 +92,8 @@ export default function App() {
   const [creatorGithub, setCreatorGithub] = useState<string>(() => getCachedSetting('creatorGithub', 'https://github.com/Hoanglovecode'));
   const [creatorTiktok, setCreatorTiktok] = useState<string>(() => getCachedSetting('creatorTiktok', 'https://www.tiktok.com/@hoang_algoict'));
   const [creatorInstagram, setCreatorInstagram] = useState<string>(() => getCachedSetting('creatorInstagram', 'https://www.instagram.com/vhoang2_7/'));
-  const [chatbotName, setChatbotName] = useState<string>(() => getCachedSetting('chatbotName', 'AI Love Bot'));
-  const [chatbotWelcomeMessage, setChatbotWelcomeMessage] = useState<string>(() => getCachedSetting('chatbotWelcomeMessage', 'Chào em! Anh là trợ lý tình yêu của hai bạn. Hôm nay em muốn trò chuyện gì nào? 💕'));
+  const [chatbotName, setChatbotName] = useState<string>(() => getCachedSetting('chatbotName', 'AI Assistant'));
+  const [chatbotWelcomeMessage, setChatbotWelcomeMessage] = useState<string>(() => getCachedSetting('chatbotWelcomeMessage', 'Chào bạn! Mình là trợ lý ảo. Hôm nay bạn muốn trò chuyện gì nào? ✨'));
   const [chatbotSystemPrompt, setChatbotSystemPrompt] = useState<string>(() => getCachedSetting('chatbotSystemPrompt', ''));
   const [chatbotApiKey, setChatbotApiKey] = useState<string>(() => getCachedSetting('chatbotApiKey', ''));
 
@@ -119,10 +112,9 @@ export default function App() {
     async function loadData() {
       try {
         // Fetch all resources in parallel to optimize loading times
-        const [photosRes, videosRes, lettersRes, settingsRes] = await Promise.all([
+        const [photosRes, videosRes, settingsRes] = await Promise.all([
           fetch(`${API_BASE_URL}/photos`),
           fetch(`${API_BASE_URL}/videos`),
-          fetch(`${API_BASE_URL}/letters`),
           fetch(`${API_BASE_URL}/settings`)
         ]);
 
@@ -161,12 +153,7 @@ export default function App() {
           localStorage.setItem('cached_videos', JSON.stringify(mappedVideos));
         }
 
-        // 3. Process letters
-        if (lettersRes.ok) {
-          const lettersData = await lettersRes.json();
-          setLetters(lettersData);
-          localStorage.setItem('cached_letters', JSON.stringify(lettersData));
-        }
+
 
         // 3.5. Process music and chatbot settings
         if (settingsRes.ok) {
@@ -449,8 +436,6 @@ export default function App() {
   const navigate = (view: View) => {
     if (view === 'fantasy') {
       window.location.hash = 'fantasy';
-    } else if (view === 'synapse') {
-      window.location.hash = 'synapse';
     } else if (view === 'home') {
       window.location.hash = 'memories';
     } else {
@@ -460,11 +445,11 @@ export default function App() {
     window.scrollTo(0, 0);
   };
 
-  if (isLoading && currentView !== 'fantasy' && currentView !== 'synapse') {
+  if (isLoading && currentView !== 'fantasy') {
     return (
       <div className="fixed inset-0 bg-theme-main flex flex-col items-center justify-center z-[9999]">
         <Heart className="text-theme-accent2 fill-current animate-pulse mb-4 text-[#F2BED1]" size={80} />
-        <p className="text-xl font-serif italic text-theme-dark animate-bounce">Đang tải những kỷ niệm ngọt ngào...</p>
+        <p className="text-xl font-serif italic text-theme-dark animate-bounce">Đang tải những kỷ niệm tuyệt vời...</p>
       </div>
     );
   }
@@ -496,11 +481,11 @@ export default function App() {
         </div>
       )}
 
-      {currentView === 'synapse' ? (
-        <SynapseLanding navigate={navigate} />
-      ) : currentView === 'fantasy' ? (
+      <CamelVoiceAI onSpeakStateChange={setIsCamelSpeaking} chatbotWelcomeMessage={chatbotWelcomeMessage} />
+
+      {currentView === 'fantasy' ? (
         <div className="relative w-full h-screen overflow-y-auto bg-[#FDFBF7] flex flex-col justify-between scroll-smooth selection:bg-theme-accent2 selection:text-white">
-          <Navbar onBack={() => navigate('synapse')} />
+          <Navbar onBack={() => navigate('fantasy')} />
           
           {/* Hero Section */}
           <div className="relative w-full min-h-screen lg:h-screen flex-shrink-0">
@@ -512,7 +497,7 @@ export default function App() {
             <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="text-center md:text-left">
                 <p className="text-base font-serif italic text-[#A7727D] font-bold">
-                  Dự án kỷ niệm được thiết kế bởi Lê Văn Hoàng ❤️
+                  Dự án được thiết kế bởi Lê Văn Hoàng ✨
                 </p>
                 <p className="text-xs text-[#A7727D]/70 mt-1.5 font-medium">
                   © {new Date().getFullYear()} Memories Gallery. All rights reserved.
@@ -666,12 +651,6 @@ export default function App() {
               >
                 <Film size={18} /> Video kỷ niệm
               </button>
-              <button
-                onClick={() => navigate('letter')}
-                className="hover:text-[#8A5B66] hover:bg-white/40 px-3.5 py-2 rounded-full transition-all duration-300 flex items-center gap-1.5 hidden md:flex cursor-pointer"
-              >
-                <Mail size={18} /> Thư tình
-              </button>
 
               {/* Mobile Nav Icons */}
               <button
@@ -687,13 +666,6 @@ export default function App() {
                 title="Video kỷ niệm"
               >
                 <Film size={18} />
-              </button>
-              <button
-                onClick={() => navigate('letter')}
-                className="md:hidden hover:text-theme-accent2 p-1.5 rounded-full hover:bg-white/40 transition-colors cursor-pointer"
-                title="Thư tình"
-              >
-                <Mail size={18} />
               </button>
 
               <div className="w-[1px] h-6 bg-theme-dark/20 mx-1 hidden md:block"></div>
@@ -731,14 +703,13 @@ export default function App() {
                 onCloseVideo={handleCloseVideo}
               />
             )}
-            {currentView === 'letter' && <LetterView letters={letters} />}
+
             {currentView === 'login' && <Login setIsAdmin={setIsAdmin} navigate={navigate} />}
             {currentView === 'admin' && isAdmin && (
               <AdminDashboard
                 photos={photos}
                 setPhotos={setPhotos}
-                letters={letters}
-                setLetters={setLetters}
+
                 videos={videos}
                 setVideos={setVideos}
                 musicUrl={musicUrl}
@@ -777,7 +748,7 @@ export default function App() {
               <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="text-center md:text-left">
                   <p className="text-base font-serif italic text-[#A7727D] font-bold">
-                    Dự án kỷ niệm được thiết kế bởi Lê Văn Hoàng ❤️
+                    Dự án được thiết kế bởi Lê Văn Hoàng ✨
                   </p>
                   <p className="text-xs text-[#A7727D]/70 mt-1.5 font-medium">
                     © {new Date().getFullYear()} Memories Gallery. All rights reserved.

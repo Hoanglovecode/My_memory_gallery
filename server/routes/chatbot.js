@@ -5,7 +5,6 @@ const Settings = require('../models/Settings');
 const ChatLog = require('../models/ChatLog');
 const Photo = require('../models/Photo');
 const Video = require('../models/Video');
-const Letter = require('../models/Letter');
 
 // Giới hạn mỗi IP chỉ được gửi tối đa 30 request mỗi 10 phút
 const chatLimiter = rateLimit({
@@ -56,7 +55,7 @@ router.post('/chat', chatLimiter, async (req, res) => {
     const settings = await Settings.findOne();
     if (!settings || !settings.chatbotApiKey) {
       return res.json({
-        reply: "Chào em! Anh là trợ lý AI. Hiện tại anh chưa được cấu hình API Key của Google Gemini trong Bảng quản trị, nên anh chưa thể trả lời em được. Hãy nhắn anh người yêu (Hoàng) cấu hình API Key nhé! 💕"
+        reply: "Xin chào! Hiện tại hệ thống chưa được cấu hình API Key của Google Gemini trong Bảng quản trị nên chưa thể hoạt động. Hãy nhắn quản trị viên cấu hình nhé! ✨"
       });
     }
 
@@ -97,10 +96,9 @@ ${settings.chatbotSystemPrompt || ''}`;
 
     // Fetch memory context dynamically from the database to inject into the Gemini context
     try {
-      const [photos, videos, letters] = await Promise.all([
+      const [photos, videos] = await Promise.all([
         Photo.find({}, 'title eventDate').limit(40),
-        Video.find({}, 'title eventDate').limit(20),
-        Letter.find({}, 'title content').limit(5)
+        Video.find({}, 'title eventDate').limit(20)
       ]);
 
       let memoryContext = '\n\n[Dữ liệu Album kỷ niệm thực tế từ website của bạn để sử dụng khi trò chuyện:]';
@@ -109,9 +107,6 @@ ${settings.chatbotSystemPrompt || ''}`;
       }
       if (videos.length > 0) {
         memoryContext += '\n- Video kỷ niệm hiện có: ' + videos.map(v => `"${v.title}" (${v.eventDate || 'chưa rõ ngày'})`).join(', ');
-      }
-      if (letters.length > 0) {
-        memoryContext += '\n- Thư tình đã viết: ' + letters.map(l => `Thư "${l.title}" (nội dung chính: "${l.content.substring(0, 150)}...")`).join('; ');
       }
       systemPrompt += memoryContext;
     } catch (dbErr) {

@@ -18,7 +18,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/photos', require('./routes/photos'));
 app.use('/api/videos', require('./routes/videos'));
-app.use('/api/letters', require('./routes/letters'));
+
 app.use('/api/settings', require('./routes/settings'));
 app.use('/api/chatbot', require('./routes/chatbot'));
 app.use('/api/analytics', require('./routes/analytics'));

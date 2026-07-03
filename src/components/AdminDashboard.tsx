@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Lock, Plus, Trash2, Save, CheckCircle, Upload, Edit2, Film, Music, Sparkles, GripVertical, BarChart2, Eye, Users, Globe } from 'lucide-react';
-import type { Photo, Letter, Video } from '../types';
+import type { Photo, Video } from '../types';
 import { API_BASE_URL } from '../config';
 
 interface AdminDashboardProps {
   photos: Photo[];
   setPhotos: React.Dispatch<React.SetStateAction<Photo[]>>;
-  letters: Letter[];
-  setLetters: React.Dispatch<React.SetStateAction<Letter[]>>;
   videos: Video[];
   setVideos: React.Dispatch<React.SetStateAction<Video[]>>;
   musicUrl: string;
@@ -47,8 +45,6 @@ interface Toast {
 export default function AdminDashboard({ 
   photos, 
   setPhotos, 
-  letters, 
-  setLetters, 
   videos, 
   setVideos,
   musicUrl,
@@ -86,7 +82,7 @@ export default function AdminDashboard({
     };
   };
 
-  const [activeTab, setActiveTab] = useState<'photos' | 'letter' | 'videos' | 'music' | 'chatbot' | 'social' | 'analytics'>('photos');
+  const [activeTab, setActiveTab] = useState<'photos' | 'videos' | 'music' | 'chatbot' | 'social' | 'analytics'>('photos');
   const [showAddForm, setShowAddForm] = useState(false);
   const [newPhoto, setNewPhoto] = useState({ title: '', description: '', eventDate: '', imageUrl: '' });
   const [uploadMode, setUploadMode] = useState<'file' | 'url'>('file');
@@ -169,21 +165,7 @@ export default function AdminDashboard({
   const [testStatus, setTestStatus] = useState<'idle' | 'testing' | 'success' | 'failed'>('idle');
   const [testError, setTestError] = useState('');
 
-  const [editLetterTitle, setEditLetterTitle] = useState('');
-  const [editLetterContent, setEditLetterContent] = useState('');
-
   const currentUsername = localStorage.getItem('admin_username') || 'levanhoang';
-
-  useEffect(() => {
-    const myLetter = letters.find(l => l.username === currentUsername);
-    if (myLetter) {
-      setEditLetterTitle(myLetter.title);
-      setEditLetterContent(myLetter.content);
-    } else {
-      setEditLetterTitle('Dear My Love,');
-      setEditLetterContent('');
-    }
-  }, [letters, currentUsername]);
 
   const displayPhotos = currentUsername === 'admin' 
     ? photos 
@@ -723,48 +705,6 @@ export default function AdminDashboard({
     }
   };
 
-  const handleSaveLetter = async () => {
-    if (!editLetterTitle || !editLetterContent) {
-      showToast('Vui lòng điền đầy đủ tiêu đề và nội dung thư!', 'error');
-      return;
-    }
-
-    try {
-      const response = await fetch(`${API_BASE_URL}/letters`, {
-        method: 'PUT',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({
-          title: editLetterTitle,
-          content: editLetterContent
-        })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.msg || 'Không thể lưu thư tình.');
-      }
-
-      // Format from _id to id if backend returned _id
-      const mappedLetter: Letter = {
-        id: data._id,
-        title: data.title,
-        content: data.content,
-        username: data.username || currentUsername,
-        user: data.user
-      };
-
-      const exists = letters.some(l => l.username === currentUsername);
-      if (exists) {
-        setLetters(letters.map(l => l.username === currentUsername ? mappedLetter : l));
-      } else {
-        setLetters([...letters, mappedLetter]);
-      }
-      showToast('Đã cập nhật và lưu thư tình thành công! ❤️');
-    } catch (err: any) {
-      showToast(err.message || 'Lỗi kết nối server', 'error');
-    }
-  };
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 animate-fade-in relative">
@@ -808,14 +748,7 @@ export default function AdminDashboard({
         >
           Quản lý Video ({displayVideos.length})
         </button>
-        <button 
-          onClick={() => setActiveTab('letter')} 
-          className={`pb-3 px-6 font-bold text-lg transition-colors cursor-pointer ${
-            activeTab === 'letter' ? 'text-theme-dark border-b-4 border-theme-dark' : 'text-gray-400 hover:text-theme-dark'
-          }`}
-        >
-          Chỉnh sửa Thư Tình
-        </button>
+
         <button 
           onClick={() => setActiveTab('music')} 
           className={`pb-3 px-6 font-bold text-lg transition-colors cursor-pointer ${
@@ -1215,37 +1148,7 @@ export default function AdminDashboard({
         </div>
       )}
 
-      {/* Tùy chọn Thư Tình */}
-      {activeTab === 'letter' && (
-        <div className="bg-white p-8 rounded-2xl shadow-md border border-gray-100 animate-fade-in">
-          <div className="mb-6">
-            <label className="block font-bold text-gray-700 mb-2">Tiêu đề thư</label>
-            <input 
-              type="text" 
-              value={editLetterTitle} 
-              onChange={(e) => setEditLetterTitle(e.target.value)}
-              className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-theme-accent1 outline-none focus:border-theme-dark transition-all"
-            />
-          </div>
-          <div className="mb-6">
-            <label className="block font-bold text-gray-700 mb-2">Nội dung thư</label>
-            <textarea 
-              rows={12} 
-              value={editLetterContent}
-              onChange={(e) => setEditLetterContent(e.target.value)}
-              className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-theme-accent1 outline-none focus:border-theme-dark transition-all leading-relaxed"
-            />
-          </div>
-          <div className="flex justify-end">
-            <button 
-              onClick={handleSaveLetter}
-              className="bg-theme-dark text-white px-8 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-[#8A5B66] shadow-lg transition-all cursor-pointer"
-            >
-              <Save size={20}/> Cập nhật Thư Tình
-            </button>
-          </div>
-        </div>
-      )}
+
 
       {/* Tùy chọn Nhạc Nền */}
       {activeTab === 'music' && (
@@ -1391,7 +1294,7 @@ export default function AdminDashboard({
               <input 
                 type="text" 
                 required
-                placeholder="Ví dụ: AI Love Bot"
+                placeholder="Ví dụ: AI Assistant"
                 value={editChatbotName} 
                 onChange={e => setEditChatbotName(e.target.value)}
                 className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-theme-accent1 outline-none focus:border-theme-dark transition-all"
@@ -1414,7 +1317,7 @@ export default function AdminDashboard({
             {/* Chỉ dẫn AI / Persona */}
             <div>
               <label className="block font-bold text-gray-700 mb-2 font-semibold">Chỉ dẫn AI (System Prompt) *</label>
-              <p className="text-xs text-gray-500 mb-2">Định hình tính cách, phong cách trả lời cho AI. Ví dụ: xưng hô ngọt ngào, hài hước, trả lời ngắn gọn...</p>
+              <p className="text-xs text-gray-500 mb-2">Định hình tính cách, phong cách trả lời cho AI. Ví dụ: xưng hô lịch sự, hài hước, trả lời ngắn gọn...</p>
               <textarea 
                 rows={6}
                 required

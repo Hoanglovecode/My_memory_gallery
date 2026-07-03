@@ -64,7 +64,7 @@ export default function ChatbotWidget({ chatbotName, chatbotWelcomeMessage }: Ch
           setMessages([
             {
               role: 'ai',
-              text: chatbotWelcomeMessage || 'Chào cậu! Tớ là trợ lý tình yêu của hai bạn. Hôm nay tớ có thể giúp gì cho cậu? 💕',
+              text: chatbotWelcomeMessage || 'Chào cậu! Tớ là trợ lý ảo của bạn. Hôm nay tớ có thể giúp gì cho cậu? ✨',
               timestamp: new Date()
             }
           ]);
@@ -74,7 +74,7 @@ export default function ChatbotWidget({ chatbotName, chatbotWelcomeMessage }: Ch
         setMessages([
           {
             role: 'ai',
-            text: chatbotWelcomeMessage || 'Chào cậu! Tớ là trợ lý tình yêu của hai bạn. Hôm nay tớ có thể giúp gì cho cậu? 💕',
+            text: chatbotWelcomeMessage || 'Chào cậu! Tớ là trợ lý ảo của bạn. Hôm nay tớ có thể giúp gì cho cậu? ✨',
             timestamp: new Date()
           }
         ]);
@@ -183,9 +183,9 @@ export default function ChatbotWidget({ chatbotName, chatbotWelcomeMessage }: Ch
   };
 
   const quickReplies = [
-    "Kể tớ nghe chuyện cười đi 😄",
-    "Chúc tớ một câu ngọt ngào nhé 💕",
-    "Hôm nay nên đi đâu chơi đây? 🗺️",
+    "Kể tớ nghe chuyện vui đi 😄",
+    "Nhắc lại một kỷ niệm nhé ✨",
+    "Hôm nay nên làm gì cho thú vị? 🗺️",
     "Gợi ý cho tớ một bài nhạc hay 🎵"
   ];
 
@@ -205,8 +205,8 @@ export default function ChatbotWidget({ chatbotName, chatbotWelcomeMessage }: Ch
                 <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-400 border-2 border-white rounded-full"></span>
               </div>
               <div>
-                <h4 className="font-serif font-bold tracking-wide text-md">{chatbotName || 'AI Love Bot'}</h4>
-                <p className="text-[10px] text-white/80 font-medium">Trợ lý tình yêu đang trực tuyến</p>
+                <h4 className="font-serif font-bold tracking-wide text-md">{chatbotName || 'AI Assistant'}</h4>
+                <p className="text-[10px] text-white/80 font-medium">Trợ lý ảo đang trực tuyến</p>
               </div>
             </div>
             <div className="flex items-center gap-1">

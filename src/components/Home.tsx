@@ -68,7 +68,7 @@ export default function Home({ navigate, photos }: HomeProps) {
                     />
                     <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/85 via-black/45 to-transparent p-3 text-white">
                       <p className="font-bold text-sm drop-shadow-md tracking-wide truncate">{photo.title}</p>
-                      <p className="text-[10px] text-white/80 italic mt-0.5">Đăng bởi: {photo.username === 'bangaituonglai' ? 'Bạn gái tương lai' : 'Hoàng'}</p>
+                      <p className="text-[10px] text-white/80 italic mt-0.5">Đăng bởi: {photo.username || 'Admin'}</p>
                     </div>
                   </div>
                 ))}
@@ -105,7 +105,7 @@ export default function Home({ navigate, photos }: HomeProps) {
                     />
                     <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/85 via-black/45 to-transparent p-3 text-white">
                       <p className="font-bold text-sm drop-shadow-md tracking-wide truncate">{photo.title}</p>
-                      <p className="text-[10px] text-white/80 italic mt-0.5">Đăng bởi: {photo.username === 'bangaituonglai' ? 'Bạn gái tương lai' : 'Hoàng'}</p>
+                      <p className="text-[10px] text-white/80 italic mt-0.5">Đăng bởi: {photo.username || 'Admin'}</p>
                     </div>
                   </div>
                 ))}
@@ -167,7 +167,7 @@ export default function Home({ navigate, photos }: HomeProps) {
                   {selectedPhoto.eventDate || 'Hôm nay'}
                 </span>
                 <span className="text-[10px] bg-[#E6C280] text-theme-dark font-semibold px-2.5 py-0.5 rounded-full inline-block">
-                  Đăng bởi: {selectedPhoto.username === 'bangaituonglai' ? 'Bạn gái tương lai' : 'Hoàng'}
+                  Đăng bởi: {selectedPhoto.username || 'Admin'}
                 </span>
               </div>
               <h3 className="text-xl font-serif font-bold text-theme-dark line-clamp-1">
