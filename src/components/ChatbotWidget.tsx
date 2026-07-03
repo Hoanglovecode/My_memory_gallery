@@ -165,7 +165,7 @@ export default function ChatbotWidget({ chatbotName, chatbotWelcomeMessage }: Ch
           setMessages([
             {
               role: 'ai',
-              text: chatbotWelcomeMessage || 'Chào cậu! Tớ là trợ lý tình yêu của hai bạn. Hôm nay tớ có thể giúp gì cho cậu? 💕',
+              text: chatbotWelcomeMessage || 'Chào cậu! Tớ là trợ lý của hai bạn. Hôm nay tớ có thể giúp gì cho cậu? 💕',
               timestamp: new Date()
             }
           ]);
