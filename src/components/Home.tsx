@@ -21,7 +21,8 @@ export default function Home({ navigate, photos }: HomeProps) {
 
   // Hàm tính toán bán kính Z cho từng Carousel
   const getRadius = (total: number) => {
-    return Math.max(120, Math.round((180 / 2) / Math.tan(Math.PI / (total || 1))) + 20);
+    const calculated = Math.round((180 / 2) / Math.tan(Math.PI / (total || 1))) + 20;
+    return Math.min(160, Math.max(120, calculated));
   };
 
   const radius1 = getRadius(carousel1Photos.length);
@@ -29,6 +30,33 @@ export default function Home({ navigate, photos }: HomeProps) {
 
   const radius2 = getRadius(carousel2Photos.length);
   const theta2 = 360 / (carousel2Photos.length || 1);
+
+  // Helper to render twinkling golden particles around the frame border
+  const renderSparkles = () => {
+    return Array.from({ length: 14 }).map((_, i) => {
+      const top = i < 4 ? '1px' : i < 7 ? `${((i - 4) * 33) + 10}%` : i < 11 ? 'auto' : `${((11 - i) * 33) + 10}%`;
+      const bottom = i >= 7 && i < 11 ? '1px' : 'auto';
+      const left = i < 4 ? `${(i * 28) + 5}%` : i < 7 ? 'auto' : i < 11 ? `${((11 - i) * 28) + 5}%` : '1px';
+      const right = i >= 4 && i < 7 ? '1px' : 'auto';
+      const delay = `${(i * 0.25).toFixed(2)}s`;
+      const duration = i % 2 === 0 ? '1.8s' : '2.4s';
+      const size = i % 3 === 0 ? 'w-2 h-2' : i % 2 === 0 ? 'w-1.5 h-1.5' : 'w-1 h-1';
+      return (
+        <div
+          key={`sparkle-${i}`}
+          className={`absolute ${size} rounded-full bg-white shadow-[0_0_8px_#FFD700,0_0_3px_#FFF] animate-twinkle pointer-events-none z-[12]`}
+          style={{ 
+            top, 
+            bottom, 
+            left, 
+            right, 
+            animationDelay: delay,
+            ['--twinkle-duration' as any]: duration
+          }}
+        />
+      );
+    });
+  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[85vh] px-4 text-center animate-fade-in relative overflow-x-hidden">
@@ -55,16 +83,19 @@ export default function Home({ navigate, photos }: HomeProps) {
                       e.stopPropagation(); // Ngăn sự kiện click lan ra container cha
                       setSelectedPhoto(photo);
                     }}
-                    className="carousel-item-compact p-[3px] bg-white/10 shadow-[0_8px_20px_rgba(167,114,125,0.2)] group-hover:opacity-40 group-hover:blur-[2px] hover:!opacity-100 hover:!blur-none hover:scale-115 hover:z-50 hover:shadow-[0_20px_45px_rgba(229,115,115,0.45)] transition-all duration-500 cursor-pointer group"
+                    className="carousel-item-compact p-[8px] gold-glitter-border shadow-[0_0_25px_rgba(255,215,0,0.4)] group-hover:opacity-40 group-hover:blur-[2px] hover:!opacity-100 hover:!blur-none hover:scale-115 hover:z-50 hover:shadow-[0_0_40px_rgba(255,215,0,0.75)] transition-all duration-500 cursor-pointer group"
                     style={{
                       transform: `rotateY(${index * theta1}deg) translateZ(${radius1}px)`
                     }}
                   >
-                    {/* Glowing rotating border light */}
-                    <div className="absolute inset-[-50%] bg-[conic-gradient(from_0deg,transparent,#E57373,#FFF9C4,#E6C280,#FDCEDF,transparent_50%)] animate-spin-border opacity-85 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                    {/* Glowing rotating golden dragon border light */}
+                    <div className="absolute inset-[-50%] bg-[conic-gradient(from_0deg,transparent,transparent,#FFF9C4,#FFEB3B,#FFC107,#FF9800)] animate-spin-border opacity-90 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-0" />
+                    
+                    {/* Twinkling stardust sparkles */}
+                    {renderSparkles()}
                     
                     {/* Card Inner mask */}
-                    <div className="relative w-full h-full rounded-[17px] overflow-hidden bg-black/90 z-10 flex flex-col">
+                    <div className="relative w-full h-full rounded-[12px] overflow-hidden bg-black/90 z-10 flex flex-col">
                       <img
                         src={optimizeImageUrl(photo.imageUrl, 400)}
                         alt={photo.title}
@@ -98,16 +129,19 @@ export default function Home({ navigate, photos }: HomeProps) {
                       e.stopPropagation(); // Ngăn sự kiện click lan ra container cha
                       setSelectedPhoto(photo);
                     }}
-                    className="carousel-item-compact p-[3px] bg-white/10 shadow-[0_8px_20px_rgba(167,114,125,0.2)] group-hover:opacity-40 group-hover:blur-[2px] hover:!opacity-100 hover:!blur-none hover:scale-115 hover:z-50 hover:shadow-[0_20px_45px_rgba(229,115,115,0.45)] transition-all duration-500 cursor-pointer group"
+                    className="carousel-item-compact p-[8px] gold-glitter-border shadow-[0_0_25px_rgba(255,215,0,0.4)] group-hover:opacity-40 group-hover:blur-[2px] hover:!opacity-100 hover:!blur-none hover:scale-115 hover:z-50 hover:shadow-[0_0_40px_rgba(255,215,0,0.75)] transition-all duration-500 cursor-pointer group"
                     style={{
                       transform: `rotateY(${index * theta2}deg) translateZ(${radius2}px)`
                     }}
                   >
-                    {/* Glowing rotating border light */}
-                    <div className="absolute inset-[-50%] bg-[conic-gradient(from_0deg,transparent,#E57373,#FFF9C4,#E6C280,#FDCEDF,transparent_50%)] animate-spin-border opacity-85 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                    {/* Glowing rotating golden dragon border light */}
+                    <div className="absolute inset-[-50%] bg-[conic-gradient(from_0deg,transparent,transparent,#FFF9C4,#FFEB3B,#FFC107,#FF9800)] animate-spin-border opacity-90 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-0" />
+                    
+                    {/* Twinkling stardust sparkles */}
+                    {renderSparkles()}
                     
                     {/* Card Inner mask */}
-                    <div className="relative w-full h-full rounded-[17px] overflow-hidden bg-black/90 z-10 flex flex-col">
+                    <div className="relative w-full h-full rounded-[12px] overflow-hidden bg-black/90 z-10 flex flex-col">
                       <img
                         src={optimizeImageUrl(photo.imageUrl, 400)}
                         alt={photo.title}
