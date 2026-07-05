@@ -392,8 +392,6 @@ export default function App() {
 
   // Autoplay background music with user interaction fallback (due to browser autoplay policies)
   useEffect(() => {
-    if (isLoading) return; // Wait until loading screen ends
-
     const playAudio = () => {
       if (audioRef.current) {
         audioRef.current.play()
@@ -431,7 +429,7 @@ export default function App() {
     return () => {
       removeInteractionListeners();
     };
-  }, [isLoading, musicUrl]);
+  }, [musicUrl]);
 
   const navigate = (view: View) => {
     if (view === 'fantasy') {
@@ -445,19 +443,17 @@ export default function App() {
     window.scrollTo(0, 0);
   };
 
-  if (isLoading && currentView !== 'fantasy') {
-    return (
-      <div className="fixed inset-0 bg-theme-main flex flex-col items-center justify-center z-[9999]">
-        <Heart className="text-theme-accent2 fill-current animate-pulse mb-4 text-[#F2BED1]" size={80} />
-        <p className="text-xl font-serif italic text-theme-dark animate-bounce">Đang tải những kỷ niệm tuyệt vời...</p>
-      </div>
-    );
-  }
-
   return (
     <>
       {/* Persistent Background Music */}
       <audio ref={audioRef} loop src={musicUrl} />
+
+      {isLoading && currentView !== 'fantasy' && (
+        <div className="fixed inset-0 bg-theme-main flex flex-col items-center justify-center z-[9999]">
+          <Heart className="text-theme-accent2 fill-current animate-pulse mb-4 text-[#F2BED1]" size={80} />
+          <p className="text-xl font-serif italic text-theme-dark animate-bounce">Đang tải những kỷ niệm tuyệt vời...</p>
+        </div>
+      )}
 
       {/* Visitor Stats Toast Notification */}
       {showVisitorNotification && todayUnique > 0 && (
