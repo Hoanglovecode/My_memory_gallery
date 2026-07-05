@@ -97,9 +97,14 @@ export default function ChatbotWidget({ chatbotName, chatbotWelcomeMessage, onMi
     }
   }, [messages, isTyping]);
 
-  // Sync latest handleSend to ref for STT callbacks
+  const onMicrophoneStartRef = useRef(onMicrophoneStart);
+  const onMicrophoneEndRef = useRef(onMicrophoneEnd);
+
+  // Sync latest handleSend and mic callbacks to refs for STT callbacks
   useEffect(() => {
     handleSendRef.current = handleSend;
+    onMicrophoneStartRef.current = onMicrophoneStart;
+    onMicrophoneEndRef.current = onMicrophoneEnd;
   });
 
   // Initialize Speech Recognition
@@ -118,7 +123,7 @@ export default function ChatbotWidget({ chatbotName, chatbotWelcomeMessage, onMi
 
       rec.onstart = () => {
         setIsListening(true);
-        if (onMicrophoneStart) onMicrophoneStart();
+        if (onMicrophoneStartRef.current) onMicrophoneStartRef.current();
       };
       
       rec.onresult = (event: any) => {
@@ -136,7 +141,7 @@ export default function ChatbotWidget({ chatbotName, chatbotWelcomeMessage, onMi
 
       rec.onend = () => {
         setIsListening(false);
-        if (onMicrophoneEnd) onMicrophoneEnd();
+        if (onMicrophoneEndRef.current) onMicrophoneEndRef.current();
       };
 
       recognitionRef.current = rec;
