@@ -29,7 +29,7 @@ export default function FallingPetals({
     window.addEventListener('resize', handleResize);
 
     const particleTypes = ['sakura', 'rose', 'gold', 'maple', 'snow', 'mint', 'lilac', 'willow', 'feather'] as const;
-    const activeParticleTypes: typeof particleTypes[number][] = ['gold', 'maple', 'snow', 'mint', 'lilac', 'willow', 'feather'];
+    const activeParticleTypes: typeof particleTypes[number][] = ['sakura', 'rose', 'gold', 'maple', 'snow', 'mint', 'lilac', 'willow', 'feather'];
 
     class Petal {
       x: number;

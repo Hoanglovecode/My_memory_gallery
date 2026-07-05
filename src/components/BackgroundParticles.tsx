@@ -12,7 +12,7 @@ interface Particle {
 }
 
 const symbols = {
-  sparkle: ['✨', '⭐', '🌟', '💫']
+  heart: ['❤️', '💖', '💝', '💕', '💗', '💓', '💞', '💟']
 };
 
 export default function BackgroundParticles() {
@@ -20,7 +20,7 @@ export default function BackgroundParticles() {
 
   useEffect(() => {
     const items: Particle[] = [];
-    const symbolList = symbols.sparkle;
+    const symbolList = symbols.heart;
     for (let i = 0; i < 80; i++) {
       const symbol = symbolList[Math.floor(Math.random() * symbolList.length)];
       items.push({
