@@ -29,6 +29,7 @@ export default function App() {
   const [isPlayingMusic, setIsPlayingMusic] = useState(false);
 
   const [wasPlayingBeforeVideo, setWasPlayingBeforeVideo] = useState(false);
+  const [wasPlayingBeforeVoice, setWasPlayingBeforeVoice] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
@@ -388,6 +389,26 @@ export default function App() {
     }
   };
 
+  const handleMicrophoneStart = () => {
+    if (isPlayingMusic) {
+      setWasPlayingBeforeVoice(true);
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+      setIsPlayingMusic(false);
+    }
+  };
+
+  const handleMicrophoneEnd = () => {
+    if (wasPlayingBeforeVoice) {
+      if (audioRef.current) {
+        audioRef.current.play().catch(e => console.log("Failed to resume music:", e));
+      }
+      setIsPlayingMusic(true);
+      setWasPlayingBeforeVoice(false);
+    }
+  };
+
   // Autoplay background music with user interaction fallback (due to browser autoplay policies)
   useEffect(() => {
     const playAudio = () => {
@@ -575,6 +596,8 @@ export default function App() {
             <ChatbotWidget
               chatbotName={chatbotName}
               chatbotWelcomeMessage={chatbotWelcomeMessage}
+              onMicrophoneStart={handleMicrophoneStart}
+              onMicrophoneEnd={handleMicrophoneEnd}
             />
           )}
 

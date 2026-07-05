@@ -11,9 +11,11 @@ interface Message {
 interface ChatbotWidgetProps {
   chatbotName: string;
   chatbotWelcomeMessage: string;
+  onMicrophoneStart?: () => void;
+  onMicrophoneEnd?: () => void;
 }
 
-export default function ChatbotWidget({ chatbotName, chatbotWelcomeMessage }: ChatbotWidgetProps) {
+export default function ChatbotWidget({ chatbotName, chatbotWelcomeMessage, onMicrophoneStart, onMicrophoneEnd }: ChatbotWidgetProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
@@ -114,7 +116,10 @@ export default function ChatbotWidget({ chatbotName, chatbotWelcomeMessage }: Ch
       rec.interimResults = false;
       rec.lang = 'vi-VN';
 
-      rec.onstart = () => setIsListening(true);
+      rec.onstart = () => {
+        setIsListening(true);
+        if (onMicrophoneStart) onMicrophoneStart();
+      };
       
       rec.onresult = (event: any) => {
         const transcript = event.results[0][0].transcript;
@@ -131,6 +136,7 @@ export default function ChatbotWidget({ chatbotName, chatbotWelcomeMessage }: Ch
 
       rec.onend = () => {
         setIsListening(false);
+        if (onMicrophoneEnd) onMicrophoneEnd();
       };
 
       recognitionRef.current = rec;
