@@ -390,11 +390,9 @@ export default function App() {
   };
 
   const handleMicrophoneStart = () => {
-    if (isPlayingMusic) {
+    if (audioRef.current && !audioRef.current.paused) {
       setWasPlayingBeforeVoice(true);
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
+      audioRef.current.pause();
       setIsPlayingMusic(false);
     }
   };

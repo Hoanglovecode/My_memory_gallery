@@ -123,7 +123,6 @@ export default function ChatbotWidget({ chatbotName, chatbotWelcomeMessage, onMi
 
       rec.onstart = () => {
         setIsListening(true);
-        if (onMicrophoneStartRef.current) onMicrophoneStartRef.current();
       };
       
       rec.onresult = (event: any) => {
@@ -152,16 +151,24 @@ export default function ChatbotWidget({ chatbotName, chatbotWelcomeMessage, onMi
     }
   }, []);
 
-  const toggleListening = () => {
+  const toggleListening = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     if (!isSpeechSupported) return;
     if (isListening) {
       recognitionRef.current?.stop();
       setIsListening(false);
     } else {
       try {
+        if (onMicrophoneStartRef.current) onMicrophoneStartRef.current();
+        setIsListening(true);
         recognitionRef.current?.start();
       } catch (err) {
         console.error(err);
+        setIsListening(false);
+        if (onMicrophoneEndRef.current) onMicrophoneEndRef.current();
       }
     }
   };
