@@ -272,7 +272,7 @@ export default function CamelVoiceAI({ onSpeakStateChange, chatbotWelcomeMessage
         {isSpeaking  && <span className="absolute inset-0 rounded-full animate-ping bg-amber-400/50" style={{ animationDuration: '2s' }} />}
       </motion.button>
 
-      {(isListening || isProcessing || isSpeaking || userTranscript || aiReply) && (
+      {(isListening || isProcessing || isSpeaking) && (
         <motion.div
           initial={{ opacity: 0, x: -20, scale: 0.95 }}
           animate={{ opacity: 1, x: 0, scale: 1 }}
