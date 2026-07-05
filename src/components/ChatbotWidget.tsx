@@ -121,7 +121,7 @@ export default function ChatbotWidget({ chatbotName, chatbotWelcomeMessage }: Ch
 
       const aiMessage: Message = {
         role: 'ai',
-        text: data.reply || "Xin lỗi em, hình như có chút trục trặc kết nối... 💕",
+        text: data.reply || "Xin lỗi, hình như có chút trục trặc kết nối...",
         timestamp: new Date()
       };
 
@@ -156,7 +156,7 @@ export default function ChatbotWidget({ chatbotName, chatbotWelcomeMessage }: Ch
   };
 
   const handleClearHistory = async () => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử trò chuyện này không? 💕")) {
+    if (window.confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử trò chuyện này không?")) {
       try {
         const response = await fetch(`${API_BASE_URL}/chatbot/history?sessionId=${sessionId}`, {
           method: 'DELETE'
@@ -165,7 +165,7 @@ export default function ChatbotWidget({ chatbotName, chatbotWelcomeMessage }: Ch
           setMessages([
             {
               role: 'ai',
-              text: chatbotWelcomeMessage || 'Chào cậu! Tớ là trợ lý của hai bạn. Hôm nay tớ có thể giúp gì cho cậu? 💕',
+              text: chatbotWelcomeMessage || 'Xin chào! Tôi là trợ lý AI của bạn. Hôm nay tôi có thể giúp gì cho bạn? 😊',
               timestamp: new Date()
             }
           ]);

@@ -29,6 +29,7 @@ export default function FallingPetals({
     window.addEventListener('resize', handleResize);
 
     const particleTypes = ['sakura', 'rose', 'gold', 'maple', 'snow', 'mint', 'lilac', 'willow', 'feather'] as const;
+    const activeParticleTypes: typeof particleTypes[number][] = ['gold', 'maple', 'snow', 'mint', 'lilac', 'willow', 'feather'];
 
     class Petal {
       x: number;
@@ -49,7 +50,7 @@ export default function FallingPetals({
         this.rotation = Math.random() * Math.PI * 2;
         this.opacity = Math.random() * 0.5 + 0.4;
 
-        this.petalType = particleTypes[Math.floor(Math.random() * particleTypes.length)];
+        this.petalType = activeParticleTypes[Math.floor(Math.random() * activeParticleTypes.length)];
 
         // Base physics speed configuration
         this.speedY = (Math.random() * 1.5 + 1) * speed;

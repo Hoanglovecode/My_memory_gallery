@@ -54,7 +54,7 @@ async def voice_chat(req: ChatRequest):
             try:
                 reply_text = candidates[0]["content"]["parts"][0]["text"].strip()
             except (KeyError, IndexError):
-                reply_text = "Xin lỗi, tớ chưa hiểu ý bạn lắm, chúng ta đổi chủ đề nhé?"
+                reply_text = "Xin lỗi, tôi chưa hiểu rõ ý bạn lắm, bạn có thể nói lại được không?"
 
         print(f"[VoiceChat] Gemini reply: {reply_text}")
 
