@@ -631,45 +631,45 @@ export default function App() {
                 onClick={() => navigate('home')}
               >
                 <Heart className="text-theme-accent2 fill-current animate-pulse w-[18px] h-[18px] md:w-6 md:h-6" />
-                <span className="leading-none">Memories</span>
+                <span className="leading-none hidden sm:inline">Memories</span>
               </div>
             </div>
-            <div className="flex gap-1 md:gap-3 text-xs md:text-sm font-semibold items-center">
+            <div className="flex gap-1.5 md:gap-3 text-[13px] sm:text-[14px] md:text-base font-bold items-center">
               <button
                 onClick={() => navigate('slideshow')}
-                className="hover:text-[#8A5B66] hover:bg-white/40 px-2.5 py-1.5 md:px-3.5 md:py-2 rounded-full transition-all duration-300 flex items-center gap-1 cursor-pointer text-theme-dark"
+                className="bg-white/40 border border-white/40 shadow-[0_2px_8px_rgba(167,114,125,0.06)] text-theme-dark/90 hover:text-[#E57373] hover:bg-white/80 hover:border-white/80 hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(229,115,115,0.15)] active:translate-y-0 active:shadow-sm px-3 py-1.5 md:px-4 md:py-2 rounded-full transition-all duration-300 flex items-center gap-1 sm:gap-1.5 cursor-pointer"
                 title="Ảnh kỷ niệm"
               >
-                <ImageIcon size={16} className="md:w-[18px] md:h-[18px]" />
+                <ImageIcon size={17} className="md:w-[19px] md:h-[19px]" />
                 <span>Ảnh</span>
               </button>
               <button
                 onClick={() => navigate('videos')}
-                className="hover:text-[#8A5B66] hover:bg-white/40 px-2.5 py-1.5 md:px-3.5 md:py-2 rounded-full transition-all duration-300 flex items-center gap-1 cursor-pointer text-theme-dark"
+                className="bg-white/40 border border-white/40 shadow-[0_2px_8px_rgba(167,114,125,0.06)] text-theme-dark/90 hover:text-[#E57373] hover:bg-white/80 hover:border-white/80 hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(229,115,115,0.15)] active:translate-y-0 active:shadow-sm px-3 py-1.5 md:px-4 md:py-2 rounded-full transition-all duration-300 flex items-center gap-1 sm:gap-1.5 cursor-pointer"
                 title="Video kỷ niệm"
               >
-                <Film size={16} className="md:w-[18px] md:h-[18px]" />
+                <Film size={17} className="md:w-[19px] md:h-[19px]" />
                 <span>Video</span>
               </button>
 
-              <div className="w-[1px] h-4 bg-theme-dark/20 mx-0.5 md:mx-1"></div>
+              <div className="w-[1px] h-5 bg-theme-dark/20 mx-0.5 md:mx-1"></div>
 
               {isAdmin ? (
                 <button
                   onClick={() => { setIsAdmin(false); localStorage.removeItem('admin_token'); localStorage.removeItem('admin_username'); navigate('home'); }}
-                  className="text-rose-500 hover:text-rose-700 px-2.5 py-1.5 md:px-3.5 md:py-2 rounded-full hover:bg-white/40 transition-all flex items-center gap-1 cursor-pointer"
+                  className="bg-white/40 border border-rose-100 shadow-[0_2px_8px_rgba(244,63,94,0.06)] text-rose-500 hover:text-rose-700 hover:bg-rose-50/80 hover:border-rose-200 hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(244,63,94,0.15)] active:translate-y-0 active:shadow-sm px-3 py-1.5 md:px-4 md:py-2 rounded-full transition-all duration-300 flex items-center gap-1 sm:gap-1.5 cursor-pointer"
                   title="Đăng xuất"
                 >
-                  <LogOut size={16} className="md:w-[18px] md:h-[18px]" />
+                  <LogOut size={17} className="md:w-[19px] md:h-[19px]" />
                   <span>Thoát</span>
                 </button>
               ) : (
                 <button
                   onClick={() => navigate('login')}
-                  className="hover:text-theme-accent2 px-2.5 py-1.5 md:px-3.5 md:py-2 rounded-full hover:bg-white/40 transition-all flex items-center gap-1 cursor-pointer"
+                  className="bg-white/40 border border-white/40 shadow-[0_2px_8px_rgba(167,114,125,0.06)] text-theme-dark/90 hover:text-[#E57373] hover:bg-white/80 hover:border-white/80 hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(229,115,115,0.15)] active:translate-y-0 active:shadow-sm px-3 py-1.5 md:px-4 md:py-2 rounded-full transition-all duration-300 flex items-center gap-1 sm:gap-1.5 cursor-pointer"
                   title="Quản trị"
                 >
-                  <Lock size={16} className="md:w-[18px] md:h-[18px]" />
+                  <Lock size={17} className="md:w-[19px] md:h-[19px]" />
                   <span>Admin</span>
                 </button>
               )}
