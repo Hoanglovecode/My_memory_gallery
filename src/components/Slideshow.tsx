@@ -11,6 +11,7 @@ interface SlideshowProps {
 export default function Slideshow({ photos, navigate }: SlideshowProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [direction, setDirection] = useState<'next' | 'prev'>('next');
 
   // Tự động chuyển ảnh liên tục (Auto-play) và tự động reset khi chuyển ảnh thủ công
   useEffect(() => {
@@ -27,6 +28,7 @@ export default function Slideshow({ photos, navigate }: SlideshowProps) {
 
       // Chuyển sang ảnh tiếp theo sau 5 giây
       timer = setInterval(() => {
+        setDirection('next');
         setCurrentIndex((prev) => (prev + 1) % photos.length);
       }, 5000);
     }
@@ -46,10 +48,12 @@ export default function Slideshow({ photos, navigate }: SlideshowProps) {
   }
 
   const handleNext = () => {
+    setDirection('next');
     setCurrentIndex((prev) => (prev + 1) % photos.length);
   };
 
   const handlePrev = () => {
+    setDirection('prev');
     setCurrentIndex((prev) => (prev - 1 + photos.length) % photos.length);
   };
 
@@ -57,8 +61,8 @@ export default function Slideshow({ photos, navigate }: SlideshowProps) {
 
   return (
     <div className="fixed inset-0 bg-black z-[100] flex flex-col justify-center items-center select-none">
-      {/* Hiệu ứng chuyển cảnh (Crossfade) */}
-      <div key={currentPhoto.id} className="absolute inset-0 animate-fade-in overflow-hidden">
+      {/* Hiệu ứng chuyển cảnh mượt mà */}
+      <div key={currentPhoto.id} className={`absolute inset-0 overflow-hidden ${direction === 'next' ? 'animate-slide-in-right' : 'animate-slide-in-left'}`}>
         <img 
           src={optimizeImageUrl(currentPhoto.imageUrl)} 
           alt={currentPhoto.title}
