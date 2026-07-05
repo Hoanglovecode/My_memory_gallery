@@ -12,8 +12,6 @@ import ChatbotWidget from './components/ChatbotWidget';
 
 import Hero from './components/Hero';
 import Navbar from './components/Navbar';
-import CamelVoiceAI from './components/CamelVoiceAI';
-
 
 export default function App() {
   const [currentView, setCurrentView] = useState<View>(() => {
@@ -476,8 +474,6 @@ export default function App() {
           </button>
         </div>
       )}
-
-      <CamelVoiceAI onSpeakStateChange={() => {}} chatbotWelcomeMessage={chatbotWelcomeMessage} />
 
       {currentView === 'fantasy' ? (
         <div className="relative w-full h-screen overflow-y-auto bg-[#FDFBF7] flex flex-col justify-between scroll-smooth selection:bg-theme-accent2 selection:text-white">

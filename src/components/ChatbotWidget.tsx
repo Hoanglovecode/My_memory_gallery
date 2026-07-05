@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { MessageCircle, Send, X, Sparkles, Heart, Trash2 } from 'lucide-react';
+import { MessageCircle, Send, X, Sparkles, Heart, Trash2, Mic } from 'lucide-react';
 import { API_BASE_URL } from '../config';
 
 interface Message {
@@ -20,8 +20,12 @@ export default function ChatbotWidget({ chatbotName, chatbotWelcomeMessage }: Ch
   const [isTyping, setIsTyping] = useState(false);
   const [hasNewMessage, setHasNewMessage] = useState(false);
   const [sessionId, setSessionId] = useState<string>('');
+  const [isListening, setIsListening] = useState(false);
+  const [isSpeechSupported, setIsSpeechSupported] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const recognitionRef = useRef<any>(null);
+  const handleSendRef = useRef<any>(null);
 
   // Initialize session ID, draft, and open state on mount
   useEffect(() => {
@@ -90,6 +94,66 @@ export default function ChatbotWidget({ chatbotName, chatbotWelcomeMessage }: Ch
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, isTyping]);
+
+  // Sync latest handleSend to ref for STT callbacks
+  useEffect(() => {
+    handleSendRef.current = handleSend;
+  });
+
+  // Initialize Speech Recognition
+  useEffect(() => {
+    const supported = 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window;
+    if (!supported) {
+      setIsSpeechSupported(false);
+      return;
+    }
+    try {
+      const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      const rec = new SR();
+      rec.continuous = false;
+      rec.interimResults = false;
+      rec.lang = 'vi-VN';
+
+      rec.onstart = () => setIsListening(true);
+      
+      rec.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setIsListening(false);
+        if (handleSendRef.current) {
+          handleSendRef.current(transcript);
+        }
+      };
+
+      rec.onerror = (event: any) => {
+        console.error('[STT] error:', event.error);
+        setIsListening(false);
+      };
+
+      rec.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = rec;
+      setIsSpeechSupported(true);
+    } catch (err) {
+      console.error('[STT] init failed:', err);
+      setIsSpeechSupported(false);
+    }
+  }, []);
+
+  const toggleListening = () => {
+    if (!isSpeechSupported) return;
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+    } else {
+      try {
+        recognitionRef.current?.start();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  };
 
   const handleSend = async (textToSend: string) => {
     if (!textToSend.trim()) return;
@@ -283,12 +347,25 @@ export default function ChatbotWidget({ chatbotName, chatbotWelcomeMessage }: Ch
             onSubmit={(e) => { e.preventDefault(); handleSend(inputText); }} 
             className="p-3 bg-white border-t border-theme-accent1/20 flex gap-2 items-center"
           >
+            {isSpeechSupported && (
+              <button
+                type="button"
+                onClick={toggleListening}
+                disabled={isTyping}
+                className={`p-2.5 rounded-full transition-all cursor-pointer flex items-center justify-center pointer-events-auto flex-shrink-0 ${
+                  isListening ? 'bg-rose-500 text-white shadow-lg animate-pulse' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-theme-accent2'
+                } disabled:opacity-50`}
+                title={isListening ? 'Đang nghe (Bấm để dừng)' : 'Ghi âm giọng nói'}
+              >
+                <Mic size={18} />
+              </button>
+            )}
             <input 
               type="text" 
-              value={inputText}
-              onChange={e => handleInputChange(e.target.value)}
+              value={isListening ? 'Đang nghe...' : inputText}
+              onChange={e => { if (!isListening) handleInputChange(e.target.value); }}
               placeholder="Nhập tin nhắn của bạn..."
-              disabled={isTyping}
+              disabled={isTyping || isListening}
               className="flex-1 px-4 py-2.5 bg-theme-main/20 text-theme-dark placeholder-theme-dark/50 text-sm border border-transparent rounded-full focus:outline-hidden focus:border-theme-accent2 focus:bg-white transition-all font-medium"
             />
             <button 
