@@ -89,9 +89,9 @@ export default function Slideshow({ photos, navigate }: SlideshowProps) {
 
       {/* Thông tin ảnh */}
       <div className="absolute bottom-20 left-0 w-full p-8 text-white z-40 text-center md:text-left md:left-12 md:w-2/3">
-        <h2 className="text-3xl md:text-5xl font-serif font-bold mb-3.5 drop-shadow-lg leading-tight">{currentPhoto.title}</h2>
+        <h2 className="text-3xl md:text-5xl font-serif font-bold mb-3.5 drop-shadow-lg leading-tight animate-gradient-text">{currentPhoto.title}</h2>
         {currentPhoto.description && (
-          <p className="text-xl md:text-2xl italic mb-3 text-gray-200 drop-shadow-md font-medium">"{currentPhoto.description}"</p>
+          <p className="text-xl md:text-2xl italic mb-3 drop-shadow-md font-medium animate-gradient-text">"{currentPhoto.description}"</p>
         )}
         <p className="text-sm font-light text-theme-accent2 drop-shadow-md">Ngày: {currentPhoto.eventDate} | Đăng bởi: {currentPhoto.username || 'Admin'}</p>
       </div>

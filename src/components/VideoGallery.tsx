@@ -19,7 +19,7 @@ export default function VideoGallery({ videos, onPlayVideo, onCloseVideo }: Vide
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 animate-fade-in relative">
       <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-serif font-bold text-theme-dark mb-4 flex items-center justify-center gap-3">
+        <h1 className="text-4xl md:text-5xl font-serif font-bold mb-4 flex items-center justify-center gap-3 animate-gradient-text">
           <Film className="text-theme-accent2 animate-pulse" size={40} />
           Video Kỷ Niệm
         </h1>
@@ -67,7 +67,7 @@ export default function VideoGallery({ videos, onPlayVideo, onCloseVideo }: Vide
 
               {/* Video Details */}
               <div className="p-5 flex-1 flex flex-col">
-                <h3 className="font-bold text-xl text-gray-800 mb-2 line-clamp-1 group-hover:text-theme-dark transition-colors">
+                <h3 className="font-bold text-xl mb-2 line-clamp-1 animate-gradient-text">
                   {video.title}
                 </h3>
                 <p className="text-gray-600 text-sm line-clamp-2 italic flex-1">

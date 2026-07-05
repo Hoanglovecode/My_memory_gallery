@@ -32,7 +32,7 @@ export default function Home({ navigate, photos }: HomeProps) {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[85vh] px-4 text-center animate-fade-in relative overflow-x-hidden">
-      <h1 className="text-5xl md:text-7xl font-serif font-bold mb-6 md:mb-16 text-theme-dark tracking-wider drop-shadow-md">
+      <h1 className="text-5xl md:text-7xl font-serif font-bold mb-6 md:mb-16 tracking-wider drop-shadow-md animate-gradient-text">
         Ảnh Kỷ Niệm
       </h1>
 
@@ -55,20 +55,26 @@ export default function Home({ navigate, photos }: HomeProps) {
                       e.stopPropagation(); // Ngăn sự kiện click lan ra container cha
                       setSelectedPhoto(photo);
                     }}
-                    className="carousel-item-compact border-4 border-[#E6C280]/80 shadow-[0_8px_20px_rgba(167,114,125,0.25)] group-hover:opacity-40 group-hover:blur-[2px] hover:!opacity-100 hover:!blur-none hover:scale-115 hover:z-50 hover:border-[#E6C280] hover:shadow-[0_20px_45px_rgba(167,114,125,0.6)] transition-all duration-500 cursor-pointer"
+                    className="carousel-item-compact p-[3px] bg-white/10 shadow-[0_8px_20px_rgba(167,114,125,0.2)] group-hover:opacity-40 group-hover:blur-[2px] hover:!opacity-100 hover:!blur-none hover:scale-115 hover:z-50 hover:shadow-[0_20px_45px_rgba(229,115,115,0.45)] transition-all duration-500 cursor-pointer group"
                     style={{
                       transform: `rotateY(${index * theta1}deg) translateZ(${radius1}px)`
                     }}
                   >
-                    <img
-                      src={optimizeImageUrl(photo.imageUrl, 400)}
-                      alt={photo.title}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                    <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/85 via-black/45 to-transparent p-3 text-white">
-                      <p className="font-bold text-sm drop-shadow-md tracking-wide truncate">{photo.title}</p>
-                      <p className="text-[10px] text-white/80 italic mt-0.5">Đăng bởi: {photo.username || 'Admin'}</p>
+                    {/* Glowing rotating border light */}
+                    <div className="absolute inset-[-50%] bg-[conic-gradient(from_0deg,transparent,#E57373,#FFF9C4,#E6C280,#FDCEDF,transparent_50%)] animate-spin-border opacity-85 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                    
+                    {/* Card Inner mask */}
+                    <div className="relative w-full h-full rounded-[17px] overflow-hidden bg-black/90 z-10 flex flex-col">
+                      <img
+                        src={optimizeImageUrl(photo.imageUrl, 400)}
+                        alt={photo.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
+                      />
+                      <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/85 via-black/45 to-transparent p-3 text-white">
+                        <p className="font-bold text-sm drop-shadow-md tracking-wide truncate animate-gradient-text">{photo.title}</p>
+                        <p className="text-[10px] text-white/80 italic mt-0.5">Đăng bởi: {photo.username || 'Admin'}</p>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -92,20 +98,26 @@ export default function Home({ navigate, photos }: HomeProps) {
                       e.stopPropagation(); // Ngăn sự kiện click lan ra container cha
                       setSelectedPhoto(photo);
                     }}
-                    className="carousel-item-compact border-4 border-[#E6C280]/80 shadow-[0_8px_20px_rgba(167,114,125,0.25)] group-hover:opacity-40 group-hover:blur-[2px] hover:!opacity-100 hover:!blur-none hover:scale-115 hover:z-50 hover:border-[#E6C280] hover:shadow-[0_20px_45px_rgba(167,114,125,0.6)] transition-all duration-500 cursor-pointer"
+                    className="carousel-item-compact p-[3px] bg-white/10 shadow-[0_8px_20px_rgba(167,114,125,0.2)] group-hover:opacity-40 group-hover:blur-[2px] hover:!opacity-100 hover:!blur-none hover:scale-115 hover:z-50 hover:shadow-[0_20px_45px_rgba(229,115,115,0.45)] transition-all duration-500 cursor-pointer group"
                     style={{
                       transform: `rotateY(${index * theta2}deg) translateZ(${radius2}px)`
                     }}
                   >
-                    <img
-                      src={optimizeImageUrl(photo.imageUrl, 400)}
-                      alt={photo.title}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                    <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/85 via-black/45 to-transparent p-3 text-white">
-                      <p className="font-bold text-sm drop-shadow-md tracking-wide truncate">{photo.title}</p>
-                      <p className="text-[10px] text-white/80 italic mt-0.5">Đăng bởi: {photo.username || 'Admin'}</p>
+                    {/* Glowing rotating border light */}
+                    <div className="absolute inset-[-50%] bg-[conic-gradient(from_0deg,transparent,#E57373,#FFF9C4,#E6C280,#FDCEDF,transparent_50%)] animate-spin-border opacity-85 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                    
+                    {/* Card Inner mask */}
+                    <div className="relative w-full h-full rounded-[17px] overflow-hidden bg-black/90 z-10 flex flex-col">
+                      <img
+                        src={optimizeImageUrl(photo.imageUrl, 400)}
+                        alt={photo.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
+                      />
+                      <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/85 via-black/45 to-transparent p-3 text-white">
+                        <p className="font-bold text-sm drop-shadow-md tracking-wide truncate animate-gradient-text">{photo.title}</p>
+                        <p className="text-[10px] text-white/80 italic mt-0.5">Đăng bởi: {photo.username || 'Admin'}</p>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -170,7 +182,7 @@ export default function Home({ navigate, photos }: HomeProps) {
                   Đăng bởi: {selectedPhoto.username || 'Admin'}
                 </span>
               </div>
-              <h3 className="text-xl font-serif font-bold text-theme-dark line-clamp-1">
+              <h3 className="text-xl font-serif font-bold line-clamp-1 animate-gradient-text">
                 {selectedPhoto.title}
               </h3>
               {selectedPhoto.description && (

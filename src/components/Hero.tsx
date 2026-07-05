@@ -76,7 +76,7 @@ export default function Hero({ navigate, totalPhotos, totalVideos }: HeroProps) 
               }}
               initial="hidden"
               animate="visible"
-              className="text-4xl sm:text-5xl md:text-7xl lg:text-[6rem] leading-[1.05] text-[#4A2545] mb-4 md:mb-6 drop-shadow-sm select-none flex flex-row justify-center lg:justify-start flex-wrap"
+              className="text-4xl sm:text-5xl md:text-7xl lg:text-[6rem] leading-[1.05] mb-4 md:mb-6 drop-shadow-sm select-none flex flex-row justify-center lg:justify-start flex-wrap animate-gradient-text font-bold"
               style={{ fontFamily: "'Cormorant Garamond', serif" }}
             >
               {/* Letters of "MY" */}
@@ -96,7 +96,7 @@ export default function Hero({ navigate, totalPhotos, totalVideos }: HeroProps) 
               {/* Space */}
               <span className="inline-block w-[0.25em]">&nbsp;</span>
 
-              {/* Letters of "ALBUM" (italic and colored) */}
+              {/* Letters of "ALBUM" (italic) */}
               {["A", "L", "B", "U", "M"].map((letter, index) => (
                 <motion.span
                   key={`album-${index}`}
@@ -104,7 +104,7 @@ export default function Hero({ navigate, totalPhotos, totalVideos }: HeroProps) 
                     hidden: { opacity: 0, y: -100 },
                     visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 120, damping: 10 } }
                   }}
-                  className="inline-block italic text-[#E57373]"
+                  className="inline-block italic"
                 >
                   {letter}
                 </motion.span>
@@ -123,7 +123,7 @@ export default function Hero({ navigate, totalPhotos, totalVideos }: HeroProps) 
               ease: "easeInOut",
               delay: 0.3,
             }}
-            className="text-2xl sm:text-3xl md:text-4xl text-[#E57373] max-w-md mx-auto lg:mx-0 font-semibold leading-relaxed select-none font-caveat"
+            className="text-2xl sm:text-3xl md:text-4xl max-w-md mx-auto lg:mx-0 font-semibold leading-relaxed select-none font-caveat animate-gradient-text"
           >
             "This project is designed for storing images and videos, with continuous improvements being made to enhance the product."
           </motion.p>
@@ -172,7 +172,7 @@ export default function Hero({ navigate, totalPhotos, totalVideos }: HeroProps) 
                 <line x1="17" y1="17" x2="22" y2="17" />
               </svg>
             </div>
-            <span className="font-cinzel text-[8px] sm:text-[9px] md:text-xs text-[#4A2545] font-semibold uppercase tracking-wider md:tracking-widest text-center">View Video</span>
+            <span className="font-cinzel text-[8px] sm:text-[9px] md:text-xs font-semibold uppercase tracking-wider md:tracking-widest text-center animate-gradient-text">View Video</span>
           </motion.div>
 
           {/* Card 2 — Total Memories (Highlight) */}
@@ -189,12 +189,12 @@ export default function Hero({ navigate, totalPhotos, totalVideos }: HeroProps) 
             className="w-[105px] h-[145px] sm:w-[120px] sm:h-[165px] md:w-[170px] md:h-[240px] rounded-[1.2rem] sm:rounded-[1.5rem] md:rounded-[2rem] bg-gradient-to-br from-[#FFF9C4]/60 to-[#FCE4EC]/60 border border-white/80 backdrop-blur-xl shadow-[0_8px_32px_rgba(244,143,177,0.2)] flex flex-col items-center justify-center p-2.5 sm:p-3 md:p-4 transition-transform duration-300"
           >
             <h3
-              className="text-2xl sm:text-3xl md:text-5xl text-[#E57373] mb-0.5 sm:mb-1 md:mb-3 drop-shadow-sm font-semibold"
+              className="text-2xl sm:text-3xl md:text-5xl mb-0.5 sm:mb-1 md:mb-3 drop-shadow-sm font-semibold animate-gradient-text"
               style={{ fontFamily: "'Cormorant Garamond', serif" }}
             >
               {totalPhotos + totalVideos}
             </h3>
-            <span className="font-cinzel text-[8px] sm:text-[9px] md:text-[11px] text-[#4A2545] font-bold uppercase tracking-wider md:tracking-widest text-center leading-normal md:leading-loose">
+            <span className="font-cinzel text-[8px] sm:text-[9px] md:text-[11px] font-bold uppercase tracking-wider md:tracking-widest text-center leading-normal md:leading-loose animate-gradient-text">
               Total<br />Memories
             </span>
           </motion.div>
@@ -232,7 +232,7 @@ export default function Hero({ navigate, totalPhotos, totalVideos }: HeroProps) 
                 <polyline points="21 15 16 10 5 21" />
               </svg>
             </div>
-            <span className="font-cinzel text-[8px] sm:text-[9px] md:text-xs text-[#4A2545] font-semibold uppercase tracking-wider md:tracking-widest text-center">View Images</span>
+            <span className="font-cinzel text-[8px] sm:text-[9px] md:text-xs font-semibold uppercase tracking-wider md:tracking-widest text-center animate-gradient-text">View Images</span>
           </motion.div>
         </motion.div>
       </div>

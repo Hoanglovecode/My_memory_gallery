@@ -627,29 +627,29 @@ export default function App() {
                 <ArrowLeft size={16} className="md:w-5 md:h-5" />
               </button>
               <div
-                className="text-lg sm:text-xl md:text-2xl font-bold italic cursor-pointer flex items-center gap-1.5 md:gap-2 select-none hover:opacity-85 transition-opacity"
+                className="text-lg sm:text-xl md:text-2xl font-bold italic cursor-pointer flex items-center gap-1.5 md:gap-2 select-none"
                 onClick={() => navigate('home')}
               >
                 <Heart className="text-theme-accent2 fill-current animate-pulse w-[18px] h-[18px] md:w-6 md:h-6" />
-                <span className="leading-none hidden sm:inline">Memories</span>
+                <span className="leading-none hidden sm:inline animate-gradient-text">Memories</span>
               </div>
             </div>
             <div className="flex gap-1.5 md:gap-3 text-[13px] sm:text-[14px] md:text-base font-bold items-center">
               <button
                 onClick={() => navigate('slideshow')}
-                className="bg-white/40 border border-white/40 shadow-[0_2px_8px_rgba(167,114,125,0.06)] text-theme-dark/90 hover:text-[#E57373] hover:bg-white/80 hover:border-white/80 hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(229,115,115,0.15)] active:translate-y-0 active:shadow-sm px-3 py-1.5 md:px-4 md:py-2 rounded-full transition-all duration-300 flex items-center gap-1 sm:gap-1.5 cursor-pointer"
+                className="bg-white/40 border border-white/40 shadow-[0_2px_8px_rgba(167,114,125,0.06)] text-theme-dark/90 hover:bg-white/85 hover:border-white/85 hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(229,115,115,0.15)] active:translate-y-0 active:shadow-sm px-3 py-1.5 md:px-4 md:py-2 rounded-full transition-all duration-300 flex items-center gap-1 sm:gap-1.5 cursor-pointer"
                 title="Ảnh kỷ niệm"
               >
-                <ImageIcon size={17} className="md:w-[19px] md:h-[19px]" />
-                <span>Ảnh</span>
+                <ImageIcon size={17} className="md:w-[19px] md:h-[19px] text-[#E57373]" />
+                <span className="animate-gradient-text">Ảnh</span>
               </button>
               <button
                 onClick={() => navigate('videos')}
-                className="bg-white/40 border border-white/40 shadow-[0_2px_8px_rgba(167,114,125,0.06)] text-theme-dark/90 hover:text-[#E57373] hover:bg-white/80 hover:border-white/80 hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(229,115,115,0.15)] active:translate-y-0 active:shadow-sm px-3 py-1.5 md:px-4 md:py-2 rounded-full transition-all duration-300 flex items-center gap-1 sm:gap-1.5 cursor-pointer"
+                className="bg-white/40 border border-white/40 shadow-[0_2px_8px_rgba(167,114,125,0.06)] text-theme-dark/90 hover:bg-white/85 hover:border-white/85 hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(229,115,115,0.15)] active:translate-y-0 active:shadow-sm px-3 py-1.5 md:px-4 md:py-2 rounded-full transition-all duration-300 flex items-center gap-1 sm:gap-1.5 cursor-pointer"
                 title="Video kỷ niệm"
               >
-                <Film size={17} className="md:w-[19px] md:h-[19px]" />
-                <span>Video</span>
+                <Film size={17} className="md:w-[19px] md:h-[19px] text-[#E57373]" />
+                <span className="animate-gradient-text">Video</span>
               </button>
 
               <div className="w-[1px] h-5 bg-theme-dark/20 mx-0.5 md:mx-1"></div>
@@ -661,12 +661,12 @@ export default function App() {
                   title="Đăng xuất"
                 >
                   <LogOut size={17} className="md:w-[19px] md:h-[19px]" />
-                  <span>Thoát</span>
+                  <span className="animate-gradient-text text-rose-500">Thoát</span>
                 </button>
               ) : (
                 <button
                   onClick={() => navigate('login')}
-                  className="bg-white/40 border border-white/40 shadow-[0_2px_8px_rgba(167,114,125,0.06)] text-theme-dark/90 hover:text-[#E57373] hover:bg-white/80 hover:border-white/80 hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(229,115,115,0.15)] active:translate-y-0 active:shadow-sm px-3 py-1.5 md:px-4 md:py-2 rounded-full transition-all duration-300 flex items-center gap-1 sm:gap-1.5 cursor-pointer"
+                  className="bg-white/40 border border-white/40 shadow-[0_2px_8px_rgba(167,114,125,0.06)] text-theme-dark/90 hover:bg-white/80 hover:border-white/80 hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(229,115,115,0.15)] active:translate-y-0 active:shadow-sm px-3 py-1.5 md:px-4 md:py-2 rounded-full transition-all duration-300 flex items-center gap-1 sm:gap-1.5 cursor-pointer"
                   title="Quản trị"
                 >
                   <Lock size={17} className="md:w-[19px] md:h-[19px]" />
