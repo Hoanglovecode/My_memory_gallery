@@ -216,3 +216,23 @@
   border-radius: inherit;
   z-index: 1;
 }
+
+.white-glitter-border {
+  background: linear-gradient(135deg, #FFFFFF, #F3F4F6, #E5E7EB, #F9FAFB, #FFFFFF);
+}
+
+.white-glitter-border::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(circle, #ffffff 1px, transparent 1px),
+    radial-gradient(circle, #F3F4F6 1.5px, transparent 1.5px),
+    radial-gradient(circle, #E5E7EB 1px, transparent 1px);
+  background-size: 9px 9px, 13px 13px, 17px 17px;
+  background-position: 0 0, 4px 4px, 6px 6px;
+  opacity: 0.75;
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 1;
+}

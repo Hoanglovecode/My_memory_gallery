@@ -16,6 +16,34 @@ export default function VideoGallery({ videos, onPlayVideo, onCloseVideo }: Vide
     onCloseVideo();
   };
 
+  // Helper to render twinkling golden particles around the frame border
+  const renderSparkles = () => {
+    return Array.from({ length: 14 }).map((_, i) => {
+      const top = i < 4 ? '1px' : i < 7 ? `${((i - 4) * 33) + 10}%` : i < 11 ? 'auto' : `${((11 - i) * 33) + 10}%`;
+      const bottom = i >= 7 && i < 11 ? '1px' : 'auto';
+      const left = i < 4 ? `${(i * 28) + 5}%` : i < 7 ? 'auto' : i < 11 ? `${((11 - i) * 28) + 5}%` : '1px';
+      const right = i >= 4 && i < 7 ? '1px' : 'auto';
+      const delay = `${(i * 0.25).toFixed(2)}s`;
+      const duration = i % 2 === 0 ? '1.8s' : '2.4s';
+      const size = i % 3 === 0 ? 'w-2 h-2' : i % 2 === 0 ? 'w-1.5 h-1.5' : 'w-1 h-1';
+      return (
+        <div
+          key={`sparkle-${i}`}
+          className={`absolute ${size} rounded-full bg-white shadow-[0_0_8px_#FFFFFF,0_0_3px_#F3F4F6] animate-twinkle pointer-events-none z-[12]`}
+          style={{ 
+            top, 
+            bottom, 
+            left, 
+            right, 
+            animationDelay: delay,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            ['--twinkle-duration' as any]: duration
+          }}
+        />
+      );
+    });
+  };
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 animate-fade-in relative">
       <div className="text-center mb-12">
@@ -30,13 +58,21 @@ export default function VideoGallery({ videos, onPlayVideo, onCloseVideo }: Vide
           {videos.map((video) => (
             <div 
               key={video.id} 
-              className="bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 group cursor-pointer flex flex-col"
+              className="relative p-[5px] white-glitter-border rounded-3xl overflow-hidden shadow-[0_0_20px_rgba(255,255,255,0.4)] hover:shadow-[0_0_35px_rgba(255,255,255,0.8)] hover:-translate-y-1 transition-all duration-500 group cursor-pointer flex flex-col"
               onClick={() => {
                 setActiveVideo(video);
                 onPlayVideo();
               }}
             >
-              {/* Video Thumbnail (Auto preview from first frame) */}
+              {/* Glowing rotating white dragon border light */}
+              <div className="absolute inset-[-50%] bg-[conic-gradient(from_0deg,transparent,transparent,#FFFFFF,#F3F4F6,#E5E7EB,#D1D5DB)] animate-spin-border opacity-80 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-0" />
+              
+              {/* Twinkling stardust sparkles */}
+              {renderSparkles()}
+
+              {/* Inner card mask */}
+              <div className="relative w-full h-full rounded-[20px] overflow-hidden bg-white z-10 flex flex-col flex-1">
+                {/* Video Thumbnail (Auto preview from first frame) */}
               <div className="h-44 sm:h-48 md:h-56 relative bg-black flex items-center justify-center overflow-hidden">
                 <video 
                   src={video.videoUrl.includes('#') ? video.videoUrl : `${video.videoUrl}#t=0.001`} 
@@ -73,6 +109,7 @@ export default function VideoGallery({ videos, onPlayVideo, onCloseVideo }: Vide
                 <p className="text-gray-600 text-sm line-clamp-2 italic flex-1">
                   {video.description || "Không có mô tả."}
                 </p>
+              </div>
               </div>
             </div>
           ))}

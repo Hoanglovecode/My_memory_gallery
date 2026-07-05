@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Heart, Image as ImageIcon, Lock, LogOut, Music, Pause, Film, ArrowLeft, Eye } from 'lucide-react';
+import { Heart, Image as ImageIcon, Lock, LogOut, Music, Pause, ArrowLeft, Eye, Play } from 'lucide-react';
 import type { Photo, View, Video } from './types';
 import Home from './components/Home';
 import Slideshow from './components/Slideshow';
@@ -648,7 +648,7 @@ export default function App() {
                 className="bg-white/40 border border-white/40 shadow-[0_2px_8px_rgba(167,114,125,0.06)] text-theme-dark/90 hover:bg-white/85 hover:border-white/85 hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(229,115,115,0.15)] active:translate-y-0 active:shadow-sm px-3 py-1.5 md:px-4 md:py-2 rounded-full transition-all duration-300 flex items-center gap-1 sm:gap-1.5 cursor-pointer"
                 title="Video kỷ niệm"
               >
-                <Film size={17} className="md:w-[19px] md:h-[19px] text-[#E57373]" />
+                <Play size={17} className="md:w-[19px] md:h-[19px] text-[#E57373] fill-current" />
                 <span className="animate-gradient-text">Video</span>
               </button>
 
