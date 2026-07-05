@@ -634,55 +634,43 @@ export default function App() {
                 <span className="leading-none">Memories</span>
               </div>
             </div>
-            <div className="flex gap-1 md:gap-4 text-sm md:text-base font-medium items-center">
+            <div className="flex gap-1 md:gap-3 text-xs md:text-sm font-semibold items-center">
               <button
                 onClick={() => navigate('slideshow')}
-                className="hover:text-[#8A5B66] hover:bg-white/40 px-3.5 py-2 rounded-full transition-all duration-300 flex items-center gap-1.5 hidden md:flex cursor-pointer"
+                className="hover:text-[#8A5B66] hover:bg-white/40 px-2.5 py-1.5 md:px-3.5 md:py-2 rounded-full transition-all duration-300 flex items-center gap-1 cursor-pointer text-theme-dark"
+                title="Ảnh kỷ niệm"
               >
-                <ImageIcon size={18} /> Bật Slideshow
+                <ImageIcon size={16} className="md:w-[18px] md:h-[18px]" />
+                <span>Ảnh</span>
               </button>
               <button
                 onClick={() => navigate('videos')}
-                className="hover:text-[#8A5B66] hover:bg-white/40 px-3.5 py-2 rounded-full transition-all duration-300 flex items-center gap-1.5 hidden md:flex cursor-pointer"
-              >
-                <Film size={18} /> Video kỷ niệm
-              </button>
-
-              {/* Mobile Nav Icons */}
-              <button
-                onClick={() => navigate('slideshow')}
-                className="md:hidden hover:text-theme-accent2 p-1.5 rounded-full hover:bg-white/40 transition-colors cursor-pointer"
-                title="Slideshow"
-              >
-                <ImageIcon size={18} />
-              </button>
-              <button
-                onClick={() => navigate('videos')}
-                className="md:hidden hover:text-theme-accent2 p-1.5 rounded-full hover:bg-white/40 transition-colors cursor-pointer"
+                className="hover:text-[#8A5B66] hover:bg-white/40 px-2.5 py-1.5 md:px-3.5 md:py-2 rounded-full transition-all duration-300 flex items-center gap-1 cursor-pointer text-theme-dark"
                 title="Video kỷ niệm"
               >
-                <Film size={18} />
+                <Film size={16} className="md:w-[18px] md:h-[18px]" />
+                <span>Video</span>
               </button>
 
-              <div className="w-[1px] h-6 bg-theme-dark/20 mx-1 hidden md:block"></div>
+              <div className="w-[1px] h-4 bg-theme-dark/20 mx-0.5 md:mx-1"></div>
 
               {isAdmin ? (
                 <button
                   onClick={() => { setIsAdmin(false); localStorage.removeItem('admin_token'); localStorage.removeItem('admin_username'); navigate('home'); }}
-                  className="text-rose-400 hover:text-rose-600 p-1.5 md:px-3.5 md:py-2 rounded-full hover:bg-white/40 transition-all flex items-center gap-1.5 cursor-pointer"
+                  className="text-rose-500 hover:text-rose-700 px-2.5 py-1.5 md:px-3.5 md:py-2 rounded-full hover:bg-white/40 transition-all flex items-center gap-1 cursor-pointer"
                   title="Đăng xuất"
                 >
-                  <LogOut size={18} />
-                  <span className="hidden md:inline">Đăng xuất</span>
+                  <LogOut size={16} className="md:w-[18px] md:h-[18px]" />
+                  <span>Thoát</span>
                 </button>
               ) : (
                 <button
                   onClick={() => navigate('login')}
-                  className="hover:text-theme-accent2 p-1.5 md:px-3.5 md:py-2 rounded-full hover:bg-white/40 transition-all flex items-center gap-1.5 cursor-pointer"
+                  className="hover:text-theme-accent2 px-2.5 py-1.5 md:px-3.5 md:py-2 rounded-full hover:bg-white/40 transition-all flex items-center gap-1 cursor-pointer"
                   title="Quản trị"
                 >
-                  <Lock size={18} />
-                  <span className="hidden md:inline">Quản trị</span>
+                  <Lock size={16} className="md:w-[18px] md:h-[18px]" />
+                  <span>Admin</span>
                 </button>
               )}
             </div>
