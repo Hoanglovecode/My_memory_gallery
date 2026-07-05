@@ -136,6 +136,23 @@ export default function ChatbotWidget({ chatbotName, chatbotWelcomeMessage, onMi
       rec.onerror = (event: any) => {
         console.error('[STT] error:', event.error);
         setIsListening(false);
+        
+        // Cảnh báo người dùng nếu lỗi do quyền truy cập hoặc không có tiếng
+        let errorMsg = "";
+        if (event.error === 'not-allowed' || event.error === 'permission-denied') {
+          errorMsg = "⚠️ Bạn chưa cấp quyền Micro! Vui lòng cho phép trình duyệt sử dụng Micro để tôi có thể nghe bạn nói nhé.";
+        } else if (event.error === 'no-speech') {
+          errorMsg = "⚠️ Tôi chưa nghe được âm thanh nào. Bạn hãy kiểm tra lại Micro và nói to hơn chút nha.";
+        } else {
+          errorMsg = "⚠️ Lỗi nhận diện giọng nói: " + event.error;
+        }
+        
+        // Thêm tin nhắn cảnh báo vào khung chat
+        setMessages(prev => [...prev, {
+          role: 'ai',
+          text: errorMsg,
+          timestamp: new Date()
+        }]);
       };
 
       rec.onend = () => {
