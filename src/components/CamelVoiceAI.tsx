@@ -248,7 +248,7 @@ export default function CamelVoiceAI({ onSpeakStateChange, chatbotWelcomeMessage
 
   // ── UI ───────────────────────────────────────────────────────────────────
   return (
-    <div className="fixed right-4 sm:right-10 top-1/2 -translate-y-1/2 z-50 flex flex-col items-center gap-4">
+    <div className="fixed left-4 sm:left-10 top-1/2 -translate-y-1/2 z-50 flex flex-col items-center gap-4">
       <motion.button
         onClick={toggleListening}
         whileHover={{ scale: isSpeechSupported ? 1.1 : 1 }}
@@ -274,9 +274,9 @@ export default function CamelVoiceAI({ onSpeakStateChange, chatbotWelcomeMessage
 
       {(isListening || isProcessing || isSpeaking || userTranscript || aiReply) && (
         <motion.div
-          initial={{ opacity: 0, x: 20, scale: 0.95 }}
+          initial={{ opacity: 0, x: -20, scale: 0.95 }}
           animate={{ opacity: 1, x: 0, scale: 1 }}
-          className="absolute right-full mr-4 top-1/2 -translate-y-1/2 w-64 sm:w-80 p-4 rounded-3xl bg-black/80 text-white backdrop-blur-xl border border-white/10 shadow-2xl flex flex-col gap-3 pointer-events-auto"
+          className="absolute left-full ml-4 top-1/2 -translate-y-1/2 w-64 sm:w-80 p-4 rounded-3xl bg-black/80 text-white backdrop-blur-xl border border-white/10 shadow-2xl flex flex-col gap-3 pointer-events-auto"
         >
           <div className="flex items-center gap-2 pb-2 border-b border-white/10">
             <span className={`w-2.5 h-2.5 rounded-full ${
