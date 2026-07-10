@@ -2,6 +2,18 @@ const express = require('express');
 const router = express.Router();
 const Settings = require('../models/Settings');
 const auth = require('../middleware/auth');
+const { saveBase64File } = require('../utils/fileUpload');
+
+// Helper to format settings properties and resolve static URLs dynamically
+const formatSettingsUrl = (settings, req) => {
+  const s = settings.toObject ? settings.toObject() : { ...settings };
+  if (s.musicUrl && s.musicUrl.startsWith('/uploads/')) {
+    const host = req.get('host');
+    const protocol = host.includes('localhost') ? 'http' : 'https';
+    s.musicUrl = `${protocol}://${host}${s.musicUrl}`;
+  }
+  return s;
+};
 
 // @route   GET api/settings
 // @desc    Get application settings
@@ -19,8 +31,8 @@ router.get('/', async (req, res) => {
     }
     
     // Mask the chatbot API Key before sending to frontend
-    const settingsObj = settings.toObject();
-    settingsObj.chatbotApiKey = settings.chatbotApiKey ? '********' : '';
+    const settingsObj = formatSettingsUrl(settings, req);
+    settingsObj.chatbotApiKey = settingsObj.chatbotApiKey ? '********' : '';
     
     res.json(settingsObj);
   } catch (err) {
@@ -51,9 +63,12 @@ router.put('/', auth, async (req, res) => {
 
   try {
     let settings = await Settings.findOne();
+    
+    // Save base64 music to file if new one is provided
+    const savedMusicUrl = musicUrl ? await saveBase64File(musicUrl, 'music') : undefined;
+
     if (!settings) {
       const initSettings = { 
-        musicUrl, 
         musicTitle, 
         chatbotEnabled, 
         chatbotName, 
@@ -66,12 +81,13 @@ router.put('/', auth, async (req, res) => {
         creatorTiktok,
         creatorInstagram
       };
+      if (savedMusicUrl !== undefined) initSettings.musicUrl = savedMusicUrl;
       if (chatbotApiKey && chatbotApiKey !== '********') {
         initSettings.chatbotApiKey = chatbotApiKey;
       }
       settings = new Settings(initSettings);
     } else {
-      if (musicUrl !== undefined) settings.musicUrl = musicUrl;
+      if (savedMusicUrl !== undefined) settings.musicUrl = savedMusicUrl;
       if (musicTitle !== undefined) settings.musicTitle = musicTitle;
       if (chatbotEnabled !== undefined) settings.chatbotEnabled = chatbotEnabled;
       if (chatbotName !== undefined) settings.chatbotName = chatbotName;
@@ -92,8 +108,8 @@ router.put('/', auth, async (req, res) => {
 
     await settings.save();
     
-    const settingsObj = settings.toObject();
-    settingsObj.chatbotApiKey = settings.chatbotApiKey ? '********' : '';
+    const settingsObj = formatSettingsUrl(settings, req);
+    settingsObj.chatbotApiKey = settingsObj.chatbotApiKey ? '********' : '';
     
     res.json(settingsObj);
   } catch (err) {
