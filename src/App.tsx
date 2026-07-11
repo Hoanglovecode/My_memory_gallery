@@ -110,11 +110,41 @@ export default function App() {
   useEffect(() => {
     async function loadData() {
       try {
-        // Fetch all resources in parallel to optimize loading times
-        const [photosRes, videosRes, settingsRes] = await Promise.all([
+        // Fetch settings immediately and independently to speed up music loading
+        fetch(`${API_BASE_URL}/settings`).then(async (settingsRes) => {
+          if (settingsRes.ok) {
+            const settingsData = await settingsRes.json();
+            if (settingsData.musicUrl) setMusicUrl(settingsData.musicUrl);
+            if (settingsData.musicTitle) setMusicTitle(settingsData.musicTitle);
+            if (settingsData.chatbotEnabled !== undefined) setChatbotEnabled(settingsData.chatbotEnabled);
+            if (settingsData.chatbotName) setChatbotName(settingsData.chatbotName);
+            if (settingsData.chatbotWelcomeMessage) setChatbotWelcomeMessage(settingsData.chatbotWelcomeMessage);
+            if (settingsData.chatbotSystemPrompt) setChatbotSystemPrompt(settingsData.chatbotSystemPrompt);
+            if (settingsData.chatbotApiKey) setChatbotApiKey(settingsData.chatbotApiKey);
+            if (settingsData.creatorFacebook) setCreatorFacebook(settingsData.creatorFacebook);
+            if (settingsData.creatorLinkedin) setCreatorLinkedin(settingsData.creatorLinkedin);
+            if (settingsData.creatorYoutube) setCreatorYoutube(settingsData.creatorYoutube);
+            if (settingsData.creatorGithub) setCreatorGithub(settingsData.creatorGithub);
+            if (settingsData.creatorTiktok) setCreatorTiktok(settingsData.creatorTiktok);
+            if (settingsData.creatorInstagram) setCreatorInstagram(settingsData.creatorInstagram);
+
+            // Create settings copy without large base64 audio data for local storage caching
+            const settingsToCache = { ...settingsData } as Record<string, any>;
+            if (settingsToCache.musicUrl && settingsToCache.musicUrl.startsWith('data:')) {
+              delete settingsToCache.musicUrl;
+            }
+            try {
+              localStorage.setItem('cached_settings', JSON.stringify(settingsToCache));
+            } catch (e) {
+              console.warn("Failed to cache settings in localStorage:", e);
+            }
+          }
+        }).catch(err => console.error("Failed to load settings:", err));
+
+        // Fetch other resources in parallel
+        const [photosRes, videosRes] = await Promise.all([
           fetch(`${API_BASE_URL}/photos`),
-          fetch(`${API_BASE_URL}/videos`),
-          fetch(`${API_BASE_URL}/settings`)
+          fetch(`${API_BASE_URL}/videos`)
         ]);
 
         // 1. Process photos
@@ -150,38 +180,6 @@ export default function App() {
           }));
           setVideos(mappedVideos);
           localStorage.setItem('cached_videos', JSON.stringify(mappedVideos));
-        }
-
-
-
-        // 3.5. Process music and chatbot settings
-        if (settingsRes.ok) {
-          const settingsData = await settingsRes.json();
-          if (settingsData.musicUrl) setMusicUrl(settingsData.musicUrl);
-          if (settingsData.musicTitle) setMusicTitle(settingsData.musicTitle);
-          if (settingsData.chatbotEnabled !== undefined) setChatbotEnabled(settingsData.chatbotEnabled);
-          if (settingsData.chatbotName) setChatbotName(settingsData.chatbotName);
-          if (settingsData.chatbotWelcomeMessage) setChatbotWelcomeMessage(settingsData.chatbotWelcomeMessage);
-          if (settingsData.chatbotSystemPrompt) setChatbotSystemPrompt(settingsData.chatbotSystemPrompt);
-          if (settingsData.chatbotApiKey) setChatbotApiKey(settingsData.chatbotApiKey);
-          if (settingsData.creatorFacebook) setCreatorFacebook(settingsData.creatorFacebook);
-          if (settingsData.creatorLinkedin) setCreatorLinkedin(settingsData.creatorLinkedin);
-          if (settingsData.creatorYoutube) setCreatorYoutube(settingsData.creatorYoutube);
-          if (settingsData.creatorGithub) setCreatorGithub(settingsData.creatorGithub);
-          if (settingsData.creatorTiktok) setCreatorTiktok(settingsData.creatorTiktok);
-          if (settingsData.creatorInstagram) setCreatorInstagram(settingsData.creatorInstagram);
-
-          // Create settings copy without large base64 audio data for local storage caching to prevent QuotaExceededError
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const settingsToCache = { ...settingsData } as Record<string, any>;
-          if (settingsToCache.musicUrl && settingsToCache.musicUrl.startsWith('data:')) {
-            delete settingsToCache.musicUrl;
-          }
-          try {
-            localStorage.setItem('cached_settings', JSON.stringify(settingsToCache));
-          } catch (e) {
-            console.warn("Failed to cache settings in localStorage:", e);
-          }
         }
 
         // 4. Check auth status
