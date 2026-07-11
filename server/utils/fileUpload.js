@@ -60,7 +60,11 @@ async function saveBase64File(base64Data, prefix = 'file') {
     const base64Str = matches[2];
     const buffer = Buffer.from(base64Str, 'base64');
 
-    const extension = mimeType.split('/')[1] || 'bin';
+    let extension = mimeType.split('/')[1] || 'bin';
+    if (mimeType === 'audio/mpeg' || extension === 'mpeg') {
+      extension = 'mp3';
+    }
+
     const filename = `${prefix}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${extension}`;
     
     const uploadDir = path.join(__dirname, '../uploads');
