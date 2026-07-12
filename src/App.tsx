@@ -461,7 +461,7 @@ export default function App() {
   return (
     <>
       {/* Persistent Background Music */}
-      <audio ref={audioRef} loop src={musicUrl} />
+      <audio ref={audioRef} loop src={musicUrl} preload="auto" />
 
       {isLoading && currentView !== 'fantasy' && (
         <div className="fixed inset-0 bg-theme-main flex flex-col items-center justify-center z-[9999]">

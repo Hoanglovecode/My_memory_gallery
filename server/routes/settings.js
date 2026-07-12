@@ -8,8 +8,17 @@ const { saveBase64File } = require('../utils/fileUpload');
 const formatSettingsUrl = (settings, req) => {
   const s = settings.toObject ? settings.toObject() : { ...settings };
   if (s.musicUrl && s.musicUrl.startsWith('/uploads/')) {
-    const host = req.get('host');
-    const protocol = host.includes('localhost') ? 'http' : 'https';
+    const host = req.get('host') || '';
+    let protocol = req.headers['x-forwarded-proto'] || req.protocol;
+    
+    // Force HTTP for local network IP addresses to fix mobile device access
+    if (host.includes('localhost') || host.match(/^(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|127\.)/)) {
+      protocol = 'http';
+    } else if (!req.headers['x-forwarded-proto']) {
+      // For external domains without proxy headers, assume HTTPS in production
+      protocol = 'https';
+    }
+
     s.musicUrl = `${protocol}://${host}${s.musicUrl}`;
   }
   return s;
