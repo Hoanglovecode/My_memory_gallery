@@ -106,6 +106,20 @@ export default function App() {
     }
   });
 
+  const needsWelcome = currentView !== 'admin' && currentView !== 'login';
+  const [hasEntered, setHasEntered] = useState(!needsWelcome);
+
+  const handleEnterSite = () => {
+    setHasEntered(true);
+    if (audioRef.current) {
+      audioRef.current.play().then(() => {
+        setIsPlayingMusic(true);
+      }).catch(err => {
+        console.log("Failed to play on enter:", err);
+      });
+    }
+  };
+
   // Load from Backend API on mount
   useEffect(() => {
     async function loadData() {
@@ -463,12 +477,26 @@ export default function App() {
       {/* Persistent Background Music */}
       <audio ref={audioRef} loop src={musicUrl} preload="auto" />
 
-      {isLoading && currentView !== 'fantasy' && (
+      {/* Welcome Screen Overlay */}
+      {(!hasEntered && needsWelcome) ? (
+        <div className="fixed inset-0 bg-theme-main flex flex-col items-center justify-center z-[10000] transition-opacity duration-1000 bg-[url('/assets/bg-pattern.svg')] bg-cover bg-center">
+          <Heart className="text-theme-accent2 fill-current animate-pulse mb-6 text-[#F2BED1]" size={80} />
+          <h1 className="text-4xl md:text-5xl font-serif text-theme-dark mb-4 text-center px-4 font-bold drop-shadow-sm">Chào mừng bạn!</h1>
+          <p className="text-lg font-sans text-theme-dark/80 mb-10 text-center px-4 max-w-md">Hãy cùng mở ra cuốn sổ kỷ niệm đong đầy yêu thương và những khoảnh khắc tuyệt đẹp nhé.</p>
+          <button 
+            onClick={handleEnterSite}
+            className="px-8 py-4 bg-theme-accent2 hover:bg-theme-accent1 text-white rounded-full font-bold text-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-3 animate-bounce cursor-pointer"
+          >
+            <Play size={24} fill="currentColor" />
+            Bắt đầu khám phá
+          </button>
+        </div>
+      ) : (isLoading && currentView !== 'fantasy' && (
         <div className="fixed inset-0 bg-theme-main flex flex-col items-center justify-center z-[9999]">
           <Heart className="text-theme-accent2 fill-current animate-pulse mb-4 text-[#F2BED1]" size={80} />
           <p className="text-xl font-serif italic text-theme-dark animate-bounce">Đang tải những kỷ niệm tuyệt vời...</p>
         </div>
-      )}
+      ))}
 
       {/* Visitor Stats Toast Notification */}
       {showVisitorNotification && todayUnique > 0 && (
