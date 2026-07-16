@@ -481,8 +481,7 @@ export default function App() {
       {(!hasEntered && needsWelcome) ? (
         <div className="fixed inset-0 bg-theme-main flex flex-col items-center justify-center z-[10000] transition-opacity duration-1000 bg-[url('/assets/bg-pattern.svg')] bg-cover bg-center">
           <Heart className="text-theme-accent2 fill-current animate-pulse mb-6 text-[#F2BED1]" size={80} />
-          <h1 className="text-4xl md:text-5xl font-serif text-theme-dark mb-4 text-center px-4 font-bold drop-shadow-sm">Chào mừng bạn!</h1>
-          <p className="text-lg font-sans text-theme-dark/80 mb-10 text-center px-4 max-w-md">Hãy cùng mở ra cuốn sổ kỷ niệm đong đầy yêu thương và những khoảnh khắc tuyệt đẹp nhé.</p>
+          <h1 className="text-4xl md:text-5xl font-serif text-theme-dark mb-10 text-center px-4 font-bold drop-shadow-sm">Chào mừng bạn!</h1>
           <button 
             onClick={handleEnterSite}
             className="px-8 py-4 bg-theme-accent2 hover:bg-theme-accent1 text-white rounded-full font-bold text-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-3 animate-bounce cursor-pointer"
