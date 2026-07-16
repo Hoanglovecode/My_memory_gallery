@@ -44,7 +44,7 @@ export default function Home({ navigate, photos }: HomeProps) {
       return (
         <div
           key={`sparkle-${i}`}
-          className={`absolute ${size} rounded-full bg-white shadow-[0_0_8px_#FFD700,0_0_3px_#FFF] animate-twinkle pointer-events-none z-[12]`}
+          className={`absolute ${size} rounded-full bg-white shadow-[0_0_8px_#F06292,0_0_3px_#FFF] animate-twinkle pointer-events-none z-[12]`}
           style={{ 
             top, 
             bottom, 
@@ -83,13 +83,13 @@ export default function Home({ navigate, photos }: HomeProps) {
                       e.stopPropagation(); // Ngăn sự kiện click lan ra container cha
                       setSelectedPhoto(photo);
                     }}
-                    className="carousel-item-compact p-[8px] gold-glitter-border shadow-[0_0_25px_rgba(255,215,0,0.4)] group-hover:opacity-40 group-hover:blur-[2px] hover:!opacity-100 hover:!blur-none hover:scale-115 hover:z-50 hover:shadow-[0_0_40px_rgba(255,215,0,0.75)] transition-all duration-500 cursor-pointer group"
+                    className="carousel-item-compact p-[8px] pink-glitter-border shadow-[0_0_25px_rgba(236,64,122,0.4)] group-hover:opacity-40 group-hover:blur-[2px] hover:!opacity-100 hover:!blur-none hover:scale-115 hover:z-50 hover:shadow-[0_0_40px_rgba(236,64,122,0.75)] transition-all duration-500 cursor-pointer group"
                     style={{
                       transform: `rotateY(${index * theta1}deg) translateZ(${radius1}px)`
                     }}
                   >
-                    {/* Glowing rotating golden dragon border light */}
-                    <div className="absolute inset-[-50%] bg-[conic-gradient(from_0deg,transparent,transparent,#FFF9C4,#FFEB3B,#FFC107,#FF9800)] animate-spin-border opacity-90 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-0" />
+                    {/* Glowing rotating pink border light */}
+                    <div className="absolute inset-[-50%] bg-[conic-gradient(from_0deg,transparent,transparent,#FCE4EC,#F48FB1,#EC407A,#D81B60)] animate-spin-border opacity-90 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-0" />
                     
                     {/* Twinkling stardust sparkles */}
                     {renderSparkles()}
@@ -129,13 +129,13 @@ export default function Home({ navigate, photos }: HomeProps) {
                       e.stopPropagation(); // Ngăn sự kiện click lan ra container cha
                       setSelectedPhoto(photo);
                     }}
-                    className="carousel-item-compact p-[8px] gold-glitter-border shadow-[0_0_25px_rgba(255,215,0,0.4)] group-hover:opacity-40 group-hover:blur-[2px] hover:!opacity-100 hover:!blur-none hover:scale-115 hover:z-50 hover:shadow-[0_0_40px_rgba(255,215,0,0.75)] transition-all duration-500 cursor-pointer group"
+                    className="carousel-item-compact p-[8px] pink-glitter-border shadow-[0_0_25px_rgba(236,64,122,0.4)] group-hover:opacity-40 group-hover:blur-[2px] hover:!opacity-100 hover:!blur-none hover:scale-115 hover:z-50 hover:shadow-[0_0_40px_rgba(236,64,122,0.75)] transition-all duration-500 cursor-pointer group"
                     style={{
                       transform: `rotateY(${index * theta2}deg) translateZ(${radius2}px)`
                     }}
                   >
-                    {/* Glowing rotating golden dragon border light */}
-                    <div className="absolute inset-[-50%] bg-[conic-gradient(from_0deg,transparent,transparent,#FFF9C4,#FFEB3B,#FFC107,#FF9800)] animate-spin-border opacity-90 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-0" />
+                    {/* Glowing rotating pink border light */}
+                    <div className="absolute inset-[-50%] bg-[conic-gradient(from_0deg,transparent,transparent,#FCE4EC,#F48FB1,#EC407A,#D81B60)] animate-spin-border opacity-90 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-0" />
                     
                     {/* Twinkling stardust sparkles */}
                     {renderSparkles()}

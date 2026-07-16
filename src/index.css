@@ -197,18 +197,18 @@
   animation: twinkle var(--twinkle-duration, 2s) ease-in-out infinite;
 }
 
-.gold-glitter-border {
-  background: linear-gradient(135deg, #FFD700, #FFB300, #FFE082, #FF8F00, #FFD700);
+.pink-glitter-border {
+  background: linear-gradient(135deg, #F06292, #EC407A, #F8BBD0, #D81B60, #F06292);
 }
 
-.gold-glitter-border::after {
+.pink-glitter-border::after {
   content: '';
   position: absolute;
   inset: 0;
   background-image: 
     radial-gradient(circle, #ffffff 1px, transparent 1px),
-    radial-gradient(circle, #FFF59D 1.5px, transparent 1.5px),
-    radial-gradient(circle, #FFE082 1px, transparent 1px);
+    radial-gradient(circle, #FCE4EC 1.5px, transparent 1.5px),
+    radial-gradient(circle, #F8BBD0 1px, transparent 1px);
   background-size: 9px 9px, 13px 13px, 17px 17px;
   background-position: 0 0, 4px 4px, 6px 6px;
   opacity: 0.75;
